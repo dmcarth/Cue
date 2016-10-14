@@ -10,8 +10,7 @@ import Foundation
 
 public class CueLexer {
 	
-	public static func lex(contentsOf string: String) -> [CueLexerToken] {
-		var queue = [UInt16](string.utf16)
+	public static func lex(bytes: [UInt16]) -> [CueLexerToken] {
 		var tokens = [CueLexerToken]()
 		
 		var index = 0
@@ -23,8 +22,8 @@ public class CueLexer {
 		var buffer = [UInt16]()
 		//buffer.reserveCapacity(100)
 		
-		while index < queue.count {
-			let c = queue[index]
+		while index < bytes.count {
+			let c = bytes[index]
 			
 			// newlines
 			if c == 0x000a || c == 0x000d { // '\n', '\r'
@@ -46,8 +45,8 @@ public class CueLexer {
 			if beginningOfLine {
 				beginningOfLine = false
 				
-				let maxPrefix = min(index+24, queue.endIndex)
-				let prefix = queue[index..<maxPrefix]
+				let maxPrefix = min(index+24, bytes.endIndex)
+				let prefix = bytes[index..<maxPrefix]
 				
 				if canParseScene(fromBytes: prefix, startingAtIndex: index) {
 					blockType = .scene

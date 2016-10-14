@@ -17,8 +17,10 @@ public class Cue {
 		self.text = [UInt16](string.utf16)
 	}
 	
-	public func lex() {
-		
+	public func parsedDocument() -> CueNode {
+		let tokens = CueLexer.lex(bytes: text)
+		let tree = CueParser.ast(fromTokens: tokens)
+		return tree
 	}
 	
 }
