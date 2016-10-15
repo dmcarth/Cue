@@ -10,7 +10,19 @@ import Foundation
 
 public struct CueLexerToken: CustomStringConvertible {
 	
-	public var type: CueNodeType
+	enum TokenType {
+		case scene(String)
+		case newline
+		case blockComment
+		case cue(String)
+		case lyricTilde
+		case colon
+		case openAsterisk
+		case closeAsterisk
+		case other
+	}
+	
+	public var type: TokenType
 	public var text: [UInt16]
 	public var location: Int
 	public var length: Int
