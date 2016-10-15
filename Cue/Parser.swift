@@ -8,9 +8,9 @@
 
 import Foundation
 
-public class CueParser {
+class CueParser {
 	
-	public func ast(fromTokens tokens: [CueLexerToken]) -> CueNode {
+	func ast(fromTokens tokens: [CueLexerToken]) -> CueNode {
 		let tree = CueNode(type: .document, location: 0, length: 0)
 		
 		for t in tokens {

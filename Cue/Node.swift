@@ -37,6 +37,10 @@ public class CueNode: CustomStringConvertible {
 		children.append(node)
 	}
 	
+	func addChildren(nodes: [CueNode]) {
+		children.append(contentsOf: nodes)
+	}
+	
 	func addMarkingRange(range: (Int, Int)) {
 		markingRanges.append(range)
 	}
