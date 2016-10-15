@@ -8,9 +8,9 @@
 
 import Foundation
 
-public class CueLexer {
+class CueLexer {
 	
-	public static func lex(bytes: [UInt16]) -> [CueLexerToken] {
+	func lex(bytes: [UInt16]) -> [CueLexerToken] {
 		var tokens = [CueLexerToken]()
 		
 		var index = 0
@@ -78,7 +78,7 @@ public class CueLexer {
 		return tokens
 	}
 	
-	private static func canParseScene(fromBytes col: ArraySlice<UInt16>, startingAtIndex i: Int) -> Bool {
+	private func canParseScene(fromBytes col: ArraySlice<UInt16>, startingAtIndex i: Int) -> Bool {
 		if col.endIndex < i+6 {
 			return false
 		}
@@ -88,7 +88,7 @@ public class CueLexer {
 		return false
 	}
 	
-	private static func canParseComment(fromBytes col: ArraySlice<UInt16>, startingAtIndex i: Int) -> Bool {
+	private func canParseComment(fromBytes col: ArraySlice<UInt16>, startingAtIndex i: Int) -> Bool {
 		if col.endIndex < i+2 {
 			return false
 		}
@@ -98,7 +98,7 @@ public class CueLexer {
 		return false
 	}
 	
-	private static func cueName(fromBytes col: ArraySlice<UInt16>, startingAtIndex i: Int) -> String? {
+	private func cueName(fromBytes col: ArraySlice<UInt16>, startingAtIndex i: Int) -> String? {
 		var ind = i
 		while ind < col.endIndex {
 			let c = col[ind]

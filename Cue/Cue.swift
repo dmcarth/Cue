@@ -10,16 +10,20 @@ import Foundation
 
 public class Cue {
 	
-	var text: [UInt16]
+	var parser = CueParser()
 	
-	init(withString string: String) {
-		//	here would be a good time to do any preprocessing
-		self.text = [UInt16](string.utf16)
+	var lexer = CueLexer()
+	
+	public func parse(_ string: String) -> CueNode {
+		// Now would be a good time to do any preprocessing
+		let bytes = [UInt16](string.utf16)
+		
+		return parse(bytes)
 	}
 	
-	public func parsedDocument() -> CueNode {
-		let tokens = CueLexer.lex(bytes: text)
-		let tree = CueParser.ast(fromTokens: tokens)
+	public func parse(_ bytes: [UInt16]) -> CueNode {
+		let tokens = lexer.lex(bytes: bytes)
+		let tree = parser.ast(fromTokens: tokens)
 		return tree
 	}
 	

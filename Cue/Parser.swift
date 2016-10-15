@@ -10,7 +10,7 @@ import Foundation
 
 public class CueParser {
 	
-	public static func ast(fromTokens tokens: [CueLexerToken]) -> CueNode {
+	public func ast(fromTokens tokens: [CueLexerToken]) -> CueNode {
 		let tree = CueNode(type: .document, location: 0, length: 0)
 		
 		for t in tokens {
@@ -50,7 +50,7 @@ public class CueParser {
 		return tree
 	}
 	
-	private static func parseItalics(fromBytes col: Array<UInt16>, startingAtIndex i: Int) -> (Int, Int)?  {
+	private func parseItalics(fromBytes col: Array<UInt16>, startingAtIndex i: Int) -> (Int, Int)?  {
 		guard col.count > 2 && col[i] == 0x002a else {
 			return nil
 		}

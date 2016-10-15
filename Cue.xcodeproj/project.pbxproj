@@ -91,11 +91,11 @@
 				10BEDB521DB1829500C283AB /* UIPlayground.playground */,
 				10B043041DACD876001D6AC7 /* MyPlayground.playground */,
 				10B042ED1DACD868001D6AC7 /* Cue.h */,
-				10536C5D1DAF9BBE00CDF901 /* Lexer.swift */,
 				1083265D1DB1600C00AD8646 /* Cue.swift */,
-				10536C5F1DAF9BCB00CDF901 /* Token.swift */,
+				10536C5D1DAF9BBE00CDF901 /* Lexer.swift */,
 				10722A081DAFF225003DB282 /* Node.swift */,
 				10722A0A1DAFF26B003DB282 /* Parser.swift */,
+				10536C5F1DAF9BCB00CDF901 /* Token.swift */,
 				10B042EE1DACD868001D6AC7 /* Info.plist */,
 			);
 			path = Cue;

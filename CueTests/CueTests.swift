@@ -10,7 +10,7 @@ import XCTest
 @testable import Cue
 
 class CueTests: XCTestCase {
-    
+	
     override func setUp() {
         super.setUp()
 		
@@ -42,10 +42,10 @@ class CueTests: XCTestCase {
     func testPerformanceExample() {
 		let fileURL = Bundle(for: CueTests.self).url(forResource: "war+peace", withExtension: "txt")!
 		let str = try! String(contentsOf: fileURL)
-		let parser = Cue(withString: str)
+		let parser = Cue()
 		
         self.measure {
-			let tree = parser.parsedDocument()
+			let tree = parser.parse(str)
         }
     }
     

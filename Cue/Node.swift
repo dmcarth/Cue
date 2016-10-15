@@ -44,7 +44,7 @@ public class CueNode: CustomStringConvertible {
 	// MARK: Iterative Functions (FOR EXISTING TREES ONLY)
 	
 	// Binary search on first level of children
-	func search(index: Int) -> Int? {
+	public func search(index: Int) -> Int? {
 		var lower = 0
 		var upper = children.count
 		
