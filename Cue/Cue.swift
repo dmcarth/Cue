@@ -14,6 +14,8 @@ public class Cue {
 	
 	var lexer = CueLexer()
 	
+	public init() {}
+	
 	public func parse(_ string: String) -> CueNode {
 		// Now would be a good time to do any preprocessing
 		let bytes = [UInt16](string.utf16)
