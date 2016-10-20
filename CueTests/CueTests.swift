@@ -42,10 +42,11 @@ class CueTests: XCTestCase {
     func testPerformanceExample() {
 		let fileURL = Bundle(for: CueTests.self).url(forResource: "war+peace", withExtension: "txt")!
 		let str = try! String(contentsOf: fileURL)
-		let parser = Cue()
+		let bytes = [UInt8](str.utf8)
+		let parser = CueDown()
 		
         self.measure {
-			let tree = parser.parse(str)
+			let ast = parser.parse(document: bytes)
         }
     }
     

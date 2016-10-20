@@ -8,11 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		10536C5C1DAF99CA00CDF901 /* war+peace.txt in Resources */ = {isa = PBXBuildFile; fileRef = 10536C5B1DAF99CA00CDF901 /* war+peace.txt */; };
-		10536C5E1DAF9BBE00CDF901 /* Lexer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10536C5D1DAF9BBE00CDF901 /* Lexer.swift */; };
-		10536C601DAF9BCB00CDF901 /* Token.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10536C5F1DAF9BCB00CDF901 /* Token.swift */; };
 		10722A091DAFF225003DB282 /* Node.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10722A081DAFF225003DB282 /* Node.swift */; };
 		10722A0B1DAFF26B003DB282 /* Parser.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10722A0A1DAFF26B003DB282 /* Parser.swift */; };
-		1083265E1DB1600C00AD8646 /* Cue.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1083265D1DB1600C00AD8646 /* Cue.swift */; };
+		1083265E1DB1600C00AD8646 /* CueDown.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1083265D1DB1600C00AD8646 /* CueDown.swift */; };
 		10B042F41DACD869001D6AC7 /* Cue.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10B042EA1DACD868001D6AC7 /* Cue.framework */; };
 		10B042F91DACD869001D6AC7 /* CueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B042F81DACD869001D6AC7 /* CueTests.swift */; };
 		10B042FB1DACD869001D6AC7 /* Cue.h in Headers */ = {isa = PBXBuildFile; fileRef = 10B042ED1DACD868001D6AC7 /* Cue.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -31,11 +29,9 @@
 
 /* Begin PBXFileReference section */
 		10536C5B1DAF99CA00CDF901 /* war+peace.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "war+peace.txt"; sourceTree = "<group>"; };
-		10536C5D1DAF9BBE00CDF901 /* Lexer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Lexer.swift; sourceTree = "<group>"; };
-		10536C5F1DAF9BCB00CDF901 /* Token.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Token.swift; sourceTree = "<group>"; };
 		10722A081DAFF225003DB282 /* Node.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Node.swift; sourceTree = "<group>"; };
 		10722A0A1DAFF26B003DB282 /* Parser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Parser.swift; sourceTree = "<group>"; };
-		1083265D1DB1600C00AD8646 /* Cue.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Cue.swift; sourceTree = "<group>"; };
+		1083265D1DB1600C00AD8646 /* CueDown.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CueDown.swift; sourceTree = "<group>"; };
 		10B042EA1DACD868001D6AC7 /* Cue.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Cue.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		10B042ED1DACD868001D6AC7 /* Cue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Cue.h; sourceTree = "<group>"; };
 		10B042EE1DACD868001D6AC7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -45,6 +41,7 @@
 		10B043041DACD876001D6AC7 /* MyPlayground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; name = MyPlayground.playground; path = ../MyPlayground.playground; sourceTree = "<group>"; };
 		10BEDB501DB1825900C283AB /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		10BEDB521DB1829500C283AB /* UIPlayground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = UIPlayground.playground; sourceTree = "<group>"; };
+		10F8B5161DB5FB2E003362A2 /* Data Structures.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = "Data Structures.playground"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -91,11 +88,10 @@
 				10BEDB521DB1829500C283AB /* UIPlayground.playground */,
 				10B043041DACD876001D6AC7 /* MyPlayground.playground */,
 				10B042ED1DACD868001D6AC7 /* Cue.h */,
-				1083265D1DB1600C00AD8646 /* Cue.swift */,
-				10536C5D1DAF9BBE00CDF901 /* Lexer.swift */,
+				10F8B5161DB5FB2E003362A2 /* Data Structures.playground */,
+				1083265D1DB1600C00AD8646 /* CueDown.swift */,
 				10722A081DAFF225003DB282 /* Node.swift */,
 				10722A0A1DAFF26B003DB282 /* Parser.swift */,
-				10536C5F1DAF9BCB00CDF901 /* Token.swift */,
 				10B042EE1DACD868001D6AC7 /* Info.plist */,
 			);
 			path = Cue;
@@ -227,10 +223,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				10722A0B1DAFF26B003DB282 /* Parser.swift in Sources */,
-				1083265E1DB1600C00AD8646 /* Cue.swift in Sources */,
+				1083265E1DB1600C00AD8646 /* CueDown.swift in Sources */,
 				10722A091DAFF225003DB282 /* Node.swift in Sources */,
-				10536C5E1DAF9BBE00CDF901 /* Lexer.swift in Sources */,
-				10536C601DAF9BCB00CDF901 /* Token.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
