@@ -12,7 +12,7 @@ public class CueDown {
 	
 	public init() {}
 	
-	public func parse(document buffer: [UInt8]) -> Node {
+	public func parse(document buffer: [UInt16]) -> Node {
 		let parser = CueParser()
 		
 		parser.process(buffer)
