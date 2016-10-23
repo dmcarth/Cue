@@ -9,9 +9,13 @@
 open class CueParser {
 	
 	let data: [UInt16]
+	
 	var root = Document()
+	
 	var lineNumber = 0
+	
 	var charNumber = 0
+	
 	var endOfLineCharNumber = 0
 	
 	open class func parse(_ string: String) -> Node {
@@ -20,12 +24,23 @@ open class CueParser {
 	}
 	
 	open class func parse(_ bytes: [UInt16]) -> Node {
-		let parser = CueParser(bytes: bytes)
+		let parser = CueParser(bytes)
 		return parser.parse()
 	}
 	
-	public init(bytes: [UInt16]) {
+	public init(_ bytes: [UInt16]) {
 		data = bytes
+		
+		// useful for debugging
+		endOfLineCharNumber = data.count
+	}
+	
+	public init(_ string: String) {
+		let bytes = [UInt16](string.utf16)
+		data = bytes
+		
+		// useful for debugging
+		endOfLineCharNumber = data.count
 	}
 	
 	open func parse() -> Node {
@@ -312,22 +327,27 @@ extension CueParser {
 // Scanners
 extension CueParser {
 	
-	func scanForLineEnding(atIndex i: Int) -> Bool {
+	public func scanForLineEnding(atIndex i: Int) -> Bool {
 		let c = data[i]
 		
 		return c == 0x000a || c == 0x000d // '\n', '\r'
 	}
 	
-	func scanForFirstNonspace(startingAtIndex i: Int) -> Int {
+	public func scanForWhitespace(atIndex i: Int) -> Bool {
+		let c = data[i]
+		
+		// ' ', '\t', newline
+		return c == 0x0020 || c == 0x0009 || scanForLineEnding(atIndex: i)
+	}
+	
+	public func scanForFirstNonspace(startingAtIndex i: Int) -> Int {
 		var j = i
 		
 		while j < endOfLineCharNumber {
-			let c = data[j]
-			
-			if c == 0x0020 || c == 0x0009 {	// ' ', '\t'
+			if scanForWhitespace(atIndex: j) {
 				j += 1
 			} else {
-				break
+				return j
 			}
 		}
 		
@@ -338,16 +358,17 @@ extension CueParser {
 	/// Returns an array of SearchResults or nil if matching failed.
 	///
 	/// - returns: [0] covers "Act", [1] covers whitespace
-	func scanForActHeading(atIndex i: Int) -> [SearchResult]? {
-		guard endOfLineCharNumber > i + 4 else {
+	public func scanForActHeading(atIndex i: Int) -> [SearchResult]? {
+		guard endOfLineCharNumber > i + 3 else {
 			return nil
 		}
 		
 		if (data[i] == 0x0041 || data[i] == 0x0061) &&
-			data[i+1] == 0x0063 && data[i+2] == 0x0074 {	// 'A'||'a', 'c', 't'
+			(data[i+1] == 0x0063 || data[i+1] == 0x0043) &&
+			(data[i+2] == 0x0074 || data[i+2] == 0x0054) {	// 'A', 'c', 't' case insensitive
 			let wc = scanForFirstNonspace(startingAtIndex: i+3)
 			
-			guard wc > i+4 else { return nil }
+			guard wc > i+3 else { return nil }
 			
 			var results = [SearchResult]()
 			let result1 = SearchResult(startIndex: i, endIndex: i+3)
@@ -363,16 +384,21 @@ extension CueParser {
 	/// Returns an array of SearchResults or nil if matching failed.
 	///
 	/// - returns: [0] covers "Chapter", [1] covers whitespace
-	func scanForChapterHeading(atIndex i: Int) -> [SearchResult]? {
-		guard endOfLineCharNumber > i + 8 else {
+	public func scanForChapterHeading(atIndex i: Int) -> [SearchResult]? {
+		guard endOfLineCharNumber > i + 7 else {
 			return nil
 		}
 		
 		if (data[i] == 0x0043 || data[i] == 0x0063) &&
-			data[i+1] == 0x0068 && data[i+2] == 0x0061 && data[i+3] == 0x0070 && data[i+4] == 0x0074 && data[i+5] == 0x0065 && data[i+6] == 0x0072 {	// 'C'||'c', 'h', 'a', 'p', 't', 'e', 'r'
+			(data[i+1] == 0x0068 || data[i+1] == 0x0048) &&
+			(data[i+2] == 0x0061 || data[i+2] == 0x0041) &&
+			(data[i+3] == 0x0070 || data[i+3] == 0x0050) &&
+			(data[i+4] == 0x0074 || data[i+4] == 0x0054) &&
+			(data[i+5] == 0x0065 || data[i+5] == 0x0045) &&
+			(data[i+6] == 0x0072 || data[i+6] == 0x0052) {	// 'C', 'h', 'a', 'p', 't', 'e', 'r' case insensitive
 			let wc = scanForFirstNonspace(startingAtIndex: i+7)
 			
-			guard wc > i+4 else { return nil }
+			guard wc > i+7 else { return nil }
 			
 			var results = [SearchResult]()
 			let result1 = SearchResult(startIndex: i, endIndex: i+7)
@@ -388,17 +414,20 @@ extension CueParser {
 	/// Returns an array of SearchResults or nil if matching failed.
 	///
 	/// - returns: [0] covers "Scene", [1] covers whitespace
-	func scanForSceneHeading(atIndex i: Int) -> [SearchResult]? {
-		guard endOfLineCharNumber > i + 6 else {
+	public func scanForSceneHeading(atIndex i: Int) -> [SearchResult]? {
+		guard endOfLineCharNumber > i + 5 else {
 			return nil
 		}
 		
 		
 		if (data[i] == 0x0053 || data[i] == 0x0073) &&
-			data[i+1] == 0x0063 && data[i+2] == 0x0065 && data[i+3] == 0x006e && data[i+4] == 0x0065 {	// 'S'||'s', 'c', 'e', 'n', 'e'
+			(data[i+1] == 0x0063 || data[i+1] == 0x0043) &&
+			(data[i+2] == 0x0065 || data[i+2] == 0x0045) &&
+			(data[i+3] == 0x006e || data[i+3] == 0x004e) &&
+			(data[i+4] == 0x0065 || data[i+4] == 0x0045) {	// 'S', 'c', 'e', 'n', 'e' case insensititve
 			let wc = scanForFirstNonspace(startingAtIndex: i+5)
 			
-			guard wc > i+4 else { return nil }
+			guard wc > i+5 else { return nil }
 			
 			var results = [SearchResult]()
 			let result1 = SearchResult(startIndex: i, endIndex: i+5)
@@ -413,27 +442,64 @@ extension CueParser {
 	
 	/// Returns an array of SearchResults or nil if matching failed.
 	///
-	/// - returns: [0] covers "//" and any additional "/", optional [1] covers whitespace
-	func scanForComment(atIndex i: Int) -> [SearchResult]? {
-		guard endOfLineCharNumber > i + 3 else {
-			return nil
-		}
+	/// - returns: [0] covers "//" and any additional "/", there may be a [1] which covers whitespace
+	public func scanForComment(atIndex i: Int) -> [SearchResult]? {
+		var result1 = SearchResult(startIndex: i, endIndex: i)
 		
 		var j = i
-		while data[j] == 0x002f && j < endOfLineCharNumber {	// '/'
+		var state = 0
+		var matched = false
+		var breakingStatement = false
+		while j < endOfLineCharNumber {
+			let c = data[j]
+			
+			switch state {
+			case 0:
+				
+				if c == 0x002f { // '/'
+					state = 1
+				} else {
+					return nil
+				}
+				
+			case 1:
+				
+				if c == 0x002f { // '/'
+					matched = true
+					result1.endIndex = j+1
+					state = 2
+				} else {
+					return nil
+				}
+				
+			case 2:
+				
+				if c == 0x002f { // '/'
+					result1.endIndex = j+1
+					break
+				} else {
+					breakingStatement = true
+				}
+				
+			default:
+				return nil
+			}
+			
+			if breakingStatement {
+				let wc = scanForFirstNonspace(startingAtIndex: j)
+				if wc-j > 0 {
+					let result2 = SearchResult(startIndex: j, endIndex: wc)
+					return [result1, result2]
+				} else {
+					return [result1]
+				}
+			}
+			
 			j += 1
 		}
-		if j > i+1 {
-			let wc = scanForFirstNonspace(startingAtIndex: j)
-			
-			var results = [SearchResult]()
-			let result1 = SearchResult(startIndex: i, endIndex: j+1)
-			results.append(result1)
-			if wc > 0 {
-				let result2 = SearchResult(startIndex: i+5, endIndex: wc)
-				results.append(result2)
-			}
-			return results
+		
+		if matched {
+			return [result1]
 		}
 		
 		return nil
@@ -442,7 +508,7 @@ extension CueParser {
 	/// Returns a SearchResult or nil if matching failed.
 	///
 	/// - returns: Result covers "~"
-	func scanForLyricPrefix(atIndex i: Int) -> SearchResult? {
+	public func scanForLyricPrefix(atIndex i: Int) -> SearchResult? {
 		guard endOfLineCharNumber > i else {
 			return nil
 		}
@@ -457,20 +523,19 @@ extension CueParser {
 	/// Returns an array of SearchResults or nil if matching failed.
 	///
 	/// - returns: [0] covers "^", [1] covers Cue name, [2] covers ":" and any whitespace
-	func scanForDualCue(atIndex i: Int) -> [SearchResult]? {
-		guard endOfLineCharNumber > i + 3 else {
+	public func scanForDualCue(atIndex i: Int) -> [SearchResult]? {
+		guard endOfLineCharNumber > i + 2 else {
 			return nil
 		}
 		
 		if data[i] == 0x005e {	// '^'
-			var results = scanForCue(atIndex: i+1)
-			
-			guard results != nil else {
+			guard let result2 = scanForCue(atIndex: i+1) else {
 				return nil
 			}
 			
 			let result1 = SearchResult(startIndex: i, endIndex: i+1)
-			results!.insert(result1, at: 0)
+			var results = [result1]
+			results.append(contentsOf: result2)
 			return results
 		}
 		
@@ -480,30 +545,44 @@ extension CueParser {
 	/// Returns an array of SearchResults or nil if matching failed.
 	///
 	/// - returns: [0] covers Cue name, [1] covers ":" and any whitespace
-	func scanForCue(atIndex i: Int) -> [SearchResult]? {
-		guard endOfLineCharNumber > i+3 else {
-			return nil
-		}
-		
+	public func scanForCue(atIndex i: Int) -> [SearchResult]? {
 		var j = i
-		while j < endOfLineCharNumber && data[j] != 0x003a  {	// ':'
-			if j-i > 24 { return nil }
+		var state = 0
+		var matched = false
+		while j < endOfLineCharNumber {
 			
-			j += 1
-		}
-		if j < endOfLineCharNumber && j-i > 1 && data[j] == 0x003a  {
-			guard data[j+1] != 0x003a else {
+			switch state {
+			case 0:
+				// initial state
+				if data[j] != 0x003a { // not ':'
+					state = 1
+				} else {
+					return nil
+				}
+				
+			case 1:
+				// find colon
+				if data[j] == 0x003a { // ':'
+					matched = true
+				} else if j-i > 22 { // cue can not be > 24 (23 chars + :)
+					return nil
+				} else {
+					state = 1
+				}
+				
+			default:
 				return nil
 			}
 			
-			let wc = scanForFirstNonspace(startingAtIndex: j+1)	//include room for the ':'
+			if matched {
+				var result1 = SearchResult(startIndex: i, endIndex: j)
+				let wc = scanForFirstNonspace(startingAtIndex: j+1)
+				let result2 = SearchResult(startIndex: result1.endIndex, endIndex: wc)
+				
+				return [result1, result2]
+			}
 			
-			var results = [SearchResult]()
-			let result1 = SearchResult(startIndex: i, endIndex: j)
-			results.append(result1)
-			let result2 = SearchResult(startIndex: j, endIndex: wc)
-			results.append(result2)
-			return results
+			j += 1
 		}
 		
 		return nil
