@@ -8,7 +8,7 @@
 
 open class CueParser {
 	
-	let data: [UInt16]
+	var data: [UInt16]
 	
 	var root = Document()
 	
@@ -261,61 +261,78 @@ extension CueParser {
 			//	Only RawText nodes should be parsed into emphasis, etc
 			guard node is RawText else { return }
 			
-			let parent = node.parent!
+			// Only Document nodes can have a nil parent
+			guard let parent = node.parent else { return }
 			
-			let stack = InlineStack()
+			let spans = InlineStack()
+			
+			var delimStack = DelimiterStack()
 			
 			charNumber = node.startIndex
 			endOfLineCharNumber = node.endIndex
 			while charNumber < endOfLineCharNumber {
 				let c = data[charNumber]
 				
+				guard c == 0x002a || c == 0x005b || c == 0x005d else {
+					charNumber += 1
+					continue
+				}
+				
+				let del = Delimiter(startIndex: charNumber, endIndex: charNumber+1)
 				switch c {
 				case 0x002a:	// '*'
-					guard let opener = stack.lastEmphasis else {
-						let del = Delimiter(startIndex: charNumber, endIndex: charNumber+1)
-						del.type = .emph
-						stack.push(del)
+					del.type = .emph
+					
+					guard let last = delimStack.peek() else {
+						delimStack.push(del)
 						break
 					}
 					
-					let em = Emphasis(startIndex: opener.startIndex, endIndex: charNumber+1)
-					em.addChild(opener)
-					let enddel = Delimiter(startIndex: charNumber, endIndex: charNumber+1)
-					enddel.type = .emph
-					em.addChild(enddel)
-					while let _ = stack.pop() {
-						// TODO: parse refs inside emphs
-						if stack.count <= stack.lastEmphasisIndex! { break }
-						if stack.count == 0 { break }
+					guard last.type != .openBracket else {
+						break
 					}
-					stack.push(em)
-					stack.lastEmphasis = nil
-					stack.lastEmphasisIndex = nil
-					break
+					
+					if last.type == del.type {
+						delimStack.pop()!
+						let em = Emphasis(startIndex: last.endIndex, endIndex: del.startIndex)
+						spans.push(last)
+						spans.push(em)
+						spans.push(del)
+						break
+					}
+					
+					fatalError("Uknown state when parsing emphasis")
 				case 0x005b:	// '['
-					let del = Delimiter(startIndex: charNumber, endIndex: charNumber+1)
 					del.type = .openBracket
-					stack.push(del)
-					break
-				case 0x005d:	// ']'
-					guard let opener = stack.lastBracket else {
+					
+					guard let last = delimStack.peek() else {
+						delimStack.push(del)
 						break
 					}
 					
-					let ref = Reference(startIndex: opener.startIndex, endIndex: charNumber+1)
-					ref.addChild(opener)
-					let endDel = Delimiter(startIndex: charNumber, endIndex: charNumber+1)
-					endDel.type = .closeBracket
-					ref.addChild(endDel)
-					while let _ = stack.pop() {
-						if stack.count <= stack.lastBracketIndex! { break }
-						if stack.count == 0 { break }
+					guard last.type != .openBracket else {
+						break
 					}
-					stack.push(ref)
-					stack.lastBracket = nil
-					stack.lastEmphasisIndex = nil
-					break
+					
+					delimStack.push(del)
+				case 0x005d:	// ']'
+					del.type = .closeBracket
+					
+					guard let last = delimStack.peek() else {
+						delimStack.push(del)
+						break
+					}
+					
+					if last.type == .openBracket {
+						delimStack.pop()!
+						let ref = Reference(startIndex: last.endIndex, endIndex: del.startIndex)
+						spans.push(last)
+						spans.push(ref)
+						spans.push(del)
+						break
+					}
+					
+					fatalError("Unknown state when parsing reference")
 				default:
 					break
 				}
@@ -323,12 +340,14 @@ extension CueParser {
 				charNumber += 1
 			}
 			
+			guard !spans.array.isEmpty else { return }
+			
 			parent.children.removeLast()
 			charNumber = node.startIndex
 			
-			// run through stack
-			for span in stack.array {
-				// take care of any interim text
+			// Run through span stack
+			for span in spans.array {
+				// Any space between spans should be just RawText
 				if span.startIndex > charNumber {
 					let text = RawText(startIndex: charNumber, endIndex: span.startIndex)
 					parent.addChild(text)
@@ -339,6 +358,7 @@ extension CueParser {
 				charNumber = span.endIndex
 			}
 			
+			// Add any remaining text as RawText
 			if charNumber < endOfLineCharNumber {
 				let te = RawText(startIndex: charNumber, endIndex: endOfLineCharNumber)
 				parent.addChild(te)
