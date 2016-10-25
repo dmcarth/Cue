@@ -294,6 +294,9 @@ extension CueParser {
 					
 					if last.type == del.type {
 						delimStack.pop()!
+						
+						guard last.endIndex < del.startIndex else { break }
+						
 						let em = Emphasis(startIndex: last.endIndex, endIndex: del.startIndex)
 						spans.push(last)
 						spans.push(em)
@@ -325,6 +328,9 @@ extension CueParser {
 					
 					if last.type == .openBracket {
 						delimStack.pop()!
+						
+						guard last.endIndex < del.startIndex else { break }
+						
 						let ref = Reference(startIndex: last.endIndex, endIndex: del.startIndex)
 						spans.push(last)
 						spans.push(ref)
