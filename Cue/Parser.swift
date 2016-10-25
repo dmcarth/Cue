@@ -264,7 +264,7 @@ extension CueParser {
 			// Only Document nodes can have a nil parent
 			guard let parent = node.parent else { return }
 			
-			let spans = InlineStack()
+			var spans = InlineStack()
 			
 			var delimStack = DelimiterStack()
 			
@@ -340,13 +340,13 @@ extension CueParser {
 				charNumber += 1
 			}
 			
-			guard !spans.array.isEmpty else { return }
+			guard !spans.isEmpty else { return }
 			
 			parent.children.removeLast()
 			charNumber = node.startIndex
 			
 			// Run through span stack
-			for span in spans.array {
+			for span in spans {
 				// Any space between spans should be just RawText
 				if span.startIndex > charNumber {
 					let text = RawText(startIndex: charNumber, endIndex: span.startIndex)
