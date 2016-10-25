@@ -93,20 +93,20 @@ extension CueParser {
 		container.startIndex = min(container.startIndex, block.startIndex)
 		container.endIndex = max(container.endIndex, block.endIndex)
 		
-		// Ensure firstline lyrics are parsed
+		// Ensure firstline lyrics are parsed last because appropriateContainer() may change the original block
 		if let cb = block as? Cue {
-			guard cb.children.last! is Text else {
+			guard cb.children.last! is RawText else {
 				print("not right")
 				return
 			}
 			
-			var last: Node = cb.children.last!
+			let last: Node = cb.children.last!
 			
 			if let result = scanForLyricPrefix(atIndex: last.startIndex) {
 				let ly = Lyric(startIndex: result.startIndex, endIndex: endOfLineCharNumber)
 				let delim = Delimiter(startIndex: result.startIndex, endIndex: result.endIndex)
 				ly.addChild(delim)
-				let te = Text(startIndex: delim.endIndex, endIndex: endOfLineCharNumber)
+				let te = RawText(startIndex: delim.endIndex, endIndex: endOfLineCharNumber)
 				ly.addChild(te)
 				cb.children.removeLast()
 				cb.addChild(ly)
@@ -117,62 +117,86 @@ extension CueParser {
 	func blockForLine() -> Block {
 		let wc = scanForFirstNonspace(startingAtIndex: charNumber)
 		
-		if let result = scanForActHeading(atIndex: wc) {
+		if scanForActHeading(atIndex: wc) {
 			let ah = ActHeading()
-			let te = Text(startIndex: result[0].startIndex, endIndex: endOfLineCharNumber)
+			
+			let te = RawText(startIndex: wc, endIndex: endOfLineCharNumber)
 			ah.addChild(te)
+			
 			return ah
-		} else if let result = scanForChapterHeading(atIndex: wc) {
+		} else if scanForChapterHeading(atIndex: wc) {
 			let ch = ChapterHeading()
-			let te = Text(startIndex: result[0].startIndex, endIndex: endOfLineCharNumber)
+			
+			let te = RawText(startIndex: wc, endIndex: endOfLineCharNumber)
 			ch.addChild(te)
+			
 			return ch
-		} else if let result = scanForSceneHeading(atIndex: wc) {
+		} else if scanForSceneHeading(atIndex: wc) {
 			let sh = SceneHeading()
-			let te = Text(startIndex: result[0].startIndex, endIndex: endOfLineCharNumber)
+			
+			let te = RawText(startIndex: wc, endIndex: endOfLineCharNumber)
 			sh.addChild(te)
+			
 			return sh
 		} else if let result = scanForComment(atIndex: wc) {
 			let com = Comment()
-			let delim = Delimiter(startIndex: result[0].startIndex, endIndex: result[0].endIndex)
-			if result.count == 2 {
-				delim.endIndex = result[1].endIndex
-			}
+			
+			let cont1 = CommentText(startIndex: result[0].startIndex, endIndex: result[0].endIndex)
+			com.addChild(cont1)
+			
+			let delim = Delimiter(startIndex: result[1].startIndex, endIndex: result[1].endIndex)
 			com.addChild(delim)
-			let te = Text(startIndex: delim.endIndex, endIndex: endOfLineCharNumber)
-			com.addChild(te)
+			
+			let cont2 = CommentText(startIndex: result[1].endIndex, endIndex: endOfLineCharNumber)
+			com.addChild(cont2)
+			
 			return com
 		} else if let result = scanForLyricPrefix(atIndex: wc) {
 			let ly = Lyric()
+			
 			let delim = Delimiter(startIndex: result.startIndex, endIndex: result.endIndex)
 			ly.addChild(delim)
-			let te = Text(startIndex: delim.endIndex, endIndex: endOfLineCharNumber)
+			
+			let te = RawText(startIndex: delim.endIndex, endIndex: endOfLineCharNumber)
 			ly.addChild(te)
+			
 			return ly
 		} else if let result = scanForDualCue(atIndex: wc) {
 			let du = DualCue()
+			
 			let del1 = Delimiter(startIndex: result[0].startIndex, endIndex: result[0].endIndex)
+			del1.type = .dual
 			du.addChild(del1)
+			
 			let name = Name(startIndex: result[1].startIndex, endIndex: result[1].endIndex)
 			du.addChild(name)
+			
 			let del2 = Delimiter(startIndex: result[2].startIndex, endIndex: result[2].endIndex)
+			del2.type = .colon
 			du.addChild(del2)
-			let te = Text(startIndex: del2.endIndex, endIndex: endOfLineCharNumber)
+			
+			let te = RawText(startIndex: del2.endIndex, endIndex: endOfLineCharNumber)
 			du.addChild(te)
+			
 			return du
 		} else if let result = scanForCue(atIndex: wc) {
 			let cu = RegularCue()
+			
 			let name = Name(startIndex: result[0].startIndex, endIndex: result[0].endIndex)
 			cu.addChild(name)
+			
 			let del2 = Delimiter(startIndex: result[1].startIndex, endIndex: result[1].endIndex)
+			del2.type = .colon
 			cu.addChild(del2)
-			let te = Text(startIndex: del2.endIndex, endIndex: endOfLineCharNumber)
+			
+			let te = RawText(startIndex: del2.endIndex, endIndex: endOfLineCharNumber)
 			cu.addChild(te)
+			
 			return cu
 		}
 		
 		let des = Description()
-		let te = Text(startIndex: wc, endIndex: endOfLineCharNumber)
+		let te = RawText(startIndex: wc, endIndex: endOfLineCharNumber)
 		des.addChild(te)
 		return des
 	}
@@ -234,7 +258,8 @@ extension CueParser {
 	func parseInlines() {
 		
 		root.enumerate { (node) in
-			guard node is Text else { return }
+			//	Only RawText nodes should be parsed into emphasis, etc
+			guard node is RawText else { return }
 			
 			let parent = node.parent!
 			
@@ -305,7 +330,7 @@ extension CueParser {
 			for span in stack.array {
 				// take care of any interim text
 				if span.startIndex > charNumber {
-					let text = Text(startIndex: charNumber, endIndex: span.startIndex)
+					let text = RawText(startIndex: charNumber, endIndex: span.startIndex)
 					parent.addChild(text)
 				}
 				
@@ -315,7 +340,7 @@ extension CueParser {
 			}
 			
 			if charNumber < endOfLineCharNumber {
-				let te = Text(startIndex: charNumber, endIndex: endOfLineCharNumber)
+				let te = RawText(startIndex: charNumber, endIndex: endOfLineCharNumber)
 				parent.addChild(te)
 			}
 		}
@@ -354,13 +379,9 @@ extension CueParser {
 		return j
 	}
 	
-	
-	/// Returns an array of SearchResults or nil if matching failed.
-	///
-	/// - returns: [0] covers "Act", [1] covers whitespace
-	public func scanForActHeading(atIndex i: Int) -> [SearchResult]? {
+	public func scanForActHeading(atIndex i: Int) -> Bool {
 		guard endOfLineCharNumber > i + 3 else {
-			return nil
+			return false
 		}
 		
 		if (data[i] == 0x0041 || data[i] == 0x0061) &&
@@ -368,25 +389,17 @@ extension CueParser {
 			(data[i+2] == 0x0074 || data[i+2] == 0x0054) {	// 'A', 'c', 't' case insensitive
 			let wc = scanForFirstNonspace(startingAtIndex: i+3)
 			
-			guard wc > i+3 else { return nil }
+			guard wc > i+3 else { return false }
 			
-			var results = [SearchResult]()
-			let result1 = SearchResult(startIndex: i, endIndex: i+3)
-			results.append(result1)
-			let result2 = SearchResult(startIndex: i+3, endIndex: wc)
-			results.append(result2)
-			return results
+			return true
 		}
 		
-		return nil
+		return false
 	}
 	
-	/// Returns an array of SearchResults or nil if matching failed.
-	///
-	/// - returns: [0] covers "Chapter", [1] covers whitespace
-	public func scanForChapterHeading(atIndex i: Int) -> [SearchResult]? {
+	public func scanForChapterHeading(atIndex i: Int) -> Bool {
 		guard endOfLineCharNumber > i + 7 else {
-			return nil
+			return false
 		}
 		
 		if (data[i] == 0x0043 || data[i] == 0x0063) &&
@@ -398,25 +411,17 @@ extension CueParser {
 			(data[i+6] == 0x0072 || data[i+6] == 0x0052) {	// 'C', 'h', 'a', 'p', 't', 'e', 'r' case insensitive
 			let wc = scanForFirstNonspace(startingAtIndex: i+7)
 			
-			guard wc > i+7 else { return nil }
+			guard wc > i+7 else { return false }
 			
-			var results = [SearchResult]()
-			let result1 = SearchResult(startIndex: i, endIndex: i+7)
-			results.append(result1)
-			let result2 = SearchResult(startIndex: i+7, endIndex: wc)
-			results.append(result2)
-			return results
+			return true
 		}
 		
-		return nil
+		return false
 	}
 	
-	/// Returns an array of SearchResults or nil if matching failed.
-	///
-	/// - returns: [0] covers "Scene", [1] covers whitespace
-	public func scanForSceneHeading(atIndex i: Int) -> [SearchResult]? {
+	public func scanForSceneHeading(atIndex i: Int) -> Bool {
 		guard endOfLineCharNumber > i + 5 else {
-			return nil
+			return false
 		}
 		
 		
@@ -427,17 +432,12 @@ extension CueParser {
 			(data[i+4] == 0x0065 || data[i+4] == 0x0045) {	// 'S', 'c', 'e', 'n', 'e' case insensititve
 			let wc = scanForFirstNonspace(startingAtIndex: i+5)
 			
-			guard wc > i+5 else { return nil }
+			guard wc > i+5 else { return false }
 			
-			var results = [SearchResult]()
-			let result1 = SearchResult(startIndex: i, endIndex: i+5)
-			results.append(result1)
-			let result2 = SearchResult(startIndex: i+5, endIndex: wc)
-			results.append(result2)
-			return results
+			return true
 		}
 		
-		return nil
+		return false
 	}
 	
 	/// Returns an array of SearchResults or nil if matching failed.
@@ -487,12 +487,8 @@ extension CueParser {
 			
 			if breakingStatement {
 				let wc = scanForFirstNonspace(startingAtIndex: j)
-				if wc-j > 0 {
-					let result2 = SearchResult(startIndex: j, endIndex: wc)
-					return [result1, result2]
-				} else {
-					return [result1]
-				}
+				let result2 = SearchResult(startIndex: j, endIndex: wc)
+				return [result1, result2]
 			}
 			
 			j += 1

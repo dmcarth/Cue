@@ -41,22 +41,26 @@ public class SceneHeading: Heading {}
 
 public class Description: Block {}
 public class CueBlock: Block {}
-public class Lyric: Block {}	// Even though lyrics are parsed as inlines, we consider lyrics a block element
+public class Lyric: Block {}
 public class Comment: Block {}
 
 public class Cue: Block {}
 public class RegularCue: Cue {}
 public class DualCue: Cue {}
 
-public class Text: Inline {}
+public class RawText: Inline {}
+public class CommentText: Inline {}
 public class Delimiter: Inline {
 	public enum DelimiterType {
-		case other
+		case whitespace
+		case dual
+		case lyric
 		case emph
+		case colon
 		case openBracket
 		case closeBracket
 	}
-	public var type: DelimiterType = .other
+	public var type: DelimiterType = .whitespace
 }
 public class Name: Inline {}
 public class Emphasis: Inline {}
