@@ -109,3 +109,15 @@ extension Node {
 		}
 	}
 }
+
+extension Node: Equatable {
+	
+	func debugString() -> String {
+		return "\(self) \(startIndex) \(endIndex)"
+	}
+	
+	public static func ==(_ lhs: Node, _ rhs: Node) -> Bool {
+		return lhs.debugString() == rhs.debugString()
+	}
+	
+}
