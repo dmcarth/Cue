@@ -53,6 +53,7 @@
 		10722A081DAFF225003DB282 /* Node.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Node.swift; sourceTree = "<group>"; };
 		10722A0A1DAFF26B003DB282 /* Parser.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Parser.swift; sourceTree = "<group>"; };
 		10A49DD01DBF6255006B4FDF /* EmphasisTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmphasisTests.swift; sourceTree = "<group>"; };
+		10A49DD21DBF818E006B4FDF /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		10B042EA1DACD868001D6AC7 /* Cue.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Cue.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		10B042ED1DACD868001D6AC7 /* Cue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Cue.h; sourceTree = "<group>"; };
 		10B042EE1DACD868001D6AC7 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -109,6 +110,7 @@
 			isa = PBXGroup;
 			children = (
 				10BEDB501DB1825900C283AB /* .gitignore */,
+				10A49DD21DBF818E006B4FDF /* README.md */,
 				10B042EC1DACD868001D6AC7 /* Cue */,
 				10B042F71DACD869001D6AC7 /* CueTests */,
 				10B042EB1DACD868001D6AC7 /* Products */,
