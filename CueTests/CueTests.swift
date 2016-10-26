@@ -61,7 +61,7 @@ class CueTests: XCTestCase {
 		let parser = CueParser(bytes)
 		
         self.measure {
-			let ast = parser.parse()
+			_ = parser.parse()
         }
     }
 	

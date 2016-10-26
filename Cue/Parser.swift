@@ -51,8 +51,6 @@ open class CueParser {
 		
 		parseBlocks()
 		
-		parseInlines()
-		
 		return root
 	}
 	
@@ -93,10 +91,9 @@ extension CueParser {
 		container.startIndex = min(container.startIndex, block.startIndex)
 		container.endIndex = max(container.endIndex, block.endIndex)
 		
-		// Ensure firstline lyrics are parsed last because appropriateContainer() may change the original block
+		// Only now can we parse first-line lyrics, because appropriateContainer() may change the original block before now
 		if let cb = block as? Cue {
 			guard cb.children.last! is RawText else {
-				print("not right")
 				return
 			}
 			
@@ -108,9 +105,17 @@ extension CueParser {
 				ly.addChild(delim)
 				let te = RawText(startIndex: delim.endIndex, endIndex: endOfLineCharNumber)
 				ly.addChild(te)
+				
+				parseInlines(for: ly, startingAt: delim.endIndex)
+				
 				cb.children.removeLast()
 				cb.addChild(ly)
 			}
+		}
+		
+		// Parse RawText into a stream of inlines. RawText, if present, will always be the last child at this stage
+		if let raw = block.children.last as? RawText {
+			parseInlines(for: block, startingAt: raw.startIndex)
 		}
 	}
 	
@@ -255,122 +260,111 @@ extension CueParser {
 // Inline Parsing
 extension CueParser {
 	
-	func parseInlines() {
+	func parseInlines(for block: Block, startingAt i: Int) {
+		var spans = InlineStack()
 		
-		root.enumerate { (node) in
-			//	Only RawText nodes should be parsed into emphasis, etc
-			guard node is RawText else { return }
+		var delimStack = DelimiterStack()
+		
+		var j = i
+		while j < endOfLineCharNumber {
+			let c = data[j]
 			
-			// Only Document nodes can have a nil parent
-			guard let parent = node.parent else { return }
+			guard c == 0x002a || c == 0x005b || c == 0x005d else {
+				j += 1
+				continue
+			}
 			
-			var spans = InlineStack()
-			
-			var delimStack = DelimiterStack()
-			
-			charNumber = node.startIndex
-			endOfLineCharNumber = node.endIndex
-			while charNumber < endOfLineCharNumber {
-				let c = data[charNumber]
+			let del = Delimiter(startIndex: j, endIndex: j+1)
+			switch c {
+			case 0x002a:	// '*'
+				del.type = .emph
 				
-				guard c == 0x002a || c == 0x005b || c == 0x005d else {
-					charNumber += 1
-					continue
-				}
-				
-				let del = Delimiter(startIndex: charNumber, endIndex: charNumber+1)
-				switch c {
-				case 0x002a:	// '*'
-					del.type = .emph
-					
-					guard let last = delimStack.peek() else {
-						delimStack.push(del)
-						break
-					}
-					
-					guard last.type != .openBracket else {
-						break
-					}
-					
-					if last.type == del.type {
-						delimStack.pop()!
-						
-						guard last.endIndex < del.startIndex else { break }
-						
-						let em = Emphasis(startIndex: last.endIndex, endIndex: del.startIndex)
-						spans.push(last)
-						spans.push(em)
-						spans.push(del)
-						break
-					}
-					
-					fatalError("Uknown state when parsing emphasis")
-				case 0x005b:	// '['
-					del.type = .openBracket
-					
-					guard let last = delimStack.peek() else {
-						delimStack.push(del)
-						break
-					}
-					
-					guard last.type != .openBracket else {
-						break
-					}
-					
+				guard let last = delimStack.peek() else {
 					delimStack.push(del)
-				case 0x005d:	// ']'
-					del.type = .closeBracket
-					
-					guard let last = delimStack.peek() else {
-						delimStack.push(del)
-						break
-					}
-					
-					if last.type == .openBracket {
-						delimStack.pop()!
-						
-						guard last.endIndex < del.startIndex else { break }
-						
-						let ref = Reference(startIndex: last.endIndex, endIndex: del.startIndex)
-						spans.push(last)
-						spans.push(ref)
-						spans.push(del)
-						break
-					}
-					
-					fatalError("Unknown state when parsing reference")
-				default:
 					break
 				}
 				
-				charNumber += 1
-			}
-			
-			guard !spans.isEmpty else { return }
-			
-			parent.children.removeLast()
-			charNumber = node.startIndex
-			
-			// Run through span stack
-			for span in spans {
-				// Any space between spans should be just RawText
-				if span.startIndex > charNumber {
-					let text = RawText(startIndex: charNumber, endIndex: span.startIndex)
-					parent.addChild(text)
+				guard last.type != .openBracket else {
+					break
 				}
 				
-				parent.addChild(span)
+				if last.type == del.type {
+					let _ = delimStack.pop()!
+					
+					guard last.endIndex < del.startIndex else { break }
+					
+					let em = Emphasis(startIndex: last.endIndex, endIndex: del.startIndex)
+					spans.push(last)
+					spans.push(em)
+					spans.push(del)
+					break
+				}
 				
-				charNumber = span.endIndex
+				fatalError("Uknown state when parsing emphasis")
+			case 0x005b:	// '['
+				del.type = .openBracket
+				
+				guard let last = delimStack.peek() else {
+					delimStack.push(del)
+					break
+				}
+				
+				guard last.type != .openBracket else {
+					break
+				}
+				
+				delimStack.push(del)
+			case 0x005d:	// ']'
+				del.type = .closeBracket
+				
+				guard let last = delimStack.peek() else {
+					delimStack.push(del)
+					break
+				}
+				
+				if last.type == .openBracket {
+					let _ = delimStack.pop()!
+					
+					guard last.endIndex < del.startIndex else { break }
+					
+					let ref = Reference(startIndex: last.endIndex, endIndex: del.startIndex)
+					spans.push(last)
+					spans.push(ref)
+					spans.push(del)
+					break
+				}
+				
+				fatalError("Unknown state when parsing reference")
+			default:
+				break
 			}
 			
-			// Add any remaining text as RawText
-			if charNumber < endOfLineCharNumber {
-				let te = RawText(startIndex: charNumber, endIndex: endOfLineCharNumber)
-				parent.addChild(te)
-			}
+			j += 1
 		}
 		
+		guard !spans.isEmpty else { return }
+		
+		block.children.removeLast()
+		j = i
+		
+		// Run through span stack
+		for span in spans {
+			// Any space between spans should be just RawText
+			if span.startIndex > j {
+				let text = RawText(startIndex: j, endIndex: span.startIndex)
+				block.addChild(text)
+			}
+			
+			block.addChild(span)
+			
+			j = span.endIndex
+		}
+		
+		// Add any remaining text as RawText
+		if j < endOfLineCharNumber {
+			let te = RawText(startIndex: j, endIndex: endOfLineCharNumber)
+			block.addChild(te)
+		}
 	}
 	
 }
@@ -597,7 +591,7 @@ extension CueParser {
 			}
 			
 			if matched {
-				var result1 = SearchResult(startIndex: i, endIndex: j)
+				let result1 = SearchResult(startIndex: i, endIndex: j)
 				let wc = scanForFirstNonspace(startingAtIndex: j+1)
 				let result2 = SearchResult(startIndex: result1.endIndex, endIndex: wc)
 				
