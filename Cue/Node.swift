@@ -9,10 +9,16 @@
 public class Node {
 	
 	public var parent: Node?
+	public var next: Node?
+	public var previous: Node?
 	public var children = [Node]()
 	
 	public var startIndex = 0
 	public var endIndex = 0
+	
+	public var isLeaf: Bool {
+		return children.isEmpty
+	}
 	
 	public init() {}
 	
@@ -21,10 +27,22 @@ public class Node {
 		self.endIndex = endIndex
 	}
 	
-	public func addChild(_ child: Node) {
-		//	TODO: if this node can't accept this child, back up until we find a parent that can
+	internal func addChild(_ child: Node) {
 		child.parent = self
+		if let last = children.last {
+			child.previous = last
+			last.next = child
+		}
 		self.children.append(child)
+	}
+	
+	internal func removeLastChild() {
+		guard !children.isEmpty else { return }
+		
+		children.removeLast()
+		if let last = children.last {
+			last.next = nil
+		}
 	}
 	
 }
@@ -66,6 +84,7 @@ public class Name: Inline {}
 public class Emphasis: Inline {}
 public class Reference: Inline {}
 
+// Public Interface
 extension Node {
 	
 	// Binary search for most specific child
@@ -110,6 +129,7 @@ extension Node {
 	}
 }
 
+// Debug Functions
 extension Node: Equatable {
 	
 	func debugString() -> String {
