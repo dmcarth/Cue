@@ -462,7 +462,7 @@ extension CueParser {
 	
 	/// Returns an array of SearchResults or nil if matching failed.
 	///
-	/// - returns: [0] covers "//" and any additional "/", there may be a [1] which covers whitespace
+	/// - returns: [0] covers "//" and any additional "/", [1] covers whitespace (if any)
 	public func scanForComment(atIndex i: Int) -> [SearchResult]? {
 		var result1 = SearchResult(startIndex: i, endIndex: i)
 		
@@ -506,16 +506,16 @@ extension CueParser {
 			}
 			
 			if breakingStatement {
-				let wc = scanForFirstNonspace(startingAtIndex: j)
-				let result2 = SearchResult(startIndex: j, endIndex: wc)
-				return [result1, result2]
+				break
 			}
 			
 			j += 1
 		}
 		
 		if matched {
-			return [result1]
+			let wc = scanForFirstNonspace(startingAtIndex: j)
+			let result2 = SearchResult(startIndex: j, endIndex: wc)
+			return [result1, result2]
 		}
 		
 		return nil
