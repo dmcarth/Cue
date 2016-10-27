@@ -108,7 +108,7 @@ extension CueParser {
 				
 				parseInlines(for: ly, startingAt: delim.endIndex)
 				
-				cb.children.removeLast()
+				cb.removeLastChild()
 				cb.addChild(ly)
 			}
 		}
@@ -261,7 +261,7 @@ extension CueParser {
 extension CueParser {
 	
 	func parseInlines(for block: Block, startingAt i: Int) {
-		var spans = InlineStack()
+		var spans = InlineCollection()
 		
 		var delimStack = DelimiterStack()
 		
@@ -344,7 +344,7 @@ extension CueParser {
 		
 		guard !spans.isEmpty else { return }
 		
-		block.children.removeLast()
+		block.removeLastChild()
 		j = i
 		
 		// Run through span stack
