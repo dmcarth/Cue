@@ -25,6 +25,7 @@
 		10A49DD11DBF6255006B4FDF /* EmphasisTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10A49DD01DBF6255006B4FDF /* EmphasisTests.swift */; };
 		10A49E0E1DC1847B006B4FDF /* NodeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10A49E0D1DC1847B006B4FDF /* NodeTests.swift */; };
 		10A49E101DC186B2006B4FDF /* DelimiterStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10A49E0F1DC186B2006B4FDF /* DelimiterStack.swift */; };
+		10A9EED91DC478AD00D1F4C9 /* DelimiterStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10A49E0F1DC186B2006B4FDF /* DelimiterStack.swift */; };
 		10B042F41DACD869001D6AC7 /* Cue.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 10B042EA1DACD868001D6AC7 /* Cue.framework */; };
 		10B042F91DACD869001D6AC7 /* CueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B042F81DACD869001D6AC7 /* CueTests.swift */; };
 		10B042FB1DACD869001D6AC7 /* Cue.h in Headers */ = {isa = PBXBuildFile; fileRef = 10B042ED1DACD868001D6AC7 /* Cue.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -319,6 +320,7 @@
 				106E767A1DBB67AD00880194 /* Node.swift in Sources */,
 				106E767C1DBB67B400880194 /* SearchResult.swift in Sources */,
 				106E767B1DBB67B000880194 /* Parser.swift in Sources */,
+				10A9EED91DC478AD00D1F4C9 /* DelimiterStack.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
