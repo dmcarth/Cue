@@ -25,7 +25,7 @@ class CueTests: XCTestCase {
 		let fileURL = Bundle(for: CueTests.self).url(forResource: "war+peace", withExtension: "txt")!
 		let str = try! String(contentsOf: fileURL)
 		let bytes = [UInt16](str.utf16)
-		let parser = CueParser(bytes)
+		let parser = CueParser(with: bytes)
 		
         self.measure {
 			_ = parser.parse()

@@ -20,11 +20,19 @@
 	
 	public class func parse(_ string: String) -> Node {
 		let bytes = [UInt16](string.utf16)
-		let parser = CueParser(bytes)
+		let parser = CueParser(with: bytes)
 		return parser.parse()
 	}
 	
-	public init(_ bytes: [UInt16]) {
+	public init(with bytes: [UInt16]) {
+		data = bytes
+		
+		// useful for debugging
+		endOfLineCharNumber = data.count
+	}
+	
+	public init(_ string: String) {
+		let bytes = [UInt16](string.utf16)
 		data = bytes
 		
 		// useful for debugging
