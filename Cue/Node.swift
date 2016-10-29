@@ -6,7 +6,7 @@
 //  Copyright © 2016 Dylan McArthur. All rights reserved.
 //
 
-public class Node {
+@objc public class Node: NSObject {
 	
 	public var parent: Node?
 	public var next: Node?
@@ -20,7 +20,9 @@ public class Node {
 		return children.isEmpty
 	}
 	
-	public init() {}
+	public override init() {
+		super.init()
+	}
 	
 	public init(startIndex: Int, endIndex: Int) {
 		self.startIndex = startIndex
@@ -60,7 +62,7 @@ public class SceneHeading: Heading {}
 public class Description: Block {}
 public class CueBlock: Block {}
 public class Lyric: Block {}
-public class Comment: Block {}
+public class CommentBlock: Block {}
 
 public class Cue: Block {}
 public class RegularCue: Cue {}
@@ -130,14 +132,14 @@ extension Node {
 }
 
 // Debug Functions
-extension Node: Equatable {
+extension Node {
 	
 	func debugString() -> String {
-		return "\(self) \(startIndex) \(endIndex)"
+		return "\(self.className) \(startIndex) \(endIndex)"
 	}
 	
-	public static func ==(_ lhs: Node, _ rhs: Node) -> Bool {
-		return lhs.debugString() == rhs.debugString()
-	}
+//	public static func ==(_ lhs: Node, _ rhs: Node) -> Bool {
+//		return lhs.debugString() == rhs.debugString()
+//	}
 	
 }
