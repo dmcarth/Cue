@@ -6,7 +6,7 @@
 //  Copyright © 2016 Dylan McArthur. All rights reserved.
 //
 
-open class CueParser {
+public class CueParser {
 	
 	var data: [UInt16]
 	
@@ -18,12 +18,12 @@ open class CueParser {
 	
 	var endOfLineCharNumber = 0
 	
-	open class func parse(_ string: String) -> Node {
+	public class func parse(_ string: String) -> Node {
 		let bytes = [UInt16](string.utf16)
 		return parse(bytes)
 	}
 	
-	open class func parse(_ bytes: [UInt16]) -> Node {
+	public class func parse(_ bytes: [UInt16]) -> Node {
 		let parser = CueParser(bytes)
 		return parser.parse()
 	}
@@ -43,7 +43,7 @@ open class CueParser {
 		endOfLineCharNumber = data.count
 	}
 	
-	open func parse() -> Node {
+	public func parse() -> Node {
 		root = Document()
 		lineNumber = 0
 		charNumber = 0
@@ -145,7 +145,7 @@ extension CueParser {
 			
 			return sh
 		} else if let result = scanForComment(atIndex: wc) {
-			let com = Comment()
+			let com = CommentBlock()
 			
 			let cont1 = CommentText(startIndex: result[0].startIndex, endIndex: result[0].endIndex)
 			com.addChild(cont1)
@@ -214,7 +214,7 @@ extension CueParser {
 		
 		switch block {
 		// These block types can only ever be level-1
-		case is ActHeading, is ChapterHeading, is SceneHeading, is Description, is Comment:
+		case is ActHeading, is ChapterHeading, is SceneHeading, is Description, is CommentBlock:
 			return container
 		// A regular cue is always level-2, with it's own initial parent cueBlock
 		case is RegularCue:
