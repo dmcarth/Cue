@@ -15,6 +15,7 @@
 	
 	public var startIndex = 0
 	public var endIndex = 0
+	public var lineNumber = 0
 	
 	public var isLeaf: Bool {
 		return children.isEmpty
@@ -135,7 +136,7 @@ extension Node {
 extension Node {
 	
 	func debugString() -> String {
-		return "\(self.className) \(startIndex) \(endIndex)"
+		return "\(NSStringFromClass(type(of: self))) \(startIndex) \(endIndex)"
 	}
 	
 //	public static func ==(_ lhs: Node, _ rhs: Node) -> Bool {

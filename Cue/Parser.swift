@@ -8,7 +8,7 @@
 
 @objc public class CueParser: NSObject {
 	
-	var data: [UInt16]
+	var data = [UInt16]()
 	
 	var root = Document()
 	
@@ -22,6 +22,10 @@
 		let bytes = [UInt16](string.utf16)
 		let parser = CueParser(with: bytes)
 		return parser.parse()
+	}
+	
+	public override init() {
+		super.init()
 	}
 	
 	public init(with bytes: [UInt16]) {
@@ -81,6 +85,7 @@ extension CueParser {
 		var block = blockForLine()
 		block.startIndex = charNumber
 		block.endIndex = endOfLineCharNumber
+		block.lineNumber = lineNumber
 		
 		let container = appropriateContainer(for: &block)
 		container.addChild(block)
