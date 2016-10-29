@@ -102,6 +102,7 @@ extension CueParser {
 			if let result = scanForLyricPrefix(atIndex: last.startIndex) {
 				let ly = Lyric(startIndex: result.startIndex, endIndex: endOfLineCharNumber)
 				let delim = Delimiter(startIndex: result.startIndex, endIndex: result.endIndex)
+				delim.type = .lyric
 				ly.addChild(delim)
 				let te = RawText(startIndex: delim.endIndex, endIndex: endOfLineCharNumber)
 				ly.addChild(te)
@@ -150,6 +151,7 @@ extension CueParser {
 			com.addChild(cont1)
 			
 			let delim = Delimiter(startIndex: result[1].startIndex, endIndex: result[1].endIndex)
+			delim.type = .whitespace
 			com.addChild(delim)
 			
 			let cont2 = CommentText(startIndex: result[1].endIndex, endIndex: endOfLineCharNumber)
@@ -160,6 +162,7 @@ extension CueParser {
 			let ly = Lyric()
 			
 			let delim = Delimiter(startIndex: result.startIndex, endIndex: result.endIndex)
+			delim.type = .lyric
 			ly.addChild(delim)
 			
 			let te = RawText(startIndex: delim.endIndex, endIndex: endOfLineCharNumber)
