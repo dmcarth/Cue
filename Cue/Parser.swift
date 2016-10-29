@@ -6,7 +6,7 @@
 //  Copyright © 2016 Dylan McArthur. All rights reserved.
 //
 
-public class CueParser {
+@objc public class CueParser: NSObject {
 	
 	var data: [UInt16]
 	
@@ -20,23 +20,11 @@ public class CueParser {
 	
 	public class func parse(_ string: String) -> Node {
 		let bytes = [UInt16](string.utf16)
-		return parse(bytes)
-	}
-	
-	public class func parse(_ bytes: [UInt16]) -> Node {
 		let parser = CueParser(bytes)
 		return parser.parse()
 	}
 	
 	public init(_ bytes: [UInt16]) {
-		data = bytes
-		
-		// useful for debugging
-		endOfLineCharNumber = data.count
-	}
-	
-	public init(_ string: String) {
-		let bytes = [UInt16](string.utf16)
 		data = bytes
 		
 		// useful for debugging
