@@ -56,7 +56,7 @@ class CommentScannerTests: XCTestCase {
 		
 		let result = parser.scanForComment(atIndex: 0)
 		
-		let expectedResult = [SearchResult(startIndex: 0, endIndex: 2)]
+		let expectedResult = [SearchResult(startIndex: 0, endIndex: 2), SearchResult(startIndex: 2, endIndex: 2)]
 		
 		XCTAssertEqual(result!, expectedResult)
 	}
