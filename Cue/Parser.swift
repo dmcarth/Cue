@@ -28,8 +28,8 @@
 		super.init()
 	}
 	
-	public init(with bytes: [UInt16]) {
-		data = bytes
+	public init<S: Sequence>(with bytes: S) where S.Iterator.Element == UInt16 {
+		data = Array(bytes)
 		
 		// useful for debugging
 		endOfLineCharNumber = data.count
