@@ -15,7 +15,6 @@
 	
 	public var startIndex = 0
 	public var endIndex = 0
-	public var lineNumber = 0
 	
 	public var isLeaf: Bool {
 		return children.isEmpty
@@ -50,7 +49,9 @@
 	
 }
 
-public class Block: Node { }
+public class Block: Node {
+	public var lineNumber = 0
+}
 public class Inline: Node { }
 
 public class Document: Block {}
@@ -91,7 +92,7 @@ public class Reference: Inline {}
 extension Node {
 	
 	// Binary search for most specific child
-	public func search(index: Int) -> Node? {
+	public func search(index: Int, options: NodeSearchOptions) -> Node? {
 		var lower = 0
 		var upper = children.count
 		
@@ -100,9 +101,14 @@ extension Node {
 			let midChild = children[midIndex]
 			
 			if index >= midChild.startIndex && index <= midChild.endIndex {
-				// TODO: optionally limit depth of search
-				if let found = midChild.search(index: index) {
-					return found
+				if options.predicate(midChild) {
+					return midChild
+				}
+				
+				if options.deepSearchEnabled {
+					if let found = midChild.search(index: index, options: options) {
+						return found
+					}
 				}
 				
 				return midChild
@@ -117,7 +123,7 @@ extension Node {
 	}
 	
 	// Convenience method for enumerating nodes
-	public func enumerate(_ handler: (Node)->Void) {
+	public func enumerate(_ handler: (_ node: Node)->Void) {
 		let isLeaf = children.isEmpty
 		handler(self)
 		
