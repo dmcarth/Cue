@@ -1,5 +1,5 @@
 # Cue
-Cue is a Markdown-style language for writing stories for print, screen, or stage. 
+Cue is a Markdown-style language for writing stories for print, screen, and stage. 
 
 It is still in development and therefore not suitable for production just yet.
 
