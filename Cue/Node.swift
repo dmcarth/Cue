@@ -91,32 +91,41 @@ public class Reference: Inline {}
 // Public Interface
 extension Node {
 	
-	// Binary search for most specific child
+	/// Binary search for node containing given index.
+	///
+	/// - Parameters:
+	///   - index: A utf16 byte index.
+	///   - options: A NodeSearchOptions object allowing fine grain control of search.
+	///      - deepSearch: A Bool causing search to search children for the most specific match. Default value is true.
+	///      - predicate: A closure causing search to return early if a matching node is found. Default expression is { _ in return false }
+	/// - Returns: Node containing given index, nil if out of bounds
 	public func search(index: Int, options: NodeSearchOptions) -> Node? {
-		var lower = 0
-		var upper = children.count
-		
-		while lower < upper {
-			let midIndex = lower + (upper - lower) / 2
-			let midChild = children[midIndex]
+		if index >= self.startIndex && index <= self.endIndex {
+			if options.predicate(self) {
+				return self
+			}
 			
-			if index >= midChild.startIndex && index <= midChild.endIndex {
-				if options.predicate(midChild) {
-					return midChild
-				}
-				
-				if options.deepSearchEnabled {
-					if let found = midChild.search(index: index, options: options) {
-						return found
+			if options.deepSearchEnabled {
+				if !isLeaf {
+					var lowerBound = 0
+					var upperBound = children.count
+					
+					while lowerBound < upperBound {
+						let midIndex = lowerBound + (upperBound - lowerBound) / 2
+						let midChild = children[midIndex]
+						
+						if index < midChild.startIndex {
+							upperBound = midIndex
+						} else if index > midChild.endIndex {
+							lowerBound = midIndex + 1
+						} else {
+							return midChild.search(index: index, options: options)
+						}
 					}
 				}
-				
-				return midChild
-			} else if index > midChild.endIndex {
-				lower = midIndex + 1
-			} else {
-				upper = midIndex
 			}
+			
+			return self
 		}
 		
 		return nil
