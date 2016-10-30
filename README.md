@@ -3,8 +3,11 @@ Cue is a Markdown-style language for writing stories for print, screen, and stag
 
 It is still in development and therefore not suitable for production just yet.
 
-##Example
-Cue is designed to be intuitive and invisible whenever possible. It should look more or less exactly the same as when it's printed. Headers, for example, are marked by their own keywords:
+## Syntax
+Cue is designed to be intuitive and invisible whenever possible. It should look more or less exactly the same as when it's printed. 
+
+### Headers
+Headers, for example, are marked by their own keywords:
 
 ```
 Act I
@@ -12,13 +15,16 @@ Chapter 1
 Scene The First
 ```
 
+### Description
 Unmarked text is treated like ordinary description and can contain any variety of plain text.
 
 ```
 Jack went to the store to buy some milk, but he came home with a Jack Russell Terrier instead.
+```
 
-// OR, if you prefer a more traditional screenplay-style of prose
+Or, if you prefer a more traditional screenplay-style of prose:
 
+```
 The door opens to reveal Jack, both arms wrapped around a nervous Jack Russell Terrier. There is no milk to be seen.
 ```
 
@@ -29,6 +35,7 @@ Emphasis is marked by *asterisks*.
 Images and other embeddable links are wrapped in [brackets].
 ```
 
+### Cues
 The real power of Cue, however, comes from the way it treats dialogue and scene description. Both are treated as the same kind of thing: a cue. Dialogue is just a cue targeted at one person. Other cues can be targeted at other parts of the mise-en-scene.
 
 ```
@@ -54,7 +61,8 @@ Jack: ~This is a song
       ~And in theory could go on forever...
 ```
 
-Note that whitespace in Cue is ignored, allowing you to align lyrics and cues however you want, except when it comes to newlines.
+### Whitespace
+Note that whitespace in Cue is generally ignored, allowing you to align lyrics and cues however you want, except when it comes to newlines.
 
 ```
 This is line #1
@@ -62,8 +70,11 @@ This is line #1
 This is line #3, because it comes two lines after line #1.
 ```
 
+### Comments
 You can also write comments.
 
 ```
 // Lines beginning with two or more slashes are considered comments.
 ```
+
+Comments are considered block elements, meaning that they take over the entire line they're on.
