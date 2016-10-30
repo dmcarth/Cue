@@ -4,20 +4,22 @@ Cue is a Markdown-style language for writing stories for print, screen, or stage
 It is still in development and therefore not suitable for production just yet.
 
 ##Example
-Cue is designed to be intuitive and invisible whenever possible. It should look more or less the same as when it's printed. For example, headers are marked like so:
+Cue is designed to be intuitive and invisible whenever possible. It should look more or less exactly the same as when it's printed. Headers, for example, are marked by their own keywords:
 
 ```
+Act I
 Chapter 1
 Scene The First
-Act I
 ```
 
-... where "Chapter", "Scene", and "Act" all form keywords for the header name.
-
-Unmarked text is treated as ordinary description.
+Unmarked text is treated like ordinary description and can contain any variety of plain text.
 
 ```
-Jack went to the store to buy some milk and came home with a Jack Russell Terrier instead.
+Jack went to the store to buy some milk, but he came home with a Jack Russell Terrier instead.
+
+// OR, if you prefer a more traditional screenplay-style of prose
+
+The door opens to reveal Jack, both arms wrapped around a nervous Jack Russell Terrier. There is no milk to be seen.
 ```
 
 It also inherits a similar inline syntax to Markdown.
@@ -27,7 +29,7 @@ Emphasis is marked by *asterisks*.
 Images and other embeddable links are wrapped in [brackets].
 ```
 
-But the real power of Cue comes from the way it treats dialogue and scene description. Both are treated as the same kind of thing: a cue. Dialogue is just a cue targeted at one person. Other cues can be targeted at other parts of the mise-en-scene.
+The real power of Cue, however, comes from the way it treats dialogue and scene description. Both are treated as the same kind of thing: a cue. Dialogue is just a cue targeted at one person. Other cues can be targeted at other parts of the mise-en-scene.
 
 ```
 Jack: This is a line of dialogue.
