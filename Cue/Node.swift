@@ -100,7 +100,7 @@ extension Node {
 	///      - predicate: A closure causing search to return early if a matching node is found. Default expression is { _ in return false }
 	/// - Returns: Node containing given index, nil if out of bounds
 	public func search(index: Int, options: NodeSearchOptions) -> Node? {
-		if index >= self.startIndex && index <= self.endIndex {
+		if index >= self.startIndex && index < self.endIndex {
 			if options.predicate(self) {
 				return self
 			}
