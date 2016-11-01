@@ -11,17 +11,7 @@ import XCTest
 
 class CueScannerTests: XCTestCase {
 
-    override func setUp() {
-        super.setUp()
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-    }
-    
-    override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-        super.tearDown()
-    }
-	
-	func testEmpty() {
+    func testEmpty() {
 		let parser = CueParser("")
 		
 		let result = parser.scanForCue(atIndex: 0)

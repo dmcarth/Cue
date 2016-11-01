@@ -11,17 +11,7 @@ import XCTest
 
 class EmphasisTests: XCTestCase {
     
-    override func setUp() {
-        super.setUp()
-        // Put setup code here. This method is called before the invocation of each test method in the class.
-    }
-    
-    override func tearDown() {
-        // Put teardown code here. This method is called after the invocation of each test method in the class.
-        super.tearDown()
-    }
-	
-	func testStarStar() {
+    func testStarStar() {
 		let ast = CueParser.parse("**")
 		
 		let doc = Document(startIndex: 0, endIndex: 2)
