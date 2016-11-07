@@ -8,9 +8,9 @@
 
 @objc public class Node: NSObject {
 	
-	public var parent: Node?
-	public var next: Node?
-	public var previous: Node?
+	public weak var parent: Node?
+	public weak var next: Node?
+	public weak var previous: Node?
 	public var children = [Node]()
 	
 	public var startIndex = 0
@@ -100,32 +100,40 @@ extension Node {
 	///      - predicate: A closure causing search to return early if a matching node is found. Default expression is { _ in return false }
 	/// - Returns: Node containing given index, nil if out of bounds
 	public func search(index: Int, options: NodeSearchOptions) -> Node? {
-		if index >= self.startIndex && index < self.endIndex {
-			if options.predicate(self) {
-				return self
-			}
+		guard index >= self.startIndex && index < endIndex else {
+			return nil
+		}
+		
+		var lowerBound = 0
+		var upperBound = children.count
+		
+		while lowerBound < upperBound {
+			let midIndex = lowerBound + (upperBound - lowerBound) / 2
+			let midChild = children[midIndex]
 			
-			if options.deepSearchEnabled {
-				if !isLeaf {
-					var lowerBound = 0
-					var upperBound = children.count
-					
-					while lowerBound < upperBound {
-						let midIndex = lowerBound + (upperBound - lowerBound) / 2
-						let midChild = children[midIndex]
-						
-						if index < midChild.startIndex {
-							upperBound = midIndex
-						} else if index > midChild.endIndex {
-							lowerBound = midIndex + 1
-						} else {
-							return midChild.search(index: index, options: options)
-						}
+			if index < midChild.startIndex {
+				upperBound = midIndex
+			} else if index >= midChild.endIndex {
+				lowerBound = midIndex + 1
+			} else {
+				// We've found a match!
+				
+				// If a custom search predicate has been provided, that takes precedence over everything else
+				if options.predicate != nil {
+					if options.predicate!(midChild) {
+						return midChild
 					}
 				}
+				
+				if options.deepSearchEnabled {
+					return midChild.search(index: index, options: options)
+				}
+				
+				// This ensures that a search with a predicate will only return if the matching node passes the predicate
+				if options.predicate == nil {
+					return midChild
+				}
 			}
-			
-			return self
 		}
 		
 		return nil
