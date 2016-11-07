@@ -11,15 +11,11 @@
 	/// Enables search to traverse nodes deeper than level-1
 	public var deepSearchEnabled: Bool
 	
-	/// Causes search to return early when it finds a node matching this predicate. Search may not return a nodes matching this predicate if the given search index has no matching parent nodes.
-	public var predicate: (Node)->Bool
+	/// Causes search to return on the first node matching this predicate. If no matching node is found, search will return nil.
+	public var predicate: ((Node)->Bool)?
 	
 	public init(deepSearch: Bool = true, searchPredicate: ((Node)->Bool)?) {
 		self.deepSearchEnabled = deepSearch
-		if let p = searchPredicate {
-			self.predicate = p
-		} else {
-			self.predicate = { n in return false }
-		}
+		self.predicate = searchPredicate
 	}
 }
