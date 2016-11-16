@@ -92,7 +92,7 @@ extension CueParser {
 		container.startIndex = min(container.startIndex, block.startIndex)
 		container.endIndex = max(container.endIndex, block.endIndex)
 		
-		// Only now can we parse first-line lyrics, because appropriateContainer() may change the original block before now
+		// Only now can we parse first-line lyrics, because appropriateContainer() may have changed the original block
 		if let cb = block as? Cue {
 			guard cb.children.last! is RawText else {
 				return
