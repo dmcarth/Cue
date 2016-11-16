@@ -97,7 +97,7 @@ extension Node {
 	///   - index: A utf16 byte index.
 	///   - options: A NodeSearchOptions object allowing fine grain control of search.
 	///      - deepSearch: A Bool causing search to search children for the most specific match. Default value is true.
-	///      - predicate: A closure causing search to return early if a matching node is found. Default expression is { _ in return false }
+	///      - predicate: A closure causing search to return early if a matching node is found.
 	/// - Returns: Node containing given index, nil if out of bounds
 	public func search(index: Int, options: NodeSearchOptions) -> Node? {
 		guard index >= self.startIndex && index < endIndex else {
@@ -139,7 +139,6 @@ extension Node {
 		return nil
 	}
 	
-	// Convenience method for enumerating nodes
 	public func enumerate(_ handler: (_ node: Node)->Void) {
 		let isLeaf = children.isEmpty
 		handler(self)
@@ -161,9 +160,5 @@ extension Node {
 	func debugString() -> String {
 		return "\(NSStringFromClass(type(of: self))) \(startIndex) \(endIndex)"
 	}
-	
-//	public static func ==(_ lhs: Node, _ rhs: Node) -> Bool {
-//		return lhs.debugString() == rhs.debugString()
-//	}
 	
 }
