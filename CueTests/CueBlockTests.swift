@@ -31,8 +31,11 @@ class CueBlockTests: XCTestCase {
 		delim.type = .whitespace
 		rc.addChild(delim)
 		
+		let lyb = LyricBlock(startIndex: 3, endIndex: 5)
+		rc.addChild(lyb)
+		
 		let ly1 = Lyric(startIndex: 3, endIndex: 5)
-		rc.addChild(ly1)
+		lyb.addChild(ly1)
 		let lydel1 = Delimiter(startIndex: 3, endIndex: 4)
 		lydel1.type = .lyric
 		ly1.addChild(lydel1)
@@ -62,8 +65,11 @@ class CueBlockTests: XCTestCase {
 		delim.type = .whitespace
 		rc.addChild(delim)
 		
+		let lyb = LyricBlock(startIndex: 3, endIndex: 8)
+		rc.addChild(lyb)
+		
 		let ly1 = Lyric(startIndex: 3, endIndex: 6)
-		rc.addChild(ly1)
+		lyb.addChild(ly1)
 		let lydel1 = Delimiter(startIndex: 3, endIndex: 4)
 		lydel1.type = .lyric
 		ly1.addChild(lydel1)
@@ -71,7 +77,7 @@ class CueBlockTests: XCTestCase {
 		ly1.addChild(raw1)
 		
 		let ly2 = Lyric(startIndex: 6, endIndex: 8)
-		rc.addChild(ly2)
+		lyb.addChild(ly2)
 		let lydel2 = Delimiter(startIndex: 6, endIndex: 7)
 		lydel2.type = .lyric
 		ly2.addChild(lydel2)
@@ -101,8 +107,11 @@ class CueBlockTests: XCTestCase {
 		delim.type = .whitespace
 		rc.addChild(delim)
 		
+		let lyb = LyricBlock(startIndex: 3, endIndex: 11)
+		rc.addChild(lyb)
+		
 		let ly1 = Lyric(startIndex: 3, endIndex: 6)
-		rc.addChild(ly1)
+		lyb.addChild(ly1)
 		let lydel1 = Delimiter(startIndex: 3, endIndex: 4)
 		lydel1.type = .lyric
 		ly1.addChild(lydel1)
@@ -110,7 +119,7 @@ class CueBlockTests: XCTestCase {
 		ly1.addChild(raw1)
 		
 		let ly2 = Lyric(startIndex: 6, endIndex: 9)
-		rc.addChild(ly2)
+		lyb.addChild(ly2)
 		let lydel2 = Delimiter(startIndex: 6, endIndex: 7)
 		lydel2.type = .lyric
 		ly2.addChild(lydel2)
@@ -118,7 +127,7 @@ class CueBlockTests: XCTestCase {
 		ly2.addChild(raw2)
 		
 		let ly3 = Lyric(startIndex: 9, endIndex: 11)
-		rc.addChild(ly3)
+		lyb.addChild(ly3)
 		let lydel3 = Delimiter(startIndex: 9, endIndex: 10)
 		lydel3.type = .lyric
 		ly3.addChild(lydel3)

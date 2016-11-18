@@ -83,8 +83,6 @@ extension CueParser {
 	
 	func processLine() {
 		var block = blockForLine()
-		block.startIndex = charNumber
-		block.endIndex = endOfLineCharNumber
 		block.lineNumber = lineNumber
 		
 		let container = appropriateContainer(for: &block)
@@ -102,13 +100,9 @@ extension CueParser {
 			
 			if let result = scanForLyricPrefix(atIndex: last.startIndex) {
 				let ly = Lyric(startIndex: result.startIndex, endIndex: endOfLineCharNumber)
-				let delim = Delimiter(startIndex: result.startIndex, endIndex: result.endIndex)
-				delim.type = .lyric
-				ly.addChild(delim)
-				let te = RawText(startIndex: delim.endIndex, endIndex: endOfLineCharNumber)
-				ly.addChild(te)
+				ly.addDefaultChildren(for: result)
 				
-				parseInlines(for: ly, startingAt: delim.endIndex)
+				parseInlines(for: ly, startingAt: result.endIndex)
 				
 				cb.removeLastChild()
 				cb.addChild(ly)
@@ -125,104 +119,66 @@ extension CueParser {
 		let wc = scanForFirstNonspace(startingAtIndex: charNumber)
 		
 		if scanForActHeading(atIndex: wc) {
-			let ah = ActHeading()
+			let ah = ActHeading(startIndex: charNumber, endIndex: endOfLineCharNumber)
 			
-			let te = RawText(startIndex: wc, endIndex: endOfLineCharNumber)
-			ah.addChild(te)
+			ah.addDefaultChildren(offset: wc)
 			
 			return ah
 		} else if scanForChapterHeading(atIndex: wc) {
-			let ch = ChapterHeading()
+			let ch = ChapterHeading(startIndex: charNumber, endIndex: endOfLineCharNumber)
 			
-			let te = RawText(startIndex: wc, endIndex: endOfLineCharNumber)
-			ch.addChild(te)
+			ch.addDefaultChildren(offset: wc)
 			
 			return ch
 		} else if scanForSceneHeading(atIndex: wc) {
-			let sh = SceneHeading()
+			let sh = SceneHeading(startIndex: charNumber, endIndex: endOfLineCharNumber)
 			
-			let te = RawText(startIndex: wc, endIndex: endOfLineCharNumber)
-			sh.addChild(te)
+			sh.addDefaultChildren(offset: wc)
 			
 			return sh
 		} else if let result = scanForComment(atIndex: wc) {
-			let com = CommentBlock()
+			let com = CommentBlock(startIndex: charNumber, endIndex: endOfLineCharNumber)
 			
-			let cont1 = CommentText(startIndex: result[0].startIndex, endIndex: result[0].endIndex)
-			com.addChild(cont1)
-			
-			let delim = Delimiter(startIndex: result[1].startIndex, endIndex: result[1].endIndex)
-			delim.type = .whitespace
-			com.addChild(delim)
-			
-			let cont2 = CommentText(startIndex: result[1].endIndex, endIndex: endOfLineCharNumber)
-			com.addChild(cont2)
+			com.addDefaultChildren(for: result)
 			
 			return com
 		} else if let result = scanForLyricPrefix(atIndex: wc) {
-			let ly = Lyric()
+			let ly = Lyric(startIndex: charNumber, endIndex: endOfLineCharNumber)
 			
-			let delim = Delimiter(startIndex: result.startIndex, endIndex: result.endIndex)
-			delim.type = .lyric
-			ly.addChild(delim)
-			
-			let te = RawText(startIndex: delim.endIndex, endIndex: endOfLineCharNumber)
-			ly.addChild(te)
+			ly.addDefaultChildren(for: result)
 			
 			return ly
 		} else if let result = scanForDualCue(atIndex: wc) {
-			let du = DualCue()
+			let du = DualCue(startIndex: charNumber, endIndex: endOfLineCharNumber)
 			
-			let del1 = Delimiter(startIndex: result[0].startIndex, endIndex: result[0].endIndex)
-			del1.type = .dual
-			du.addChild(del1)
-			
-			let name = Name(startIndex: result[1].startIndex, endIndex: result[1].endIndex)
-			du.addChild(name)
-			
-			let del2 = Delimiter(startIndex: result[2].startIndex, endIndex: result[2].endIndex)
-			del2.type = .colon
-			du.addChild(del2)
-			
-			let te = RawText(startIndex: del2.endIndex, endIndex: endOfLineCharNumber)
-			du.addChild(te)
+			du.addDefaultChildren(for: result)
 			
 			return du
 		} else if let result = scanForCue(atIndex: wc) {
-			let cu = RegularCue()
+			let cu = RegularCue(startIndex: charNumber, endIndex: endOfLineCharNumber)
 			
-			let name = Name(startIndex: result[0].startIndex, endIndex: result[0].endIndex)
-			cu.addChild(name)
-			
-			let del2 = Delimiter(startIndex: result[1].startIndex, endIndex: result[1].endIndex)
-			del2.type = .colon
-			cu.addChild(del2)
-			
-			let te = RawText(startIndex: del2.endIndex, endIndex: endOfLineCharNumber)
-			cu.addChild(te)
+			cu.addDefaultChildren(for: result)
 			
 			return cu
 		}
 		
-		let des = Description()
+		let des = Description(startIndex: charNumber, endIndex: endOfLineCharNumber)
 		let te = RawText(startIndex: wc, endIndex: endOfLineCharNumber)
 		des.addChild(te)
 		return des
 	}
 	
 	func appropriateContainer(for block: inout Block) -> Node {
-		var container: Node = self.root
+		var container: Node = root
 		
 		switch block {
 		// These block types can only ever be level-1
 		case is ActHeading, is ChapterHeading, is SceneHeading, is Description, is CommentBlock:
-			return container
+			return root
 		// A regular cue is always level-2, with it's own initial parent cueBlock
 		case is RegularCue:
-			let cueBlockContainer = CueBlock()
-			cueBlockContainer.startIndex = block.startIndex
-			cueBlockContainer.endIndex = block.endIndex
-			container.addChild(cueBlockContainer)
+			let cueBlockContainer = CueBlock(startIndex: block.startIndex, endIndex: block.endIndex)
+			root.addChild(cueBlockContainer)
 			return cueBlockContainer
 		default:
 			break
@@ -233,7 +189,13 @@ extension CueParser {
 			container = lastChild
 			
 			var foundBreakingStatement = false
+			
 			switch container {
+			case is LyricBlock:
+				if block is Lyric {
+					return container
+				}
+				break
 			case is CueBlock:
 				if block is DualCue {
 					return container
@@ -241,7 +203,9 @@ extension CueParser {
 				break
 			case is RegularCue, is DualCue:
 				if block is Lyric {
-					return container
+					let lyb = LyricBlock(startIndex: block.startIndex, endIndex: block.endIndex)
+					container.addChild(lyb)
+					return lyb
 				}
 				fallthrough
 			default:
@@ -256,7 +220,7 @@ extension CueParser {
 		block = Description()
 		block.startIndex = charNumber
 		block.endIndex = endOfLineCharNumber
-		return self.root
+		return root
 	}
 	
 }
