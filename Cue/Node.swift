@@ -51,24 +51,12 @@
 
 public class Block: Node {
 	public var lineNumber = 0
-	
-	func addDefaultChildren(offset: Int) {
-		let del = Delimiter(startIndex: startIndex, endIndex: offset)
-		del.type = .whitespace
-		addChild(del)
-	}
 }
 public class Inline: Node { }
 
 public class Document: Block {}
 
-public class Heading: Block {
-	override func addDefaultChildren(offset: Int) {
-		super.addDefaultChildren(offset: offset)
-		let te = RawText(startIndex: offset, endIndex: endIndex)
-		addChild(te)
-	}
-}
+public class Heading: Block {}
 public class ActHeading: Heading {}
 public class ChapterHeading: Heading {}
 public class SceneHeading: Heading {}
@@ -76,65 +64,12 @@ public class SceneHeading: Heading {}
 public class Description: Block {}
 public class CueBlock: Block {}
 public class LyricBlock: Block {}
-public class Lyric: Block {
-	func addDefaultChildren(for result: SearchResult) {
-		addDefaultChildren(offset: result.startIndex)
-		
-		let delim = Delimiter(startIndex: result.startIndex, endIndex: result.endIndex)
-		delim.type = .lyric
-		addChild(delim)
-		
-		let te = RawText(startIndex: delim.endIndex, endIndex: endIndex)
-		addChild(te)
-	}
-}
-public class CommentBlock: Block {
-	func addDefaultChildren(for results: [SearchResult]) {
-		addDefaultChildren(offset: results[0].startIndex)
-		
-		let cont1 = CommentText(startIndex: results[0].startIndex, endIndex: results[0].endIndex)
-		addChild(cont1)
-		
-		let delim = Delimiter(startIndex: results[1].startIndex, endIndex: results[1].endIndex)
-		delim.type = .whitespace
-		addChild(delim)
-		
-		let cont2 = CommentText(startIndex: results[1].endIndex, endIndex: endIndex)
-		addChild(cont2)
-	}
-}
+public class Lyric: Block {}
+public class CommentBlock: Block {}
 
-public class Cue: Block {
-	func addDefaultChildren(for results: [SearchResult]) {
-		let name = Name(startIndex: results[0].startIndex, endIndex: results[0].endIndex)
-		addChild(name)
-		
-		let del2 = Delimiter(startIndex: results[1].startIndex, endIndex: results[1].endIndex)
-		del2.type = .colon
-		addChild(del2)
-		
-		let te = RawText(startIndex: del2.endIndex, endIndex: endIndex)
-		addChild(te)
-	}
-}
-public class RegularCue: Cue {
-	override func addDefaultChildren(for results: [SearchResult]) {
-		addDefaultChildren(offset: results[0].startIndex)
-		
-		super.addDefaultChildren(for: results)
-	}
-}
-public class DualCue: Cue {
-	override func addDefaultChildren(for results: [SearchResult]) {
-		addDefaultChildren(offset: results[0].startIndex)
-		
-		let del = Delimiter(startIndex: results[0].startIndex, endIndex: results[0].endIndex)
-		del.type = .dual
-		addChild(del)
-		
-		super.addDefaultChildren(for: Array(results.dropFirst()))
-	}
-}
+public class Cue: Block {}
+public class RegularCue: Cue {}
+public class DualCue: Cue {}
 
 public class RawText: Inline {}
 public class CommentText: Inline {}
