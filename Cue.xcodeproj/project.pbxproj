@@ -33,6 +33,8 @@
 		10B042F91DACD869001D6AC7 /* CueTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10B042F81DACD869001D6AC7 /* CueTests.swift */; };
 		10B042FB1DACD869001D6AC7 /* Cue.h in Headers */ = {isa = PBXBuildFile; fileRef = 10B042ED1DACD868001D6AC7 /* Cue.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		10BEDB511DB1825900C283AB /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 10BEDB501DB1825900C283AB /* .gitignore */; };
+		10D532D71DDE9CB3003D3034 /* Block.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10D532D61DDE9CB3003D3034 /* Block.swift */; };
+		10D532D81DDE9CB3003D3034 /* Block.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10D532D61DDE9CB3003D3034 /* Block.swift */; };
 		10F8B5191DBA8A5D003362A2 /* SearchResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F8B5181DBA8A5D003362A2 /* SearchResult.swift */; };
 /* End PBXBuildFile section */
 
@@ -73,6 +75,7 @@
 		10B043041DACD876001D6AC7 /* MyPlayground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; name = MyPlayground.playground; path = ../MyPlayground.playground; sourceTree = "<group>"; };
 		10BEDB501DB1825900C283AB /* .gitignore */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		10BEDB521DB1829500C283AB /* UIPlayground.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = UIPlayground.playground; sourceTree = "<group>"; };
+		10D532D61DDE9CB3003D3034 /* Block.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Block.swift; sourceTree = "<group>"; };
 		10F8B5161DB5FB2E003362A2 /* Data Structures.playground */ = {isa = PBXFileReference; lastKnownFileType = file.playground; path = "Data Structures.playground"; sourceTree = "<group>"; };
 		10F8B5181DBA8A5D003362A2 /* SearchResult.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SearchResult.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -145,6 +148,7 @@
 				10B042ED1DACD868001D6AC7 /* Cue.h */,
 				10F8B5161DB5FB2E003362A2 /* Data Structures.playground */,
 				10722A081DAFF225003DB282 /* Node.swift */,
+				10D532D61DDE9CB3003D3034 /* Block.swift */,
 				107466471DC5603400784D63 /* NodeSearchOptions.swift */,
 				10722A0A1DAFF26B003DB282 /* Parser.swift */,
 				10F8B5181DBA8A5D003362A2 /* SearchResult.swift */,
@@ -324,6 +328,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				106E767D1DBB67B800880194 /* InlineCollection.swift in Sources */,
+				10D532D81DDE9CB3003D3034 /* Block.swift in Sources */,
 				106E767A1DBB67AD00880194 /* Node.swift in Sources */,
 				106E767C1DBB67B400880194 /* SearchResult.swift in Sources */,
 				106E767B1DBB67B000880194 /* Parser.swift in Sources */,
@@ -337,6 +342,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				10722A0B1DAFF26B003DB282 /* Parser.swift in Sources */,
+				10D532D71DDE9CB3003D3034 /* Block.swift in Sources */,
 				10F8B5191DBA8A5D003362A2 /* SearchResult.swift in Sources */,
 				10722A091DAFF225003DB282 /* Node.swift in Sources */,
 				106E76591DBB229B00880194 /* InlineCollection.swift in Sources */,
