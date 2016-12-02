@@ -67,9 +67,37 @@ public class LyricBlock: Block {}
 public class Lyric: Block {}
 public class CommentBlock: Block {}
 
-public class Cue: Block {}
-public class RegularCue: Cue {}
-public class DualCue: Cue {}
+public class Cue: Block {
+	func addDefaultChildren(for results: [SearchResult]) {
+		let name = Name(startIndex: results[0].startIndex, endIndex: results[0].endIndex)
+		addChild(name)
+		
+		let del2 = Delimiter(startIndex: results[1].startIndex, endIndex: results[1].endIndex)
+		del2.type = .colon
+		addChild(del2)
+		
+		let te = RawText(startIndex: del2.endIndex, endIndex: endIndex)
+		addChild(te)
+	}
+}
+public class RegularCue: Cue {
+	override func addDefaultChildren(for results: [SearchResult]) {
+		addDefaultChildren(offset: results[0].startIndex)
+		
+		super.addDefaultChildren(for: results)
+	}
+}
+public class DualCue: Cue {
+	override func addDefaultChildren(for results: [SearchResult]) {
+		addDefaultChildren(offset: results[0].startIndex)
+		
+		let del = Delimiter(startIndex: results[0].startIndex, endIndex: results[0].endIndex)
+		del.type = .dual
+		addChild(del)
+		
+		super.addDefaultChildren(for: Array(results.dropFirst()))
+	}
+}
 
 public class RawText: Inline {}
 public class CommentText: Inline {}
