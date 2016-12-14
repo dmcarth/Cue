@@ -14,11 +14,9 @@ class EmphasisTests: XCTestCase {
     func testStarStar() {
 		let ast = CueParser.parse("**")
 		
-		let doc = Document(startIndex: 0, endIndex: 2)
+		let doc = Document(startIndex: 0, endIndex: 2, offset: 0)
 		let desc = Description(startIndex: 0, endIndex: 2)
 		doc.addChild(desc)
-		let raw = RawText(startIndex: 0, endIndex: 2)
-		desc.addChild(raw)
 		
 		XCTAssertEqual(ast.debugString(), doc.debugString())
 	}
@@ -26,11 +24,9 @@ class EmphasisTests: XCTestCase {
 	func testStarA() {
 		let ast = CueParser.parse("*a")
 		
-		let doc = Document(startIndex: 0, endIndex: 2)
+		let doc = Document(startIndex: 0, endIndex: 2, offset: 0)
 		let desc = Description(startIndex: 0, endIndex: 2)
 		doc.addChild(desc)
-		let raw = RawText(startIndex: 0, endIndex: 2)
-		desc.addChild(raw)
 		
 		XCTAssertEqual(ast.debugString(), doc.debugString())
 	}
@@ -38,11 +34,9 @@ class EmphasisTests: XCTestCase {
 	func testAStar() {
 		let ast = CueParser.parse("a*")
 		
-		let doc = Document(startIndex: 0, endIndex: 2)
+		let doc = Document(startIndex: 0, endIndex: 2, offset: 0)
 		let desc = Description(startIndex: 0, endIndex: 2)
 		doc.addChild(desc)
-		let raw = RawText(startIndex: 0, endIndex: 2)
-		desc.addChild(raw)
 		
 		XCTAssertEqual(ast.debugString(), doc.debugString())
 	}
@@ -50,11 +44,9 @@ class EmphasisTests: XCTestCase {
 	func testAStarA() {
 		let ast = CueParser.parse("a*a")
 		
-		let doc = Document(startIndex: 0, endIndex: 3)
+		let doc = Document(startIndex: 0, endIndex: 3, offset: 0)
 		let desc = Description(startIndex: 0, endIndex: 3)
 		doc.addChild(desc)
-		let raw = RawText(startIndex: 0, endIndex: 3)
-		desc.addChild(raw)
 		
 		XCTAssertEqual(ast.debugString(), doc.debugString())
 	}
@@ -62,9 +54,11 @@ class EmphasisTests: XCTestCase {
 	func testStarAStar() {
 		let ast = CueParser.parse("*a*")
 		
-		let doc = Document(startIndex: 0, endIndex: 3)
+		let doc = Document(startIndex: 0, endIndex: 3, offset: 0)
 		let desc = Description(startIndex: 0, endIndex: 3)
 		doc.addChild(desc)
+		desc.removeLastChild()
+		
 		let del1 = Delimiter(startIndex: 0, endIndex: 1)
 		desc.addChild(del1)
 		let em = Emphasis(startIndex: 1, endIndex: 2)
@@ -78,9 +72,11 @@ class EmphasisTests: XCTestCase {
 	func testStarAStarAStar() {
 		let ast = CueParser.parse("*a*a*")
 		
-		let doc = Document(startIndex: 0, endIndex: 5)
+		let doc = Document(startIndex: 0, endIndex: 5, offset: 0)
 		let desc = Description(startIndex: 0, endIndex: 5)
 		doc.addChild(desc)
+		desc.removeLastChild()
+		
 		let del1 = Delimiter(startIndex: 0, endIndex: 1)
 		desc.addChild(del1)
 		let em = Emphasis(startIndex: 1, endIndex: 2)

@@ -17,21 +17,14 @@ class HeaderBlockTests: XCTestCase {
 		let ast = parser.parse()
 		print(ast)
 		
-		let doc = Document(startIndex: 0, endIndex: 7)
+		let doc = Document(startIndex: 0, endIndex: 7, offset: 0)
 		
-		let head = Heading(startIndex: 0, endIndex: 7)
+		let re1 = SearchResult(startIndex: 0, endIndex: 5, keywordType: .scene)
+		let re2 = SearchResult(startIndex: 5, endIndex: 6)
+		let re3 = SearchResult(startIndex: 6, endIndex: 7)
+		
+		let head = Heading(startIndex: 0, endIndex: 7, results: [re1, re2, re3])
 		doc.addChild(head)
-		
-		let key = Keyword(startIndex: 0, endIndex: 5)
-		key.type = .scene
-		head.addChild(key)
-		
-		let del = Delimiter(startIndex: 5, endIndex: 6)
-		del.type = .whitespace
-		head.addChild(del)
-		
-		let id = Identifier(startIndex: 6, endIndex: 7)
-		head.addChild(id)
 		
 		XCTAssertEqual(ast.debugString(), doc.debugString())
 	}
@@ -41,28 +34,16 @@ class HeaderBlockTests: XCTestCase {
 		
 		let ast = parser.parse()
 		
-		let doc = Document(startIndex: 0, endIndex: 11)
+		let doc = Document(startIndex: 0, endIndex: 11, offset: 0)
 		
-		let head = Heading(startIndex: 0, endIndex: 11)
+		let re1 = SearchResult(startIndex: 0, endIndex: 5, keywordType: .scene)
+		let re2 = SearchResult(startIndex: 5, endIndex: 6)
+		let re3 = SearchResult(startIndex: 6, endIndex: 8)
+		let re4 = SearchResult(startIndex: 8, endIndex: 10)
+		let re5 = SearchResult(startIndex: 10, endIndex: 11)
+		
+		let head = Heading(startIndex: 0, endIndex: 11, results: [re1, re2, re3, re4, re5])
 		doc.addChild(head)
-		
-		let key = Keyword(startIndex: 0, endIndex: 5)
-		key.type = .scene
-		head.addChild(key)
-		
-		let del = Delimiter(startIndex: 5, endIndex: 6)
-		del.type = .whitespace
-		head.addChild(del)
-		
-		let id = Identifier(startIndex: 6, endIndex: 8)
-		head.addChild(id)
-		
-		let del1 = Delimiter(startIndex: 8, endIndex: 10)
-		del1.type = .hyphen
-		head.addChild(del1)
-		
-		let raw = RawText(startIndex: 10, endIndex: 11)
-		head.addChild(raw)
 		
 		XCTAssertEqual(ast.debugString(), doc.debugString())
 	}
