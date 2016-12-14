@@ -4,10 +4,10 @@ Cue is a Markdown-style language for writing stories for print, screen, and stag
 It is still in development and therefore not suitable for production just yet.
 
 ## Syntax
-Cue is designed to be intuitive and invisible whenever possible. It should look more or less exactly the same as when it's printed. 
+Cue is designed to be intuitive and invisible whenever possible. It should look more or less exactly the same as when it's printed on a book or in a script. 
 
 ### Headers
-Headers, for example, are marked by their own keywords:
+Headers, for example, are marked by their own keywords and an identifier:
 
 ```
 Act I
@@ -15,8 +15,16 @@ Chapter 1
 Scene The First
 ```
 
+The identifier can be anything: roman numerals, raw text, emoji, you pick. For this reason, Cue does not currently enforce the uniqueness of each identifier.
+
+In addition, you can optionally give each header a title by adding a hyphen.
+
+```
+Chapter I - An Unexpected Party
+```
+
 ### Description
-Unmarked text is treated like ordinary description and can contain any variety of plain text.
+Unmarked text is treated as ordinary description and can contain any variety of plain text.
 
 ```
 Jack went to the store to buy some milk, but he came home with a Jack Russell Terrier instead.
@@ -32,7 +40,7 @@ It also inherits a similar inline syntax to Markdown.
 
 ```
 Emphasis is marked by *asterisks*.
-Images and other embeddable links are wrapped in [brackets].
+Links to images and other embeddable files are wrapped in [brackets].
 ```
 
 ### Cues
@@ -62,12 +70,19 @@ Jack: ~This is a song
 ```
 
 ### Whitespace
-Note that whitespace in Cue is generally ignored, allowing you to align lyrics and cues however you want, except when it comes to newlines.
+Note that whitespace in Cue is generally ignored, allowing you to align lyrics and cues however you please.
+
+```
+	Jack: ~These 3 lines of music
+~Are all
+			~Conntected.
+
+The only exception is for newlines. Unlike Markdown, Cue counts every single line
 
 ```
 This is line #1
 
-This is line #3, because it comes two lines after line #1.
+This is line #3 because it comes two lines after line #1.
 ```
 
 ### Comments
@@ -77,4 +92,4 @@ You can also write comments.
 // Lines beginning with two or more slashes are considered comments.
 ```
 
-Comments are considered block elements, meaning that they take over the entire line they're on.
+All comments are block elements, meaning that they take over the entire line they're on. If a line does not begin with `//` it can not be a comment.
