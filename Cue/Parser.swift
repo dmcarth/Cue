@@ -56,7 +56,7 @@
 	
 }
 
-// Block Parsing
+// MARK: - Block Parsing
 extension CueParser {
 	
 	func parseBlocks() {
@@ -118,24 +118,12 @@ extension CueParser {
 	func blockForLine() -> Block {
 		let wc = scanForFirstNonspace(startingAtIndex: charNumber)
 		
-		if scanForActHeading(atIndex: wc) {
-			let ah = ActHeading(startIndex: charNumber, endIndex: endOfLineCharNumber)
+		if let results = scanForHeading(atIndex: wc) {
+			let he = Heading(startIndex: wc, endIndex: endOfLineCharNumber)
 			
-			ah.addDefaultChildren(offset: wc)
+			he.addDefaultChildren(for: results)
 			
-			return ah
-		} else if scanForChapterHeading(atIndex: wc) {
-			let ch = ChapterHeading(startIndex: charNumber, endIndex: endOfLineCharNumber)
-			
-			ch.addDefaultChildren(offset: wc)
-			
-			return ch
-		} else if scanForSceneHeading(atIndex: wc) {
-			let sh = SceneHeading(startIndex: charNumber, endIndex: endOfLineCharNumber)
-			
-			sh.addDefaultChildren(offset: wc)
-			
-			return sh
+			return he
 		} else if let result = scanForComment(atIndex: wc) {
 			let com = CommentBlock(startIndex: charNumber, endIndex: endOfLineCharNumber)
 			
@@ -173,7 +161,7 @@ extension CueParser {
 		
 		switch block {
 		// These block types can only ever be level-1
-		case is ActHeading, is ChapterHeading, is SceneHeading, is Description, is CommentBlock:
+		case is Heading, is Description, is CommentBlock:
 			return root
 		// A regular cue is always level-2, with it's own initial parent cueBlock
 		case is RegularCue:
@@ -225,7 +213,7 @@ extension CueParser {
 	
 }
 
-// Inline Parsing
+// MARK: - Inline Parsing
 extension CueParser {
 	
 	func parseInlines(for block: Block, startingAt i: Int) {
@@ -337,7 +325,7 @@ extension CueParser {
 	
 }
 
-// Scanners
+// MARK: - Scanners
 extension CueParser {
 	
 	public func scanForLineEnding(atIndex i: Int) -> Bool {
@@ -360,11 +348,70 @@ extension CueParser {
 			if scanForWhitespace(atIndex: j) {
 				j += 1
 			} else {
-				return j
+				//return j
+				break
 			}
 		}
 		
 		return j
+	}
+	
+	public func scanForHyphen(startingAtIndex i: Int) -> Int {
+		var j = i
+		
+		while j < endOfLineCharNumber {
+			if data[j] == 0x002d {	// '-'
+				break
+			} else {
+				j += 1
+			}
+		}
+		
+		return j
+	}
+	
+	
+	/// Returns an array of SearchResults or nil if matching failed.
+	///
+	/// - returns: [0] covers the keyword, [1] covers whitespace, [2] covers the id, [3-4] covers the hyphen and title if present.
+	public func scanForHeading(atIndex i: Int) -> [SearchResult]? {
+		var type: Keyword.KeywordType
+		var j = i
+		
+		if scanForActHeading(atIndex: i) {
+			type = .act
+			j += 3
+		} else if scanForSceneHeading(atIndex: i) {
+			type = .scene
+			j += 5
+		} else if scanForChapterHeading(atIndex: i) {
+			type = .chapter
+			j += 7
+		} else {
+			return nil
+		}
+		let keyResult = SearchResult(startIndex: i, endIndex: j, keywordType: type)
+		
+		
+		let k = scanForFirstNonspace(startingAtIndex: j)
+		guard k < endOfLineCharNumber else {
+			return nil
+		}
+		let wResult = SearchResult(startIndex: j, endIndex: k)
+		
+		let l = scanForHyphen(startingAtIndex: k)
+		let idResult = SearchResult(startIndex: k, endIndex: l)
+		
+		var results = [keyResult, wResult, idResult]
+		
+		if l < endOfLineCharNumber {
+			let m = scanForFirstNonspace(startingAtIndex: l+1)
+			let hResult = SearchResult(startIndex: l, endIndex: m)
+			let titleResult = SearchResult(startIndex: m, endIndex: endOfLineCharNumber)
+			results.append(contentsOf: [hResult, titleResult])
+		}
+		
+		return results
 	}
 	
 	public func scanForActHeading(atIndex i: Int) -> Bool {

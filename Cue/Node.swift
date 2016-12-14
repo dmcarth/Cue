@@ -29,6 +29,10 @@
 		self.endIndex = endIndex
 	}
 	
+	public convenience init(_ result: SearchResult) {
+		self.init(startIndex: result.startIndex, endIndex: result.endIndex)
+	}
+	
 	internal func addChild(_ child: Node) {
 		child.parent = self
 		if let last = children.last {
@@ -57,9 +61,15 @@ public class Inline: Node { }
 public class Document: Block {}
 
 public class Heading: Block {}
-public class ActHeading: Heading {}
-public class ChapterHeading: Heading {}
-public class SceneHeading: Heading {}
+public class Keyword: Inline {
+	public enum KeywordType {
+		case act
+		case chapter
+		case scene
+	}
+	var type: KeywordType = .act
+}
+public class Identifier: Inline {}
 
 public class Description: Block {}
 public class CueBlock: Block {}
@@ -108,6 +118,7 @@ public class Delimiter: Inline {
 		case lyric
 		case emph
 		case colon
+		case hyphen
 		case openBracket
 		case closeBracket
 	}
@@ -120,14 +131,14 @@ public class Reference: Inline {}
 // Public Interface
 extension Node {
 	
-	/// Binary search for node containing given index.
+	/// Binary search for the node containing a given index.
 	///
 	/// - Parameters:
 	///   - index: A utf16 byte index.
 	///   - options: A NodeSearchOptions object allowing fine grain control of search.
-	///      - deepSearch: A Bool causing search to search children for the most specific match. Default value is true.
+	///      - deepSearch: A Bool causing search to recursively find the most specific match. Default value is true.
 	///      - predicate: A closure causing search to return early if a matching node is found.
-	/// - Returns: Node containing given index, nil if out of bounds
+	/// - Returns: Node containing a given index, nil if out of bounds
 	public func search(index: Int, options: NodeSearchOptions) -> Node? {
 		guard index >= self.startIndex && index < endIndex else {
 			return nil
@@ -148,17 +159,19 @@ extension Node {
 				// We've found a match!
 				
 				// If a custom search predicate has been provided, that takes precedence over everything else
-				if options.predicate != nil {
-					if options.predicate!(midChild) {
+				if let predicate = options.predicate{
+					if predicate(midChild) {
 						return midChild
 					}
 				}
 				
 				if options.deepSearchEnabled {
-					return midChild.search(index: index, options: options)
+					if let deepMatch = midChild.search(index: index, options: options) {
+						return deepMatch
+					}
 				}
 				
-				// This ensures that a search with a predicate will only return if the matching node passes the predicate
+				// Checking for nil ensures that a search with a predicate will only return if the matching node passes the given predicate
 				if options.predicate == nil {
 					return midChild
 				}
@@ -172,7 +185,7 @@ extension Node {
 		let isLeaf = children.isEmpty
 		handler(self)
 		
-		// This enables us to manipulate the node within the handler without also creating an infinite loop
+		// This enables us to manipulate the node within the handler without creating an infinite loop
 		guard !isLeaf else {
 			return
 		}
@@ -187,7 +200,11 @@ extension Node {
 extension Node {
 	
 	func debugString() -> String {
-		return "\(NSStringFromClass(type(of: self))) \(startIndex) \(endIndex)"
+		var s = "(\(NSStringFromClass(type(of: self))) \(startIndex) \(endIndex))"
+		if !isLeaf {
+			s += "{" + children.map { $0.debugString() }.joined(separator: ",") + "}"
+		}
+		return s
 	}
 	
 }
