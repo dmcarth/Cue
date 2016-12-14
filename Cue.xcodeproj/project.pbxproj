@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		10274A771E00FBD400FD7061 /* HeaderBlockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10274A761E00FBD400FD7061 /* HeaderBlockTests.swift */; };
+		10274A791E0155DD00FD7061 /* Inline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10274A781E0155DD00FD7061 /* Inline.swift */; };
 		10536C5C1DAF99CA00CDF901 /* war+peace.txt in Resources */ = {isa = PBXBuildFile; fileRef = 10536C5B1DAF99CA00CDF901 /* war+peace.txt */; };
 		106E76591DBB229B00880194 /* InlineCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106E76581DBB229B00880194 /* InlineCollection.swift */; };
 		106E76791DBB679800880194 /* Cue.h in Headers */ = {isa = PBXBuildFile; fileRef = 10B042ED1DACD868001D6AC7 /* Cue.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -51,6 +52,7 @@
 
 /* Begin PBXFileReference section */
 		10274A761E00FBD400FD7061 /* HeaderBlockTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HeaderBlockTests.swift; sourceTree = "<group>"; };
+		10274A781E0155DD00FD7061 /* Inline.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Inline.swift; sourceTree = "<group>"; };
 		10536C5B1DAF99CA00CDF901 /* war+peace.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "war+peace.txt"; sourceTree = "<group>"; };
 		106E76581DBB229B00880194 /* InlineCollection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InlineCollection.swift; sourceTree = "<group>"; };
 		106E76611DBB66E900880194 /* Cue.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Cue.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -108,6 +110,17 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		10274A7A1E01562400FD7061 /* AST */ = {
+			isa = PBXGroup;
+			children = (
+				10722A081DAFF225003DB282 /* Node.swift */,
+				107466471DC5603400784D63 /* NodeSearchOptions.swift */,
+				10D532D61DDE9CB3003D3034 /* Block.swift */,
+				10274A781E0155DD00FD7061 /* Inline.swift */,
+			);
+			name = AST;
+			sourceTree = "<group>";
+		};
 		106E76871DBC29E500880194 /* Scanners */ = {
 			isa = PBXGroup;
 			children = (
@@ -149,9 +162,7 @@
 				10B043041DACD876001D6AC7 /* MyPlayground.playground */,
 				10B042ED1DACD868001D6AC7 /* Cue.h */,
 				10F8B5161DB5FB2E003362A2 /* Data Structures.playground */,
-				10722A081DAFF225003DB282 /* Node.swift */,
-				10D532D61DDE9CB3003D3034 /* Block.swift */,
-				107466471DC5603400784D63 /* NodeSearchOptions.swift */,
+				10274A7A1E01562400FD7061 /* AST */,
 				10722A0A1DAFF26B003DB282 /* Parser.swift */,
 				10F8B5181DBA8A5D003362A2 /* SearchResult.swift */,
 				106E76581DBB229B00880194 /* InlineCollection.swift */,
@@ -350,6 +361,7 @@
 				10722A091DAFF225003DB282 /* Node.swift in Sources */,
 				106E76591DBB229B00880194 /* InlineCollection.swift in Sources */,
 				107466481DC5603400784D63 /* NodeSearchOptions.swift in Sources */,
+				10274A791E0155DD00FD7061 /* Inline.swift in Sources */,
 				10A49E101DC186B2006B4FDF /* DelimiterStack.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -580,6 +592,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PUBLIC_HEADERS_FOLDER_PATH = "$(CONTENTS_FOLDER_PATH)/Headers";
 				SKIP_INSTALL = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				SWIFT_VERSION = 3.0;
 			};
 			name = Release;
