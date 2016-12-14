@@ -53,40 +53,7 @@
 	
 }
 
-
-public class Inline: Node { }
-
-
-public class Keyword: Inline {
-	public enum KeywordType {
-		case act
-		case chapter
-		case scene
-	}
-	var type: KeywordType = .act
-}
-public class Identifier: Inline {}
-
-public class RawText: Inline {}
-public class CommentText: Inline {}
-public class Delimiter: Inline {
-	public enum DelimiterType {
-		case whitespace
-		case dual
-		case lyric
-		case emph
-		case colon
-		case hyphen
-		case openBracket
-		case closeBracket
-	}
-	public var type: DelimiterType = .whitespace
-}
-public class Name: Inline {}
-public class Emphasis: Inline {}
-public class Reference: Inline {}
-
-// Public Interface
+// MARK: - Public Interface
 extension Node {
 	
 	/// Binary search for the node containing a given index.
@@ -154,7 +121,7 @@ extension Node {
 	}
 }
 
-// Debug Functions
+// MARK: - Debug Functions
 extension Node {
 	
 	func debugString() -> String {
