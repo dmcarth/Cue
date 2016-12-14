@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		10274A771E00FBD400FD7061 /* HeaderBlockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10274A761E00FBD400FD7061 /* HeaderBlockTests.swift */; };
 		10536C5C1DAF99CA00CDF901 /* war+peace.txt in Resources */ = {isa = PBXBuildFile; fileRef = 10536C5B1DAF99CA00CDF901 /* war+peace.txt */; };
 		106E76591DBB229B00880194 /* InlineCollection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 106E76581DBB229B00880194 /* InlineCollection.swift */; };
 		106E76791DBB679800880194 /* Cue.h in Headers */ = {isa = PBXBuildFile; fileRef = 10B042ED1DACD868001D6AC7 /* Cue.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -49,6 +50,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		10274A761E00FBD400FD7061 /* HeaderBlockTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HeaderBlockTests.swift; sourceTree = "<group>"; };
 		10536C5B1DAF99CA00CDF901 /* war+peace.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "war+peace.txt"; sourceTree = "<group>"; };
 		106E76581DBB229B00880194 /* InlineCollection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = InlineCollection.swift; sourceTree = "<group>"; };
 		106E76611DBB66E900880194 /* Cue.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Cue.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -166,6 +168,7 @@
 				10A49E0D1DC1847B006B4FDF /* NodeTests.swift */,
 				10A49DD01DBF6255006B4FDF /* EmphasisTests.swift */,
 				1074664A1DC5708000784D63 /* CueBlockTests.swift */,
+				10274A761E00FBD400FD7061 /* HeaderBlockTests.swift */,
 				106E76871DBC29E500880194 /* Scanners */,
 				10536C5B1DAF99CA00CDF901 /* war+peace.txt */,
 				10B042FA1DACD869001D6AC7 /* Info.plist */,
@@ -355,6 +358,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				10274A771E00FBD400FD7061 /* HeaderBlockTests.swift in Sources */,
 				106E768D1DBC410C00880194 /* CommentScannerTests.swift in Sources */,
 				106E76891DBC349000880194 /* DualCueScannerTests.swift in Sources */,
 				106E768F1DBC4BB900880194 /* HeaderScannerTests.swift in Sources */,
