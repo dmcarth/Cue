@@ -73,6 +73,7 @@ Jack: ~This is a song
 Note that whitespace in Cue is generally ignored, allowing you to align lyrics and cues however you please.
 
 ```
+	Scene 2
        Jack:	~This is
 				~a stanza of music
 Christopher:	~Aligned by the begining
