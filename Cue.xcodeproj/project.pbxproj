@@ -160,8 +160,8 @@
 			children = (
 				10BEDB521DB1829500C283AB /* UIPlayground.playground */,
 				10B043041DACD876001D6AC7 /* MyPlayground.playground */,
-				10B042ED1DACD868001D6AC7 /* Cue.h */,
 				10F8B5161DB5FB2E003362A2 /* Data Structures.playground */,
+				10B042ED1DACD868001D6AC7 /* Cue.h */,
 				10274A7A1E01562400FD7061 /* AST */,
 				10722A0A1DAFF26B003DB282 /* Parser.swift */,
 				10F8B5181DBA8A5D003362A2 /* SearchResult.swift */,
