@@ -44,7 +44,7 @@ Links to images and other embeddable files are wrapped in [brackets].
 ```
 
 ### Cues
-The real power of Cue, however, comes from the way it treats dialogue and scene description. Both are treated as the same kind of thing: a cue. Dialogue is just a cue targeted at one person. Other cues can be targeted at other parts of the mise-en-scene.
+The real power of Cue, however, comes from the way it treats dialogue. On a fundamental level, dialogue is just scene description targeted at one person. Other cues can be targeted at other people and departments -- any part of the mise-en-scene can have a cue if it suits the writer and production team.
 
 ```
 Jack: This is a line of dialogue.
@@ -73,9 +73,13 @@ Jack: ~This is a song
 Note that whitespace in Cue is generally ignored, allowing you to align lyrics and cues however you please.
 
 ```
-	Jack: ~These 3 lines of music
-~Are all
-			~Conntected.
+       Jack:	~This is
+				~a stanza of music
+Christopher:	~Aligned by the begining
+				~Of each lyric line
+	   Jill:	~And by the end
+				~Of each cue name
+```
 
 The only exception is for newlines. Unlike Markdown, Cue counts every single line
 
