@@ -6,8 +6,12 @@
 //  Copyright © 2016 Dylan McArthur. All rights reserved.
 //
 
-extension Block {
-	func addDefaultChildren(offset: Int) {
+public class Block: Node {
+	public var lineNumber = 0
+	
+	public init(startIndex: Int, endIndex: Int, offset: Int) {
+		super.init(startIndex: startIndex, endIndex: endIndex)
+		
 		if offset > startIndex {
 			let del = Delimiter(startIndex: startIndex, endIndex: offset)
 			del.type = .whitespace
@@ -16,9 +20,15 @@ extension Block {
 	}
 }
 
-extension Heading {
-	func addDefaultChildren(for results: [SearchResult]) {
-		addDefaultChildren(offset: results[0].startIndex)
+public class Document: Block {
+	public convenience init() {
+		self.init(startIndex: 0, endIndex: 0, offset: 0)
+	}
+}
+
+public class Heading: Block {
+	public init(startIndex: Int, endIndex: Int, results: [SearchResult]) {
+		super.init(startIndex: startIndex, endIndex: endIndex, offset: results[0].startIndex)
 		
 		let key = Keyword(results[0])
 		key.type = results[0].keywordType!
@@ -40,9 +50,9 @@ extension Heading {
 	}
 }
 
-extension Lyric {
-	func addDefaultChildren(for result: SearchResult) {
-		addDefaultChildren(offset: result.startIndex)
+public class Lyric: Block {
+	public init(startIndex: Int, endIndex: Int, result: SearchResult) {
+		super.init(startIndex: startIndex, endIndex: endIndex, offset: result.startIndex)
 		
 		let delim = Delimiter(result)
 		delim.type = .lyric
@@ -53,9 +63,9 @@ extension Lyric {
 	}
 }
 
-extension CommentBlock {
-	func addDefaultChildren(for results: [SearchResult]) {
-		addDefaultChildren(offset: results[0].startIndex)
+public class CommentBlock: Block {
+	public init(startIndex: Int, endIndex: Int, results: [SearchResult]) {
+		super.init(startIndex: startIndex, endIndex: endIndex, offset: results[0].startIndex)
 		
 		let cont1 = CommentText(results[0])
 		addChild(cont1)
@@ -66,5 +76,59 @@ extension CommentBlock {
 		
 		let cont2 = CommentText(results[1])
 		addChild(cont2)
+	}
+}
+
+public class CueBlock: Block {
+	public init(startIndex: Int, endIndex: Int) {
+		super.init(startIndex: startIndex, endIndex: endIndex, offset: startIndex)
+	}
+}
+
+public class LyricBlock: Block {
+	public init(startIndex: Int, endIndex: Int) {
+		super.init(startIndex: startIndex, endIndex: endIndex, offset: startIndex)
+	}
+}
+
+public class Cue: Block {
+	internal func addDefaultChildren(for results: [SearchResult]) {
+		let name = Name(startIndex: results[0].startIndex, endIndex: results[0].endIndex)
+		addChild(name)
+		
+		let del2 = Delimiter(startIndex: results[1].startIndex, endIndex: results[1].endIndex)
+		del2.type = .colon
+		addChild(del2)
+		
+		let te = RawText(startIndex: del2.endIndex, endIndex: endIndex)
+		addChild(te)
+	}
+}
+
+public class RegularCue: Cue {
+	public init(startIndex: Int, endIndex: Int, results: [SearchResult]) {
+		super.init(startIndex: startIndex, endIndex: endIndex, offset: results[0].startIndex)
+		
+		addDefaultChildren(for: results)
+	}
+}
+public class DualCue: Cue {
+	public init(startIndex: Int, endIndex: Int, results: [SearchResult]) {
+		super.init(startIndex: startIndex, endIndex: endIndex, offset: results[0].startIndex)
+		
+		let del = Delimiter(startIndex: results[0].startIndex, endIndex: results[0].endIndex)
+		del.type = .dual
+		addChild(del)
+		
+		addDefaultChildren(for: Array(results.dropFirst()))
+	}
+}
+
+public class Description: Block {
+	public init(startIndex: Int, endIndex: Int) {
+		super.init(startIndex: startIndex, endIndex: endIndex, offset: startIndex)
+		
+		let te = RawText(startIndex: startIndex, endIndex: endIndex)
+		addChild(te)
 	}
 }
