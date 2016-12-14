@@ -99,13 +99,14 @@ extension CueParser {
 			let last: Node = cb.children.last!
 			
 			if let result = scanForLyricPrefix(atIndex: last.startIndex) {
-				let ly = Lyric(startIndex: result.startIndex, endIndex: endOfLineCharNumber)
-				ly.addDefaultChildren(for: result)
+				let lyb = LyricBlock(startIndex: result.startIndex, endIndex: endOfLineCharNumber)
+				let ly = Lyric(startIndex: result.startIndex, endIndex: endOfLineCharNumber, result: result)
+				lyb.addChild(ly)
 				
 				parseInlines(for: ly, startingAt: result.endIndex)
 				
 				cb.removeLastChild()
-				cb.addChild(ly)
+				cb.addChild(lyb)
 			}
 		}
 		
@@ -119,40 +120,28 @@ extension CueParser {
 		let wc = scanForFirstNonspace(startingAtIndex: charNumber)
 		
 		if let results = scanForHeading(atIndex: wc) {
-			let he = Heading(startIndex: wc, endIndex: endOfLineCharNumber)
-			
-			he.addDefaultChildren(for: results)
+			let he = Heading(startIndex: wc, endIndex: endOfLineCharNumber, results: results)
 			
 			return he
 		} else if let result = scanForComment(atIndex: wc) {
-			let com = CommentBlock(startIndex: charNumber, endIndex: endOfLineCharNumber)
-			
-			com.addDefaultChildren(for: result)
+			let com = CommentBlock(startIndex: charNumber, endIndex: endOfLineCharNumber, results: result)
 			
 			return com
 		} else if let result = scanForLyricPrefix(atIndex: wc) {
-			let ly = Lyric(startIndex: charNumber, endIndex: endOfLineCharNumber)
-			
-			ly.addDefaultChildren(for: result)
+			let ly = Lyric(startIndex: charNumber, endIndex: endOfLineCharNumber, result: result)
 			
 			return ly
 		} else if let result = scanForDualCue(atIndex: wc) {
-			let du = DualCue(startIndex: charNumber, endIndex: endOfLineCharNumber)
-			
-			du.addDefaultChildren(for: result)
+			let du = DualCue(startIndex: charNumber, endIndex: endOfLineCharNumber, results: result)
 			
 			return du
 		} else if let result = scanForCue(atIndex: wc) {
-			let cu = RegularCue(startIndex: charNumber, endIndex: endOfLineCharNumber)
-			
-			cu.addDefaultChildren(for: result)
+			let cu = RegularCue(startIndex: charNumber, endIndex: endOfLineCharNumber, results: result)
 			
 			return cu
 		}
 		
 		let des = Description(startIndex: charNumber, endIndex: endOfLineCharNumber)
-		let te = RawText(startIndex: wc, endIndex: endOfLineCharNumber)
-		des.addChild(te)
 		return des
 	}
 	
@@ -179,21 +168,22 @@ extension CueParser {
 			var foundBreakingStatement = false
 			
 			switch container {
-			case is LyricBlock:
-				if block is Lyric {
+			case is CueBlock:
+				if block is DualCue {
+					container.parent!.endIndex = block.endIndex
 					return container
 				}
 				break
-			case is CueBlock:
-				if block is DualCue {
+			case is LyricBlock:
+				if block is Lyric {
+					container.parent!.endIndex = block.endIndex
+					container.parent!.parent!.endIndex = block.endIndex
 					return container
 				}
 				break
 			case is RegularCue, is DualCue:
 				if block is Lyric {
-					let lyb = LyricBlock(startIndex: block.startIndex, endIndex: block.endIndex)
-					container.addChild(lyb)
-					return lyb
+					break // to drop down the tree
 				}
 				fallthrough
 			default:
@@ -202,12 +192,11 @@ extension CueParser {
 			}
 			
 			if foundBreakingStatement { break }
+			
 		}
 		
 		//	If none of those cases have matched, it is because of some invalid syntax. Assume description
-		block = Description()
-		block.startIndex = charNumber
-		block.endIndex = endOfLineCharNumber
+		block = Description(startIndex: charNumber, endIndex: endOfLineCharNumber)
 		return root
 	}
 	
