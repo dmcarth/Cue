@@ -100,6 +100,9 @@ extension Node {
 				if options.predicate == nil {
 					return midChild
 				}
+				
+				// Search matched the index but not the options, break the loop
+				break
 			}
 		}
 		
@@ -119,6 +122,7 @@ extension Node {
 			c.enumerate(handler)
 		}
 	}
+	
 }
 
 // MARK: - Debug Functions

@@ -37,6 +37,7 @@
 		10BEDB511DB1825900C283AB /* .gitignore in Resources */ = {isa = PBXBuildFile; fileRef = 10BEDB501DB1825900C283AB /* .gitignore */; };
 		10D532D71DDE9CB3003D3034 /* Block.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10D532D61DDE9CB3003D3034 /* Block.swift */; };
 		10D532D81DDE9CB3003D3034 /* Block.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10D532D61DDE9CB3003D3034 /* Block.swift */; };
+		10E89EDF1E0F8A90001EDFB0 /* Inline.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10274A781E0155DD00FD7061 /* Inline.swift */; };
 		10F8B5191DBA8A5D003362A2 /* SearchResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10F8B5181DBA8A5D003362A2 /* SearchResult.swift */; };
 /* End PBXBuildFile section */
 
@@ -341,6 +342,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				10E89EDF1E0F8A90001EDFB0 /* Inline.swift in Sources */,
 				106E767D1DBB67B800880194 /* InlineCollection.swift in Sources */,
 				10D532D81DDE9CB3003D3034 /* Block.swift in Sources */,
 				106E767A1DBB67AD00880194 /* Node.swift in Sources */,
