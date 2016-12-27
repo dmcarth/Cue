@@ -15,7 +15,7 @@ Chapter 1
 Scene The First
 ```
 
-The identifier can be anything: roman numerals, raw text, emoji, you pick. For this reason, Cue does not currently enforce the uniqueness of each identifier.
+The identifier can be anything: roman numerals, raw text, emoji, you pick.
 
 In addition, you can optionally give each header a title by adding a hyphen.
 
@@ -43,32 +43,6 @@ Emphasis is marked by *asterisks*.
 Links to images and other embeddable files are wrapped in [brackets].
 ```
 
-### Cues
-The real power of Cue, however, comes from the way it treats dialogue. On a fundamental level, dialogue is just scene description targeted at one person. Other cues can be targeted at other people and departments -- any part of the mise-en-scene can have a cue if it suits the writer and production team.
-
-```
-Jack: This is a line of dialogue.
-Audio FX: This is a cue for the audio department.
-Cut to:
-```
-
-The last line is an example of a self-describing cue. It doesn't need any further description because the cue name *is* the description.
-
-Cues that are meant to overlap with each other can be marked with a caret.
-
-```
-Jack: This is a line of dialogue.
-^Jill: This is a line meant to be spoken at the same time as Jack.
-```
-
-And cues that contain music/lyrics can be marked with a tilde
-
-```
-Jack: ~This is a song
-      ~That extends multiple lines
-      ~And in theory could go on forever...
-```
-
 ### Facsimiles
 The beggining of a letter (or email, or sign, et al.) is marked with a right angle bracket.
 
@@ -80,6 +54,38 @@ The beggining of a letter (or email, or sign, et al.) is marked with a right ang
 ```
 
 Note that each subsequent line must also begin with an angle bracket.
+
+### Cues
+The real power of Cue, however, comes from the way it treats dialogue. On a fundamental level, dialogue is just scene description targeted at one person. 
+
+```
+Jack: This part of the document is meant specifically for me.
+```
+
+This subtle distinction allows tremendous flexibility in the writing process. Other cues can be targeted at other people and departments. Indeed, any part of the mise-en-scene can have a cue if it suits the writer and production team.
+
+```
+Audio FX: This is a cue for the audio department.
+Cut to:
+```
+
+The last line is an example of a self-describing cue. It doesn't need any further description because the cue name *is* the description.
+
+Cues that are meant to overlap with each other can be marked with a caret.
+
+```
+Jack: This is a line of dialogue.
+^Jill: This is a line meant to be spoken at the same time.
+```
+
+### Lyrics
+Music and lyrics are marked with a tilde.
+
+```
+Jack: ~This is a song
+      ~That extends multiple lines
+      ~And in theory could go on forever...
+```
 
 ### Whitespace
 Note that whitespace in Cue is generally ignored, allowing you to align lyrics and cues however you please.
