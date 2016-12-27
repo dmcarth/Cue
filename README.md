@@ -69,6 +69,18 @@ Jack: ~This is a song
       ~And in theory could go on forever...
 ```
 
+### Facsimiles
+The beggining of a letter (or email, or sign, et al.) is marked with a right angle bracket.
+
+```
+> Dear Mr. Potter,
+> You are out of eggs.
+> Love,
+> The Dursleys
+```
+
+Note that each subsequent line must also begin with an angle bracket.
+
 ### Whitespace
 Note that whitespace in Cue is generally ignored, allowing you to align lyrics and cues however you please.
 
@@ -98,3 +110,10 @@ You can also write comments.
 ```
 
 All comments are block elements, meaning that they take over the entire line they're on. If a line does not begin with `//` it can not be a comment.
+
+### Ending
+Every great work deserves closure. When you've reached the end of your story simply put:
+
+```
+The End
+```

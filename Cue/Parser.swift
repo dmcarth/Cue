@@ -132,8 +132,8 @@ extension CueParser {
 			let com = CommentBlock(startIndex: charNumber, endIndex: endOfLineCharNumber, results: result)
 			
 			return com
-		} else if let result = scanForCitation(at: wc) {
-			let cit = Citation(startIndex: charNumber, endIndex: endOfLineCharNumber, result: result)
+		} else if let result = scanForFacsimile(at: wc) {
+			let cit = Facsimile(startIndex: charNumber, endIndex: endOfLineCharNumber, result: result)
 			
 			return cit
 		} else if let result = scanForLyricPrefix(at: wc) {
@@ -166,11 +166,11 @@ extension CueParser {
 			let cueBlockContainer = CueBlock(startIndex: block.startIndex, endIndex: block.endIndex)
 			root.addChild(cueBlockContainer)
 			return cueBlockContainer
-		// The same is true for Citation
-		case is Citation:
-			let citationBlockContainer = CitationBlock(startIndex: block.startIndex, endIndex: block.endIndex)
-			root.addChild(citationBlockContainer)
-			return citationBlockContainer
+		// The same is true for Facsimile
+		case is Facsimile:
+			let facsimileBlockContainer = FacsimileBlock(startIndex: block.startIndex, endIndex: block.endIndex)
+			root.addChild(facsimileBlockContainer)
+			return facsimileBlockContainer
 		default:
 			break
 		}
@@ -542,7 +542,7 @@ extension CueParser {
 	/// Returns a SearchResult or nil if matching failed.
 	///
 	/// - Returns: Result covers ">" and any whitespace
-	public func scanForCitation(at i: Int) -> SearchResult? {
+	public func scanForFacsimile(at i: Int) -> SearchResult? {
 		guard endOfLineCharNumber > i else {
 			return nil
 		}

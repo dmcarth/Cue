@@ -84,13 +84,13 @@ public class CommentBlock: Block {
 	}
 }
 
-public class CitationBlock: Block {
+public class FacsimileBlock: Block {
 	public init(startIndex: Int, endIndex: Int) {
 		super.init(startIndex: startIndex, endIndex: endIndex, offset: startIndex)
 	}
 }
 
-public class Citation: Block {
+public class Facsimile: Block {
 	public init(startIndex: Int, endIndex: Int, result: SearchResult) {
 		super.init(startIndex: startIndex, endIndex: endIndex, offset: result.startIndex)
 		

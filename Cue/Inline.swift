@@ -25,6 +25,7 @@ public class Delimiter: Inline {
 		case whitespace
 		case dual
 		case lyric
+		case facsimile
 		case emph
 		case colon
 		case hyphen
