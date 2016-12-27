@@ -84,6 +84,24 @@ public class CommentBlock: Block {
 	}
 }
 
+public class CitationBlock: Block {
+	public init(startIndex: Int, endIndex: Int) {
+		super.init(startIndex: startIndex, endIndex: endIndex, offset: startIndex)
+	}
+}
+
+public class Citation: Block {
+	public init(startIndex: Int, endIndex: Int, result: SearchResult) {
+		super.init(startIndex: startIndex, endIndex: endIndex, offset: result.startIndex)
+		
+		let de = Delimiter(startIndex: result.startIndex, endIndex: result.endIndex)
+		addChild(de)
+		
+		let te = RawText(startIndex: result.endIndex, endIndex: endIndex)
+		addChild(te)
+	}
+}
+
 public class CueBlock: Block {
 	public init(startIndex: Int, endIndex: Int) {
 		super.init(startIndex: startIndex, endIndex: endIndex, offset: startIndex)

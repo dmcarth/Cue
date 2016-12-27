@@ -103,6 +103,7 @@ extension CueParser {
 				let ly = Lyric(startIndex: result.startIndex, endIndex: endOfLineCharNumber, result: result)
 				lyb.addChild(ly)
 				
+				// Lyrics are deeply nested. It's easier to just parse now instead of adding an edge case later.
 				parseInlines(for: ly, startingAt: result.endIndex)
 				
 				cb.removeLastChild()
@@ -131,6 +132,10 @@ extension CueParser {
 			let com = CommentBlock(startIndex: charNumber, endIndex: endOfLineCharNumber, results: result)
 			
 			return com
+		} else if let result = scanForCitation(at: wc) {
+			let cit = Citation(startIndex: charNumber, endIndex: endOfLineCharNumber, result: result)
+			
+			return cit
 		} else if let result = scanForLyricPrefix(at: wc) {
 			let ly = Lyric(startIndex: charNumber, endIndex: endOfLineCharNumber, result: result)
 			
@@ -161,6 +166,11 @@ extension CueParser {
 			let cueBlockContainer = CueBlock(startIndex: block.startIndex, endIndex: block.endIndex)
 			root.addChild(cueBlockContainer)
 			return cueBlockContainer
+		// The same is true for Citation
+		case is Citation:
+			let citationBlockContainer = CitationBlock(startIndex: block.startIndex, endIndex: block.endIndex)
+			root.addChild(citationBlockContainer)
+			return citationBlockContainer
 		default:
 			break
 		}
@@ -341,7 +351,6 @@ extension CueParser {
 			if scanForWhitespace(at: j) {
 				j += 1
 			} else {
-				//return j
 				break
 			}
 		}
@@ -529,6 +538,24 @@ extension CueParser {
 		return nil
 	}
 	
+	
+	/// Returns a SearchResult or nil if matching failed.
+	///
+	/// - Returns: Result covers ">" and any whitespace
+	public func scanForCitation(at i: Int) -> SearchResult? {
+		guard endOfLineCharNumber > i else {
+			return nil
+		}
+		
+		if data[i] == 0x003e { // ">"
+			let j = scanForFirstNonspace(startingAt: i+1)
+			
+			return SearchResult(startIndex: i, endIndex: j)
+		}
+		
+		return nil
+	}
+	
 	/// Returns a SearchResult or nil if matching failed.
 	///
 	/// - returns: Result covers "~"
@@ -613,7 +640,7 @@ extension CueParser {
 	}
 	
 	func scanForTheEnd(at index: Int) -> Bool {
-		guard endOfLineCharNumber > index + 7 else {
+		guard endOfLineCharNumber > index && index + 7 == data.count else {
 			return false
 		}
 		
@@ -624,10 +651,6 @@ extension CueParser {
 			(data[index+4] == 0x0045 || data[index+4] == 0x0065) &&
 			(data[index+5] == 0x004e || data[index+5] == 0x006e) &&
 			(data[index+6] == 0x0044 || data[index+6] == 0x0064) {	// 'T', 'h', 'e', ' ', 'E', 'n', 'd' case insensitive
-			let wc = scanForFirstNonspace(startingAt: index+7)
-			
-			guard wc > index+7 else { return false }
-			
 			return true
 		}
 		
