@@ -14,7 +14,7 @@ class CommentScannerTests: XCTestCase {
 	func testEmpty() {
 		let parser = CueParser("")
 		
-		let result = parser.scanForComment(atIndex: 0)
+		let result = parser.scanForComment(at: 0)
 		
 		XCTAssertNil(result)
 	}
@@ -22,7 +22,7 @@ class CommentScannerTests: XCTestCase {
 	func testA() {
 		let parser = CueParser("a")
 		
-		let result = parser.scanForComment(atIndex: 0)
+		let result = parser.scanForComment(at: 0)
 		
 		XCTAssertNil(result)
 	}
@@ -30,7 +30,7 @@ class CommentScannerTests: XCTestCase {
 	func testSlash() {
 		let parser = CueParser("/")
 		
-		let result = parser.scanForComment(atIndex: 0)
+		let result = parser.scanForComment(at: 0)
 		
 		XCTAssertNil(result)
 	}
@@ -38,7 +38,7 @@ class CommentScannerTests: XCTestCase {
 	func testSlashSpace() {
 		let parser = CueParser("/ ")
 		
-		let result = parser.scanForComment(atIndex: 0)
+		let result = parser.scanForComment(at: 0)
 		
 		XCTAssertNil(result)
 	}
@@ -46,7 +46,7 @@ class CommentScannerTests: XCTestCase {
 	func testSlashA() {
 		let parser = CueParser("/a")
 		
-		let result = parser.scanForComment(atIndex: 0)
+		let result = parser.scanForComment(at: 0)
 		
 		XCTAssertNil(result)
 	}
@@ -54,7 +54,7 @@ class CommentScannerTests: XCTestCase {
 	func testSlashSlash() {
 		let parser = CueParser("//")
 		
-		let result = parser.scanForComment(atIndex: 0)
+		let result = parser.scanForComment(at: 0)
 		
 		let expectedResult = [SearchResult(startIndex: 0, endIndex: 2), SearchResult(startIndex: 2, endIndex: 2)]
 		
@@ -64,7 +64,7 @@ class CommentScannerTests: XCTestCase {
 	func testSlashSlashSpace() {
 		let parser = CueParser("// ")
 		
-		let result = parser.scanForComment(atIndex: 0)
+		let result = parser.scanForComment(at: 0)
 		
 		let expectedResult = [SearchResult(startIndex: 0, endIndex: 2),SearchResult(startIndex: 2, endIndex: 3)]
 		
@@ -74,7 +74,7 @@ class CommentScannerTests: XCTestCase {
 	func testSlashSlashA() {
 		let parser = CueParser("//a")
 		
-		let result = parser.scanForComment(atIndex: 0)
+		let result = parser.scanForComment(at: 0)
 		
 		let expectedResult = [SearchResult(startIndex: 0, endIndex: 2), SearchResult(startIndex: 2, endIndex: 2)]
 		

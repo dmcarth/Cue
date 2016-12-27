@@ -14,7 +14,7 @@ class CueScannerTests: XCTestCase {
     func testEmpty() {
 		let parser = CueParser("")
 		
-		let result = parser.scanForCue(atIndex: 0)
+		let result = parser.scanForCue(at: 0)
 		
 		XCTAssertNil(result)
 	}
@@ -22,7 +22,7 @@ class CueScannerTests: XCTestCase {
     func testColon() {
 		let parser = CueParser(":")
 		
-		let result = parser.scanForCue(atIndex: 0)
+		let result = parser.scanForCue(at: 0)
 		
 		XCTAssertNil(result)
     }
@@ -30,7 +30,7 @@ class CueScannerTests: XCTestCase {
 	func testColonColon() {
 		let parser = CueParser("::")
 		
-		let result = parser.scanForCue(atIndex: 0)
+		let result = parser.scanForCue(at: 0)
 		
 		XCTAssertNil(result)
 	}
@@ -38,7 +38,7 @@ class CueScannerTests: XCTestCase {
 	func testAColon() {
 		let parser = CueParser("a:")
 		
-		let result = parser.scanForCue(atIndex: 0)
+		let result = parser.scanForCue(at: 0)
 		
 		let expectedResult = [SearchResult(startIndex: 0, endIndex: 1),SearchResult(startIndex: 1, endIndex: 2)]
 		
@@ -48,7 +48,7 @@ class CueScannerTests: XCTestCase {
 	func testAAColon() {
 		let parser = CueParser("aa:")
 		
-		let result = parser.scanForCue(atIndex: 0)
+		let result = parser.scanForCue(at: 0)
 		
 		let expectedResult = [SearchResult(startIndex: 0, endIndex: 2),SearchResult(startIndex: 2, endIndex: 3)]
 		
@@ -58,7 +58,7 @@ class CueScannerTests: XCTestCase {
 	func testAColonSpace() {
 		let parser = CueParser("a: ")
 		
-		let result = parser.scanForCue(atIndex: 0)
+		let result = parser.scanForCue(at: 0)
 		
 		let expectedResult = [SearchResult(startIndex: 0, endIndex: 1),SearchResult(startIndex: 1, endIndex: 3)]
 		
@@ -68,7 +68,7 @@ class CueScannerTests: XCTestCase {
 	func testAColonSpaceSpace() {
 		let parser = CueParser("a:  ")
 		
-		let result = parser.scanForCue(atIndex: 0)
+		let result = parser.scanForCue(at: 0)
 		
 		let expectedResult = [SearchResult(startIndex: 0, endIndex: 1),SearchResult(startIndex: 1, endIndex: 4)]
 		
@@ -78,7 +78,7 @@ class CueScannerTests: XCTestCase {
 	func testAColonSpaceSpaceA() {
 		let parser = CueParser("a:  a")
 		
-		let result = parser.scanForCue(atIndex: 0)
+		let result = parser.scanForCue(at: 0)
 		
 		let expectedResult = [SearchResult(startIndex: 0, endIndex: 1),SearchResult(startIndex: 1, endIndex: 4)]
 		
@@ -88,7 +88,7 @@ class CueScannerTests: XCTestCase {
 	func test24AColon() {
 		let parser = CueParser("aaaaaaaaaaaaaaaaaaaaaaaa:")
 		
-		let result = parser.scanForCue(atIndex: 0)
+		let result = parser.scanForCue(at: 0)
 		
 		XCTAssertNil(result)
 	}

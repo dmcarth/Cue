@@ -14,7 +14,7 @@ class LyricScannerTests: XCTestCase {
     func testEmpty() {
 		let parser = CueParser("")
 		
-		let result = parser.scanForLyricPrefix(atIndex: 0)
+		let result = parser.scanForLyricPrefix(at: 0)
 		
 		XCTAssertNil(result)
     }
@@ -22,7 +22,7 @@ class LyricScannerTests: XCTestCase {
 	func testTilde() {
 		let parser = CueParser("~")
 		
-		let result = parser.scanForLyricPrefix(atIndex: 0)
+		let result = parser.scanForLyricPrefix(at: 0)
 		
 		let expectedResult = SearchResult(startIndex: 0, endIndex: 1)
 		
@@ -32,7 +32,7 @@ class LyricScannerTests: XCTestCase {
 	func testTildeA() {
 		let parser = CueParser("~a")
 		
-		let result = parser.scanForLyricPrefix(atIndex: 0)
+		let result = parser.scanForLyricPrefix(at: 0)
 		
 		let expectedResult = SearchResult(startIndex: 0, endIndex: 1)
 		
@@ -42,7 +42,7 @@ class LyricScannerTests: XCTestCase {
 	func testATilde() {
 		let parser = CueParser("a~")
 		
-		let result = parser.scanForLyricPrefix(atIndex: 0)
+		let result = parser.scanForLyricPrefix(at: 0)
 		
 		XCTAssertNil(result)
 	}

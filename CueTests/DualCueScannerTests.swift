@@ -14,7 +14,7 @@ class DualCueScannerTests: XCTestCase {
     func testEmpty() {
 		let parser = CueParser("")
 		
-		let result = parser.scanForDualCue(atIndex: 0)
+		let result = parser.scanForDualCue(at: 0)
 		
 		XCTAssertNil(result)
     }
@@ -22,7 +22,7 @@ class DualCueScannerTests: XCTestCase {
 	func testCaret() {
 		let parser = CueParser("^")
 		
-		let result = parser.scanForDualCue(atIndex: 0)
+		let result = parser.scanForDualCue(at: 0)
 		
 		XCTAssertNil(result)
 	}
@@ -30,7 +30,7 @@ class DualCueScannerTests: XCTestCase {
 	func testCaretA() {
 		let parser = CueParser("^a")
 		
-		let result = parser.scanForDualCue(atIndex: 0)
+		let result = parser.scanForDualCue(at: 0)
 		
 		XCTAssertNil(result)
 	}
@@ -38,7 +38,7 @@ class DualCueScannerTests: XCTestCase {
 	func testCaretAColon() {
 		let parser = CueParser("^a:")
 		
-		let result = parser.scanForDualCue(atIndex: 0)
+		let result = parser.scanForDualCue(at: 0)
 		
 		let expectedResult = [SearchResult(startIndex: 0, endIndex: 1),SearchResult(startIndex: 1, endIndex: 2), SearchResult(startIndex: 2, endIndex: 3)]
 		

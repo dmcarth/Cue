@@ -14,7 +14,7 @@ class HeaderScannerTests: XCTestCase {
 	func testActEmpty() {
 		let parser = CueParser("")
 		
-		let result = parser.scanForActHeading(atIndex: 0)
+		let result = parser.scanForActHeading(at: 0)
 		
 		XCTAssertFalse(result)
 	}
@@ -22,7 +22,7 @@ class HeaderScannerTests: XCTestCase {
 	func testActAct() {
 		let parser = CueParser("Act")
 		
-		let result = parser.scanForActHeading(atIndex: 0)
+		let result = parser.scanForActHeading(at: 0)
 		
 		XCTAssertFalse(result)
 	}
@@ -30,7 +30,7 @@ class HeaderScannerTests: XCTestCase {
 	func testActActSpace () {
 		let parser = CueParser("Act ")
 		
-		let result = parser.scanForActHeading(atIndex: 0)
+		let result = parser.scanForActHeading(at: 0)
 		
 		XCTAssertTrue(result)
 	}
@@ -38,7 +38,7 @@ class HeaderScannerTests: XCTestCase {
 	func testActactSpace () {
 		let parser = CueParser("act ")
 		
-		let result = parser.scanForActHeading(atIndex: 0)
+		let result = parser.scanForActHeading(at: 0)
 		
 		XCTAssertTrue(result)
 	}
@@ -46,7 +46,7 @@ class HeaderScannerTests: XCTestCase {
 	func testChapterEmpty() {
 		let parser = CueParser("")
 		
-		let result = parser.scanForChapterHeading(atIndex: 0)
+		let result = parser.scanForChapterHeading(at: 0)
 		
 		XCTAssertFalse(result)
 	}
@@ -54,7 +54,7 @@ class HeaderScannerTests: XCTestCase {
 	func testChapterChapter() {
 		let parser = CueParser("Chapter")
 		
-		let result = parser.scanForChapterHeading(atIndex: 0)
+		let result = parser.scanForChapterHeading(at: 0)
 		
 		XCTAssertFalse(result)
 	}
@@ -62,7 +62,7 @@ class HeaderScannerTests: XCTestCase {
 	func testChapterChapterSpace () {
 		let parser = CueParser("Chapter ")
 		
-		let result = parser.scanForChapterHeading(atIndex: 0)
+		let result = parser.scanForChapterHeading(at: 0)
 		
 		XCTAssertTrue(result)
 	}
@@ -70,7 +70,7 @@ class HeaderScannerTests: XCTestCase {
 	func testChapterchapterSpace () {
 		let parser = CueParser("chapter ")
 		
-		let result = parser.scanForChapterHeading(atIndex: 0)
+		let result = parser.scanForChapterHeading(at: 0)
 		
 		XCTAssertTrue(result)
 	}
@@ -78,7 +78,7 @@ class HeaderScannerTests: XCTestCase {
 	func testSceneEmpty() {
 		let parser = CueParser("")
 		
-		let result = parser.scanForSceneHeading(atIndex: 0)
+		let result = parser.scanForSceneHeading(at: 0)
 		
 		XCTAssertFalse(result)
 	}
@@ -86,7 +86,7 @@ class HeaderScannerTests: XCTestCase {
 	func testSceneScene() {
 		let parser = CueParser("Scene")
 		
-		let result = parser.scanForSceneHeading(atIndex: 0)
+		let result = parser.scanForSceneHeading(at: 0)
 		
 		XCTAssertFalse(result)
 	}
@@ -94,7 +94,7 @@ class HeaderScannerTests: XCTestCase {
 	func testSceneSceneSpace () {
 		let parser = CueParser("Scene ")
 		
-		let result = parser.scanForSceneHeading(atIndex: 0)
+		let result = parser.scanForSceneHeading(at: 0)
 		
 		XCTAssertTrue(result)
 	}
@@ -102,7 +102,7 @@ class HeaderScannerTests: XCTestCase {
 	func testScenesceneSpace () {
 		let parser = CueParser("scene ")
 		
-		let result = parser.scanForSceneHeading(atIndex: 0)
+		let result = parser.scanForSceneHeading(at: 0)
 		
 		XCTAssertTrue(result)
 	}

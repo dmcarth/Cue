@@ -14,7 +14,7 @@ class WhitespaceScannerTests: XCTestCase {
     func testEmpty() {
        let parser = CueParser("")
 		
-		let wc = parser.scanForFirstNonspace(startingAtIndex: 0)
+		let wc = parser.scanForFirstNonspace(startingAt: 0)
 		
 		XCTAssertEqual(wc, 0)
     }
@@ -22,7 +22,7 @@ class WhitespaceScannerTests: XCTestCase {
 	func testChar() {
 		let parser = CueParser("a")
 		
-		let wc = parser.scanForFirstNonspace(startingAtIndex: 0)
+		let wc = parser.scanForFirstNonspace(startingAt: 0)
 		
 		XCTAssertEqual(wc, 0)
 	}
@@ -30,7 +30,7 @@ class WhitespaceScannerTests: XCTestCase {
 	func testNewline() {
 		let parser = CueParser("\n")
 		
-		let wc = parser.scanForFirstNonspace(startingAtIndex: 0)
+		let wc = parser.scanForFirstNonspace(startingAt: 0)
 		
 		XCTAssertEqual(wc, 1)
 	}
@@ -38,7 +38,7 @@ class WhitespaceScannerTests: XCTestCase {
 	func testSpace() {
 		let parser = CueParser(" ")
 		
-		let wc = parser.scanForFirstNonspace(startingAtIndex: 0)
+		let wc = parser.scanForFirstNonspace(startingAt: 0)
 		
 		XCTAssertEqual(wc, 1)
 	}
@@ -46,7 +46,7 @@ class WhitespaceScannerTests: XCTestCase {
 	func testTab() {
 		let parser = CueParser("\t")
 		
-		let wc = parser.scanForFirstNonspace(startingAtIndex: 0)
+		let wc = parser.scanForFirstNonspace(startingAt: 0)
 		
 		XCTAssertEqual(wc, 1)
 	}
@@ -54,7 +54,7 @@ class WhitespaceScannerTests: XCTestCase {
 	func testSpaceChar() {
 		let parser = CueParser(" a")
 		
-		let wc = parser.scanForFirstNonspace(startingAtIndex: 0)
+		let wc = parser.scanForFirstNonspace(startingAt: 0)
 		
 		XCTAssertEqual(wc, 1)
 	}
@@ -62,7 +62,7 @@ class WhitespaceScannerTests: XCTestCase {
 	func testSpaceSpaceChar() {
 		let parser = CueParser("  a")
 		
-		let wc = parser.scanForFirstNonspace(startingAtIndex: 0)
+		let wc = parser.scanForFirstNonspace(startingAt: 0)
 		
 		XCTAssertEqual(wc, 2)
 	}
