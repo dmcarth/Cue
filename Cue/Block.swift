@@ -24,6 +24,24 @@ public class Document: Block {
 	public convenience init() {
 		self.init(startIndex: 0, endIndex: 0, offset: 0)
 	}
+	
+	public func nodes(from startingIndex: Int, to endingIndex: Int) -> [Node] {
+		var nodes = [Node]()
+		
+		let opts = NodeSearchOptions(deepSearch: false, searchPredicate: nil)
+		var searchIndex = startingIndex
+		
+		while searchIndex < endIndex {
+			if let node = search(index: searchIndex, options: opts) {
+				nodes.append(node)
+				searchIndex = node.endIndex
+			} else {
+				break
+			}
+		}
+		
+		return nodes
+	}
 }
 
 public class Heading: Block {
@@ -50,19 +68,6 @@ public class Heading: Block {
 	}
 }
 
-public class Lyric: Block {
-	public init(startIndex: Int, endIndex: Int, result: SearchResult) {
-		super.init(startIndex: startIndex, endIndex: endIndex, offset: result.startIndex)
-		
-		let delim = Delimiter(result)
-		delim.type = .lyric
-		addChild(delim)
-		
-		let te = RawText(startIndex: delim.endIndex, endIndex: endIndex)
-		addChild(te)
-	}
-}
-
 public class CommentBlock: Block {
 	public init(startIndex: Int, endIndex: Int, results: [SearchResult]) {
 		super.init(startIndex: startIndex, endIndex: endIndex, offset: results[0].startIndex)
@@ -80,12 +85,6 @@ public class CommentBlock: Block {
 }
 
 public class CueBlock: Block {
-	public init(startIndex: Int, endIndex: Int) {
-		super.init(startIndex: startIndex, endIndex: endIndex, offset: startIndex)
-	}
-}
-
-public class LyricBlock: Block {
 	public init(startIndex: Int, endIndex: Int) {
 		super.init(startIndex: startIndex, endIndex: endIndex, offset: startIndex)
 	}
@@ -124,6 +123,25 @@ public class DualCue: Cue {
 	}
 }
 
+public class LyricBlock: Block {
+	public init(startIndex: Int, endIndex: Int) {
+		super.init(startIndex: startIndex, endIndex: endIndex, offset: startIndex)
+	}
+}
+
+public class Lyric: Block {
+	public init(startIndex: Int, endIndex: Int, result: SearchResult) {
+		super.init(startIndex: startIndex, endIndex: endIndex, offset: result.startIndex)
+		
+		let delim = Delimiter(result)
+		delim.type = .lyric
+		addChild(delim)
+		
+		let te = RawText(startIndex: delim.endIndex, endIndex: endIndex)
+		addChild(te)
+	}
+}
+
 public class Description: Block {
 	public init(startIndex: Int, endIndex: Int) {
 		super.init(startIndex: startIndex, endIndex: endIndex, offset: startIndex)
@@ -131,4 +149,8 @@ public class Description: Block {
 		let te = RawText(startIndex: startIndex, endIndex: endIndex)
 		addChild(te)
 	}
+}
+
+public class EndBlock: Block {
+	
 }
