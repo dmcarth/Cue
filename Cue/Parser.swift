@@ -18,21 +18,8 @@
 	
 	var endOfLineCharNumber = 0
 	
-	public class func parse(_ string: String) -> Node {
-		let bytes = [UInt16](string.utf16)
-		let parser = CueParser(with: bytes)
-		return parser.parse()
-	}
-	
 	public override init() {
 		super.init()
-	}
-	
-	public init<S: Sequence>(with bytes: S) where S.Iterator.Element == UInt16 {
-		data = Array(bytes)
-		
-		// useful for debugging
-		endOfLineCharNumber = data.count
 	}
 	
 	public init(_ string: String) {
@@ -41,6 +28,11 @@
 		
 		// useful for debugging
 		endOfLineCharNumber = data.count
+	}
+	
+	public static func parse(_ string: String) -> Node {
+		let parser = CueParser(string)
+		return parser.parse()
 	}
 	
 	public func parse() -> Node {
@@ -62,7 +54,7 @@ extension CueParser {
 	func parseBlocks() {
 		// Enumerate lines
 		while charNumber < data.count {
-			//	Find line ending
+			// Find line ending
 			endOfLineCharNumber = charNumber
 			while endOfLineCharNumber < data.count {
 				endOfLineCharNumber += 1
@@ -82,6 +74,7 @@ extension CueParser {
 	}
 	
 	func processLine() {
+		// First we parse the current line as a block node and then we try to find an appropriate container node. If none can be found, we'll just assume the current line is description.
 		var block = blockForLine()
 		block.lineNumber = lineNumber
 		
@@ -103,7 +96,7 @@ extension CueParser {
 				let ly = Lyric(startIndex: result.startIndex, endIndex: endOfLineCharNumber, result: result)
 				lyb.addChild(ly)
 				
-				// Lyrics are deeply nested. It's easier to just parse now instead of adding an edge case later.
+				// Lyrics are deeply nested. It's easier to  parse them now instead of adding an edge case later.
 				parseInlines(for: ly, startingAt: result.endIndex)
 				
 				cb.removeLastChild()
@@ -111,7 +104,7 @@ extension CueParser {
 			}
 		}
 		
-		// Parse RawText into a stream of inlines. RawText, if present, will always be the last child at this stage
+		// Parse RawText into a stream of inlines. Excepting deeply nested nodes, RawText will always be the last child at this stage
 		if let raw = block.children.last as? RawText {
 			parseInlines(for: block, startingAt: raw.startIndex)
 		}
@@ -161,12 +154,12 @@ extension CueParser {
 		// These block types can only ever be level-1
 		case is Heading, is EndBlock, is Description, is CommentBlock:
 			return root
-		// A regular cue is always level-2, with it's own initial parent cueBlock
+		// A RegularCue is always level-2, with it's own initial parent CueBlock
 		case is RegularCue:
 			let cueBlockContainer = CueBlock(startIndex: block.startIndex, endIndex: block.endIndex)
 			root.addChild(cueBlockContainer)
 			return cueBlockContainer
-		// The same is true for Facsimile
+		// The same is true for Facsimile and FacsimileBlock
 		case is Facsimile:
 			let facsimileBlockContainer = FacsimileBlock(startIndex: block.startIndex, endIndex: block.endIndex)
 			root.addChild(facsimileBlockContainer)
@@ -184,6 +177,7 @@ extension CueParser {
 			switch container {
 			case is CueBlock:
 				if block is DualCue {
+					// We're adding a node to a deeply nested container. Ensure that the container is resized to include the new block.
 					container.parent!.endIndex = block.endIndex
 					return container
 				}
@@ -197,7 +191,7 @@ extension CueParser {
 				break
 			case is RegularCue, is DualCue:
 				if block is Lyric {
-					break // to drop down the tree
+					break // To drop down the tree
 				}
 				fallthrough
 			default:
@@ -209,7 +203,6 @@ extension CueParser {
 			
 		}
 		
-		//	If none of those cases have matched, it is because of some invalid syntax. Assume description
 		block = Description(startIndex: charNumber, endIndex: endOfLineCharNumber)
 		return root
 	}
@@ -605,7 +598,7 @@ extension CueParser {
 			switch state {
 			case 0:
 				// initial state
-				if data[j] != 0x003a { // not ':'
+				if data[j] != 0x003a && data[j] != 0x005b { // not ':' or '['
 					state = 1
 				} else {
 					return nil
@@ -615,7 +608,7 @@ extension CueParser {
 				// find colon
 				if data[j] == 0x003a { // ':'
 					matched = true
-				} else if j-i > 22 { // cue can not be > 24 (23 chars + :)
+				} else if j-i > 22 || data[j] == 0x005b { // cue can not be > 24 (23 chars + :), and should not contain brackets.
 					return nil
 				} else {
 					state = 1
