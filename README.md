@@ -44,13 +44,13 @@ Links to images and other embeddable files are wrapped in [brackets].
 ```
 
 ### Cues
-The real power of Cue, however, comes from the way it treats dialogue. On a fundamental level, dialogue is just scene description targeted at one person. 
+The real power of Cue, however, comes from the way it treats dialogue. On a fundamental level, dialogue is just scene description targeted at one person. This targeted direction is called a cue.
 
 ```
 Jack: This part of the document is meant specifically for me.
 ```
 
-This subtle distinction allows tremendous flexibility in the writing process. Other cues can be targeted at other people and departments. Indeed, any part of the mise-en-scene can have a cue if it suits the writer and production team.
+Other cues can be targeted at other people and departments. Indeed, any part of the mise-en-scene can have a cue if it suits the writer and production team.
 
 ```
 Audio FX: This is a cue for the audio department.
