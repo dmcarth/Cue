@@ -6,9 +6,7 @@
 //  Copyright © 2016 Dylan McArthur. All rights reserved.
 //
 
-import Foundation
-
-@objc public class NodeSearchOptions: NSObject {
+public class NodeSearchOptions {
 	
 	/// Enables search to traverse nodes deeper than level-1
 	public var deepSearchEnabled: Bool

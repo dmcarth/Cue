@@ -6,9 +6,7 @@
 //  Copyright © 2016 Dylan McArthur. All rights reserved.
 //
 
-import Foundation
-
-@objc public class CueParser: NSObject {
+public class CueParser {
 	
 	var data = [UInt16]()
 	
@@ -19,10 +17,6 @@ import Foundation
 	var charNumber = 0
 	
 	var endOfLineCharNumber = 0
-	
-	public override init() {
-		super.init()
-	}
 	
 	public init(_ string: String) {
 		let bytes = [UInt16](string.utf16)

@@ -6,9 +6,7 @@
 //  Copyright © 2016 Dylan McArthur. All rights reserved.
 //
 
-import Foundation
-
-@objc public class Node: NSObject {
+public class Node {
 	
 	public weak var parent: Node?
 	public weak var next: Node?
@@ -22,9 +20,7 @@ import Foundation
 		return children.isEmpty
 	}
 	
-	public override init() {
-		super.init()
-	}
+	public init() {}
 	
 	public init(startIndex: Int, endIndex: Int) {
 		self.startIndex = startIndex
@@ -131,7 +127,7 @@ extension Node {
 extension Node {
 	
 	func debugString() -> String {
-		var s = "(\(NSStringFromClass(type(of: self))) \(startIndex) \(endIndex))"
+		var s = "(\(type(of: self))) \(startIndex) \(endIndex))"
 		if !isLeaf {
 			s += "{" + children.map { $0.debugString() }.joined(separator: ",") + "}"
 		}
