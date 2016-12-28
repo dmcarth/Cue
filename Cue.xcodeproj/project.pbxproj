@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		10F968481E13987700D21E4B /* Cue.h in Sources */ = {isa = PBXBuildFile; fileRef = 10F968471E13969300D21E4B /* Cue.h */; };
 		OBJ_30 /* Block.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_9 /* Block.swift */; };
 		OBJ_32 /* DelimiterStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_11 /* DelimiterStack.swift */; };
 		OBJ_33 /* Inline.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_12 /* Inline.swift */; };
@@ -44,7 +43,6 @@
 		1058884C1E13934500169907 /* TheEndTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TheEndTests.swift; sourceTree = "<group>"; };
 		1058884D1E13934500169907 /* war+peace.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "war+peace.txt"; sourceTree = "<group>"; };
 		1058884E1E13934500169907 /* WhitespaceScannerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WhitespaceScannerTests.swift; sourceTree = "<group>"; };
-		10F968471E13969300D21E4B /* Cue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Cue.h; sourceTree = "<group>"; };
 		OBJ_11 /* DelimiterStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelimiterStack.swift; sourceTree = "<group>"; };
 		OBJ_12 /* Inline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inline.swift; sourceTree = "<group>"; };
 		OBJ_13 /* InlineCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InlineCollection.swift; sourceTree = "<group>"; };
@@ -157,7 +155,6 @@
 		OBJ_8 /* Cue */ = {
 			isa = PBXGroup;
 			children = (
-				10F968471E13969300D21E4B /* Cue.h */,
 				1058883F1E13931300169907 /* AST */,
 				OBJ_16 /* Parser.swift */,
 				OBJ_17 /* SearchResult.swift */,
@@ -235,7 +232,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
-				10F968481E13987700D21E4B /* Cue.h in Sources */,
 				OBJ_30 /* Block.swift in Sources */,
 				OBJ_32 /* DelimiterStack.swift in Sources */,
 				OBJ_33 /* Inline.swift in Sources */,
