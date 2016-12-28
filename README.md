@@ -43,18 +43,6 @@ Emphasis is marked by *asterisks*.
 Links to images and other embeddable files are wrapped in [brackets].
 ```
 
-### Facsimiles
-The beggining of a letter (or email, or sign, et al.) is marked with a right angle bracket.
-
-```
-> Dear Mr. Potter,
-> You are out of eggs.
-> Love,
-> The Dursleys
-```
-
-Note that each subsequent line must also begin with an angle bracket.
-
 ### Cues
 The real power of Cue, however, comes from the way it treats dialogue. On a fundamental level, dialogue is just scene description targeted at one person. 
 
@@ -79,12 +67,22 @@ Jack: This is a line of dialogue.
 ```
 
 ### Lyrics
-Music and lyrics are marked with a tilde.
+Lines that are meant to be sung are marked with a tilde.
 
 ```
 Jack: ~This is a song
       ~That extends multiple lines
       ~And in theory could go on forever...
+```
+
+### Facsimiles
+The begining of a letter (or email, or sign, *et al.*) is marked with a right angle bracket.
+
+```
+> Dear Mr. Potter,
+> You are out of eggs.
+> Love,
+> The Dursleys
 ```
 
 ### Whitespace
