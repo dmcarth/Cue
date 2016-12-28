@@ -159,8 +159,14 @@ extension CueParser {
 			let cueBlockContainer = CueBlock(startIndex: block.startIndex, endIndex: block.endIndex)
 			root.addChild(cueBlockContainer)
 			return cueBlockContainer
-		// The same is true for Facsimile and FacsimileBlock
+		// The same is true for the first line of a facsimile.
 		case is Facsimile:
+			// But the only way to know if this is a new line is to check the lastChild of the root, if present.
+			if let lastChild = root.children.last {
+				if lastChild is FacsimileBlock { break }
+			}
+			
+			// First line. Initialize new container
 			let facsimileBlockContainer = FacsimileBlock(startIndex: block.startIndex, endIndex: block.endIndex)
 			root.addChild(facsimileBlockContainer)
 			return facsimileBlockContainer
@@ -168,16 +174,20 @@ extension CueParser {
 			break
 		}
 		
-		//	If none of those predetermined cases match, iterate down the tree, checking each lastchild in succession
+		// If none of those predetermined cases match, iterate down the tree, checking each lastchild in succession
 		while let lastChild = container.children.last {
 			container = lastChild
 			
 			var foundBreakingStatement = false
 			
+			// If we're going to be adding the block to a deeply nested container, ensure that the container's parents are resized to include the new block.
 			switch container {
+			case is FacsimileBlock:
+				if block is Facsimile {
+					return container
+				}
 			case is CueBlock:
 				if block is DualCue {
-					// We're adding a node to a deeply nested container. Ensure that the container is resized to include the new block.
 					container.parent!.endIndex = block.endIndex
 					return container
 				}
