@@ -6,7 +6,7 @@
 //  Copyright © 2016 Dylan McArthur. All rights reserved.
 //
 
-public class CueParser {
+public struct CueParser {
 	
 	var data = [UInt16]()
 	
@@ -27,11 +27,11 @@ public class CueParser {
 	}
 	
 	public static func parse(_ string: String) -> Node {
-		let parser = CueParser(string)
+		var parser = CueParser(string)
 		return parser.parse()
 	}
 	
-	public func parse() -> Node {
+	public mutating func parse() -> Node {
 		root = Document()
 		lineNumber = 0
 		charNumber = 0
@@ -47,7 +47,7 @@ public class CueParser {
 // MARK: - Block Parsing
 extension CueParser {
 	
-	func parseBlocks() {
+	mutating func parseBlocks() {
 		// Enumerate lines
 		while charNumber < data.count {
 			// Find line ending
@@ -69,7 +69,7 @@ extension CueParser {
 		root.endIndex = data.count
 	}
 	
-	func processLine() {
+	mutating func processLine() {
 		// First we parse the current line as a block node and then we try to find an appropriate container node. If none can be found, we'll just assume the current line is description.
 		var block = blockForLine()
 		block.lineNumber = lineNumber

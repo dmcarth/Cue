@@ -6,7 +6,7 @@
 //  Copyright © 2016 Dylan McArthur. All rights reserved.
 //
 
-public class NodeSearchOptions {
+public struct NodeSearchOptions {
 	
 	/// Enables search to traverse nodes deeper than level-1
 	public var deepSearchEnabled: Bool

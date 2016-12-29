@@ -7,6 +7,17 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		10F968511E148C2400D21E4B /* CueBlockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105888411E13934500169907 /* CueBlockTests.swift */; };
+		10F968521E148C2900D21E4B /* EmphasisTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105888451E13934500169907 /* EmphasisTests.swift */; };
+		10F968531E148C2900D21E4B /* FacsimileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105888461E13934500169907 /* FacsimileTests.swift */; };
+		10F968541E148C2900D21E4B /* HeaderBlockTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105888471E13934500169907 /* HeaderBlockTests.swift */; };
+		10F968551E148C2900D21E4B /* NodeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1058884B1E13934500169907 /* NodeTests.swift */; };
+		10F968561E148C2D00D21E4B /* CommentScannerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105888401E13934500169907 /* CommentScannerTests.swift */; };
+		10F968571E148C2D00D21E4B /* CueScannerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105888421E13934500169907 /* CueScannerTests.swift */; };
+		10F968581E148C2D00D21E4B /* DualCueScannerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105888441E13934500169907 /* DualCueScannerTests.swift */; };
+		10F968591E148C2D00D21E4B /* HeaderScannerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 105888481E13934500169907 /* HeaderScannerTests.swift */; };
+		10F9685A1E148C2D00D21E4B /* LyricScannerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1058884A1E13934500169907 /* LyricScannerTests.swift */; };
+		10F9685B1E148C2D00D21E4B /* TheEndTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1058884C1E13934500169907 /* TheEndTests.swift */; };
 		OBJ_30 /* Block.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_9 /* Block.swift */; };
 		OBJ_32 /* DelimiterStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_11 /* DelimiterStack.swift */; };
 		OBJ_33 /* Inline.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_12 /* Inline.swift */; };
@@ -43,6 +54,7 @@
 		1058884C1E13934500169907 /* TheEndTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TheEndTests.swift; sourceTree = "<group>"; };
 		1058884D1E13934500169907 /* war+peace.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "war+peace.txt"; sourceTree = "<group>"; };
 		1058884E1E13934500169907 /* WhitespaceScannerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WhitespaceScannerTests.swift; sourceTree = "<group>"; };
+		10F9685C1E148D9E00D21E4B /* LinuxMain.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LinuxMain.swift; sourceTree = "<group>"; };
 		OBJ_11 /* DelimiterStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelimiterStack.swift; sourceTree = "<group>"; };
 		OBJ_12 /* Inline.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Inline.swift; sourceTree = "<group>"; };
 		OBJ_13 /* InlineCollection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InlineCollection.swift; sourceTree = "<group>"; };
@@ -103,6 +115,7 @@
 		OBJ_18 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
+				10F9685C1E148D9E00D21E4B /* LinuxMain.swift */,
 				OBJ_19 /* CueTests */,
 			);
 			path = Tests;
@@ -248,6 +261,17 @@
 			buildActionMask = 0;
 			files = (
 				OBJ_45 /* CueTests.swift in Sources */,
+				10F9685A1E148C2D00D21E4B /* LyricScannerTests.swift in Sources */,
+				10F968551E148C2900D21E4B /* NodeTests.swift in Sources */,
+				10F968581E148C2D00D21E4B /* DualCueScannerTests.swift in Sources */,
+				10F968591E148C2D00D21E4B /* HeaderScannerTests.swift in Sources */,
+				10F968571E148C2D00D21E4B /* CueScannerTests.swift in Sources */,
+				10F968561E148C2D00D21E4B /* CommentScannerTests.swift in Sources */,
+				10F968521E148C2900D21E4B /* EmphasisTests.swift in Sources */,
+				10F968511E148C2400D21E4B /* CueBlockTests.swift in Sources */,
+				10F968541E148C2900D21E4B /* HeaderBlockTests.swift in Sources */,
+				10F968531E148C2900D21E4B /* FacsimileTests.swift in Sources */,
+				10F9685B1E148C2D00D21E4B /* TheEndTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

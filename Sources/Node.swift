@@ -124,7 +124,7 @@ extension Node {
 }
 
 // MARK: - Debug Functions
-extension Node {
+extension Node: Equatable {
 	
 	func debugString() -> String {
 		var s = "(\(type(of: self))) \(startIndex) \(endIndex))"
@@ -132,6 +132,10 @@ extension Node {
 			s += "{" + children.map { $0.debugString() }.joined(separator: ",") + "}"
 		}
 		return s
+	}
+	
+	public static func ==(lhs: Node, rhs: Node) -> Bool {
+		return lhs.debugString() == rhs.debugString()
 	}
 	
 }

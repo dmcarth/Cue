@@ -12,10 +12,7 @@ import XCTest
 class HeaderBlockTests: XCTestCase {
 	
 	func testHeaderScene() {
-		let parser = CueParser("Scene a")
-		
-		let ast = parser.parse()
-		print(ast)
+		let ast = CueParser.parse("Scene a")
 		
 		let doc = Document(startIndex: 0, endIndex: 7, offset: 0)
 		
@@ -30,9 +27,7 @@ class HeaderBlockTests: XCTestCase {
 	}
 
 	func testHeaderSceneDashA() {
-		let parser = CueParser("Scene a - a")
-		
-		let ast = parser.parse()
+		let ast = CueParser.parse("Scene a - a")
 		
 		let doc = Document(startIndex: 0, endIndex: 11, offset: 0)
 		

@@ -12,9 +12,7 @@ import XCTest
 class CueBlockTests: XCTestCase {
     
     func testCueLyric1Line() {
-		let parser = CueParser("a: ~a")
-		
-		let ast = parser.parse()
+		let ast = CueParser.parse("a: ~a")
 		
 		let doc = Document(startIndex: 0, endIndex: 5, offset: 0)
 		
@@ -40,9 +38,7 @@ class CueBlockTests: XCTestCase {
 	}
 	
 	func testCueLyric2Lines() {
-		let parser = CueParser("a: ~a\n~a")
-		
-		let ast = parser.parse()
+		let ast = CueParser.parse("a: ~a\n~a")
 		
 		let doc = Document(startIndex: 0, endIndex: 8, offset: 0)
 		
@@ -73,9 +69,7 @@ class CueBlockTests: XCTestCase {
 	}
 	
 	func testCueLyric3Lines() {
-		let parser = CueParser("a: ~a\n~a\n~a")
-		
-		let ast = parser.parse()
+		let ast = CueParser.parse("a: ~a\n~a\n~a")
 		
 		let doc = Document(startIndex: 0, endIndex: 11, offset: 0)
 		
