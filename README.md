@@ -1,7 +1,46 @@
 # Cue
-Cue is a Markdown-style language for writing stories for print, screen, and stage. 
+Cue is a Markdown-style language for writing stories for print, screen, and stage.
 
-It is still in development and therefore not suitable for production just yet.
+The library itself is still in early stages of development. 
+
+## Dependencies
+A top priority of the Cue library has been the ability to run without any external dependencies. As a result, anything that can compile Swift can compile the Cue library.
+
+## Installation
+I recommend using the Swift Package Mangager to install Cue. 
+
+## Usage
+Cue offers two different methods for parsing:
+
+```
+let ast = CueParser.parse("Hello world!")
+// OR
+var parser = CueParser("Hello, again!")
+let ast = CueParser.parse()
+```
+
+The returned AST is a subclass of `Node`, which comes with a number of powerful methods for traversing and querying.
+
+```
+ast.enumerate { (node) in
+	// Performs a depth-first traversal
+}
+
+var current = ast.children.first
+while let next = current {
+	// Traverses all nodes of a single parent
+	current = next.next
+}
+
+let opts = NodeSearchOptions(deepSearch: true, searchPredicate: { (node) in
+	return node is Description
+})
+if let found = ast.search(index: 44, options: opts) {
+	// Finds the deepest child node containing the utf16 byte-index 44, but only if that node is a Description object. Otherwise search returns nil.
+}
+```
+
+All `Node` subclasses contain a `startIndex` and an `endIndex` property. These map to the utf16 index in the original string where the node's content starts and ends. This is to enable maximum compatibility with NSRange in Foundation, but that may change in the future.
 
 ## Syntax
 Cue is designed to be intuitive and invisible whenever possible. It should look more or less exactly the same as when it's printed on a book or in a script. 
