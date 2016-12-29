@@ -12,7 +12,7 @@ I recommend using the Swift Package Mangager to install Cue.
 ## Usage
 Cue offers two different methods for parsing:
 
-```
+```swift
 let ast = CueParser.parse("Hello world!")
 // OR
 var parser = CueParser("Hello, again!")
@@ -21,7 +21,7 @@ let ast = CueParser.parse()
 
 The returned AST is a subclass of `Node`, which comes with a number of powerful methods for traversing and querying.
 
-```
+```swift
 ast.enumerate { (node) in
 	// Performs a depth-first traversal
 }
