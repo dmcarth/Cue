@@ -12,7 +12,7 @@ import XCTest
 class EmphasisTests: XCTestCase {
     
     func testStarStar() {
-		let ast = CueParser.parse("**")
+		let ast = CueParser("**").ast()
 		
 		let doc = Document(startIndex: 0, endIndex: 2, offset: 0)
 		let desc = Description(startIndex: 0, endIndex: 2)

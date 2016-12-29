@@ -6,7 +6,7 @@
 //  Copyright © 2016 Dylan McArthur. All rights reserved.
 //
 
-public struct CueParser {
+public class CueParser {
 	
 	var data = [UInt16]()
 	
@@ -19,19 +19,13 @@ public struct CueParser {
 	var endOfLineCharNumber = 0
 	
 	public init(_ string: String) {
-		let bytes = [UInt16](string.utf16)
-		data = bytes
+		self.data = [UInt16](string.utf16)
 		
 		// useful for debugging
-		endOfLineCharNumber = data.count
+		self.endOfLineCharNumber = data.count
 	}
 	
-	public static func parse(_ string: String) -> Node {
-		var parser = CueParser(string)
-		return parser.parse()
-	}
-	
-	public mutating func parse() -> Node {
+	public func ast() -> Document {
 		root = Document()
 		lineNumber = 0
 		charNumber = 0
@@ -47,7 +41,7 @@ public struct CueParser {
 // MARK: - Block Parsing
 extension CueParser {
 	
-	mutating func parseBlocks() {
+	func parseBlocks() {
 		// Enumerate lines
 		while charNumber < data.count {
 			// Find line ending
@@ -69,7 +63,7 @@ extension CueParser {
 		root.endIndex = data.count
 	}
 	
-	mutating func processLine() {
+	func processLine() {
 		// First we parse the current line as a block node and then we try to find an appropriate container node. If none can be found, we'll just assume the current line is description.
 		var block = blockForLine()
 		block.lineNumber = lineNumber
@@ -330,20 +324,20 @@ extension CueParser {
 // MARK: - Scanners
 extension CueParser {
 	
-	public func scanForLineEnding(at i: Int) -> Bool {
+	func scanForLineEnding(at i: Int) -> Bool {
 		let c = data[i]
 		
 		return c == 0x000a || c == 0x000d // '\n', '\r'
 	}
 	
-	public func scanForWhitespace(at i: Int) -> Bool {
+	func scanForWhitespace(at i: Int) -> Bool {
 		let c = data[i]
 		
 		// ' ', '\t', newline
 		return c == 0x0020 || c == 0x0009 || scanForLineEnding(at: i)
 	}
 	
-	public func scanForFirstNonspace(startingAt i: Int) -> Int {
+	func scanForFirstNonspace(startingAt i: Int) -> Int {
 		var j = i
 		
 		while j < endOfLineCharNumber {
@@ -357,7 +351,7 @@ extension CueParser {
 		return j
 	}
 	
-	public func scanForHyphen(startingAt i: Int) -> Int {
+	func scanForHyphen(startingAt i: Int) -> Int {
 		var j = i
 		
 		while j < endOfLineCharNumber {
@@ -375,7 +369,7 @@ extension CueParser {
 	/// Returns an array of SearchResults or nil if matching failed.
 	///
 	/// - returns: [0] covers the keyword, [1] covers whitespace, [2] covers the id, [3-4] covers the hyphen and title if present.
-	public func scanForHeading(at i: Int) -> [SearchResult]? {
+	func scanForHeading(at i: Int) -> [SearchResult]? {
 		var type: Keyword.KeywordType
 		var j = i
 		
@@ -415,7 +409,7 @@ extension CueParser {
 		return results
 	}
 	
-	public func scanForActHeading(at i: Int) -> Bool {
+	func scanForActHeading(at i: Int) -> Bool {
 		guard endOfLineCharNumber > i + 3 else {
 			return false
 		}
@@ -433,7 +427,7 @@ extension CueParser {
 		return false
 	}
 	
-	public func scanForChapterHeading(at i: Int) -> Bool {
+	func scanForChapterHeading(at i: Int) -> Bool {
 		guard endOfLineCharNumber > i + 7 else {
 			return false
 		}
@@ -455,7 +449,7 @@ extension CueParser {
 		return false
 	}
 	
-	public func scanForSceneHeading(at i: Int) -> Bool {
+	func scanForSceneHeading(at i: Int) -> Bool {
 		guard endOfLineCharNumber > i + 5 else {
 			return false
 		}
@@ -479,7 +473,7 @@ extension CueParser {
 	/// Returns an array of SearchResults or nil if matching failed.
 	///
 	/// - returns: [0] covers "//" and any additional "/", [1] covers whitespace (if any)
-	public func scanForComment(at i: Int) -> [SearchResult]? {
+	func scanForComment(at i: Int) -> [SearchResult]? {
 		var result1 = SearchResult(startIndex: i, endIndex: i)
 		
 		var j = i
@@ -541,7 +535,7 @@ extension CueParser {
 	/// Returns a SearchResult or nil if matching failed.
 	///
 	/// - Returns: Result covers ">" and any whitespace
-	public func scanForFacsimile(at i: Int) -> SearchResult? {
+	func scanForFacsimile(at i: Int) -> SearchResult? {
 		guard endOfLineCharNumber > i else {
 			return nil
 		}
@@ -558,7 +552,7 @@ extension CueParser {
 	/// Returns a SearchResult or nil if matching failed.
 	///
 	/// - returns: Result covers "~"
-	public func scanForLyricPrefix(at i: Int) -> SearchResult? {
+	func scanForLyricPrefix(at i: Int) -> SearchResult? {
 		guard endOfLineCharNumber > i else {
 			return nil
 		}
@@ -573,7 +567,7 @@ extension CueParser {
 	/// Returns an array of SearchResults or nil if matching failed.
 	///
 	/// - returns: [0] covers "^", [1] covers Cue name, [2] covers ":" and any whitespace
-	public func scanForDualCue(at i: Int) -> [SearchResult]? {
+	func scanForDualCue(at i: Int) -> [SearchResult]? {
 		guard endOfLineCharNumber > i + 2 else {
 			return nil
 		}
@@ -595,7 +589,7 @@ extension CueParser {
 	/// Returns an array of SearchResults or nil if matching failed.
 	///
 	/// - returns: [0] covers Cue name, [1] covers ":" and any whitespace
-	public func scanForCue(at i: Int) -> [SearchResult]? {
+	func scanForCue(at i: Int) -> [SearchResult]? {
 		var j = i
 		var state = 0
 		var matched = false

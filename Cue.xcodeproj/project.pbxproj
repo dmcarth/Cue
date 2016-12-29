@@ -109,6 +109,7 @@
 				105888481E13934500169907 /* HeaderScannerTests.swift */,
 				1058884A1E13934500169907 /* LyricScannerTests.swift */,
 				1058884C1E13934500169907 /* TheEndTests.swift */,
+				1058884E1E13934500169907 /* WhitespaceScannerTests.swift */,
 			);
 			name = ScannerTests;
 			sourceTree = "<group>";
@@ -133,7 +134,6 @@
 				1058884B1E13934500169907 /* NodeTests.swift */,
 				1058885C1E13935A00169907 /* ScannerTests */,
 				1058884D1E13934500169907 /* war+peace.txt */,
-				1058884E1E13934500169907 /* WhitespaceScannerTests.swift */,
 			);
 			name = CueTests;
 			path = Tests/CueTests;

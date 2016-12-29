@@ -10,16 +10,16 @@ A top priority of the Cue library has been the ability to run without any extern
 I recommend using the Swift Package Mangager to install Cue. 
 
 ## Usage
-Cue offers two different methods for parsing:
+The bread and butter of Cue is the CueParser class, which accepts a string and outputs an abstract syntax tree.
 
 ```swift
-let ast = CueParser.parse("Hello world!")
+let parser = CueParser("Hello world!")
+let ast = parser.ast()
 // OR
-var parser = CueParser("Hello, again!")
-let ast = parser.parse()
+let ast = CueParser("Hello, again!").ast()
 ```
 
-The returned AST is a subclass of `Node`, which comes with a number of powerful methods for traversing and querying.
+The returned AST comes with a number of powerful methods for traversing and querying.
 
 ```swift
 ast.enumerate { (node) in
@@ -40,7 +40,7 @@ if let found = ast.search(index: 44, options: opts) {
 }
 ```
 
-All `Node` subclasses contain a `startIndex` and an `endIndex`. These properties map to the utf16 indices in the original string where the node's content starts and ends. This is to enable maximum compatibility with NSRange in Foundation, but that may change in the future.
+All nodes in the AST contain a `startIndex` and an `endIndex`. These properties map to the utf16 indices in the original string where the node's content starts and ends. This is to enable maximum compatibility with NSRange in Foundation, but that may change in the future.
 
 ## Syntax
 Cue is designed to be intuitive and invisible whenever possible. It should look more or less exactly the same as when it's printed on a book or in a script. 

@@ -12,7 +12,7 @@ import XCTest
 class FacsimileTests: XCTestCase {
     
 	func testFacsimile1Line() {
-		let ast = CueParser.parse(">")
+		let ast = CueParser(">").ast()
 		
 		let doc = Document(startIndex: 0, endIndex: 1, offset: 0)
 		
@@ -27,7 +27,7 @@ class FacsimileTests: XCTestCase {
 	}
 	
 	func testFacsimile2Lines() {
-		let ast = CueParser.parse(">\n>")
+		let ast = CueParser(">\n>").ast()
 		
 		let doc = Document(startIndex: 0, endIndex: 3, offset: 0)
 		
