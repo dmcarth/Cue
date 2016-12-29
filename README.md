@@ -16,7 +16,7 @@ Cue offers two different methods for parsing:
 let ast = CueParser.parse("Hello world!")
 // OR
 var parser = CueParser("Hello, again!")
-let ast = CueParser.parse()
+let ast = parser.parse()
 ```
 
 The returned AST is a subclass of `Node`, which comes with a number of powerful methods for traversing and querying.
@@ -36,11 +36,11 @@ let opts = NodeSearchOptions(deepSearch: true, searchPredicate: { (node) in
 	return node is Description
 })
 if let found = ast.search(index: 44, options: opts) {
-	// Finds the deepest child node containing the utf16 byte-index 44, but only if that node is a Description object. Otherwise search returns nil.
+	// Finds and returns a node that matches the search query. If none, search returns nil.
 }
 ```
 
-All `Node` subclasses contain a `startIndex` and an `endIndex` property. These map to the utf16 index in the original string where the node's content starts and ends. This is to enable maximum compatibility with NSRange in Foundation, but that may change in the future.
+All `Node` subclasses contain a `startIndex` and an `endIndex`. These properties map to the utf16 indices in the original string where the node's content starts and ends. This is to enable maximum compatibility with NSRange in Foundation, but that may change in the future.
 
 ## Syntax
 Cue is designed to be intuitive and invisible whenever possible. It should look more or less exactly the same as when it's printed on a book or in a script. 
