@@ -8,31 +8,25 @@
 
 public class Cue {
 	
-	var data = [UInt16]()
+	var data: [UInt16]
 	
-	var root = Document()
+	var root: Document
 	
 	var lineNumber = 0
 	
 	var charNumber = 0
 	
-	var endOfLineCharNumber = 0
+	var endOfLineCharNumber: Int
 	
 	public init(_ string: String) {
 		self.data = [UInt16](string.utf16)
-		
-		// useful for debugging
+		self.root = Document(startIndex: 0, endIndex: data.count)
 		self.endOfLineCharNumber = data.count
+		
+		parseBlocks()
 	}
 	
 	public func ast() -> Document {
-		root = Document()
-		lineNumber = 0
-		charNumber = 0
-		endOfLineCharNumber = 0
-		
-		parseBlocks()
-		
 		return root
 	}
 	

@@ -21,8 +21,8 @@ public class Block: Node {
 }
 
 public class Document: Block {
-	public convenience init() {
-		self.init(startIndex: 0, endIndex: 0, offset: 0)
+	public convenience init(startIndex: Int, endIndex: Int) {
+		self.init(startIndex: startIndex, endIndex: endIndex, offset: startIndex)
 	}
 }
 
