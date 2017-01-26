@@ -121,6 +121,24 @@ extension Node {
 		}
 	}
 	
+	public func childNodes(from startingIndex: Int, to endingIndex: Int) -> [Node] {
+		var nodes = [Node]()
+		
+		let opts = NodeSearchOptions(deepSearch: false, searchPredicate: nil)
+		var searchIndex = startingIndex
+		
+		while searchIndex < endIndex {
+			if let node = search(index: searchIndex, options: opts) {
+				nodes.append(node)
+				searchIndex = node.endIndex
+			} else {
+				break
+			}
+		}
+		
+		return nodes
+	}
+	
 }
 
 // MARK: - Debug Functions

@@ -24,24 +24,6 @@ public class Document: Block {
 	public convenience init() {
 		self.init(startIndex: 0, endIndex: 0, offset: 0)
 	}
-	
-	public func nodes(from startingIndex: Int, to endingIndex: Int) -> [Node] {
-		var nodes = [Node]()
-		
-		let opts = NodeSearchOptions(deepSearch: false, searchPredicate: nil)
-		var searchIndex = startingIndex
-		
-		while searchIndex < endIndex {
-			if let node = search(index: searchIndex, options: opts) {
-				nodes.append(node)
-				searchIndex = node.endIndex
-			} else {
-				break
-			}
-		}
-		
-		return nodes
-	}
 }
 
 public class Heading: Block {
@@ -108,7 +90,7 @@ public class CueBlock: Block {
 	}
 }
 
-public class Cue: Block {
+public class AbstractCue: Block {
 	internal func addDefaultChildren(for results: [SearchResult]) {
 		let name = Name(startIndex: results[0].startIndex, endIndex: results[0].endIndex)
 		addChild(name)
@@ -122,14 +104,14 @@ public class Cue: Block {
 	}
 }
 
-public class RegularCue: Cue {
+public class RegularCue: AbstractCue {
 	public init(startIndex: Int, endIndex: Int, results: [SearchResult]) {
 		super.init(startIndex: startIndex, endIndex: endIndex, offset: results[0].startIndex)
 		
 		addDefaultChildren(for: results)
 	}
 }
-public class DualCue: Cue {
+public class DualCue: AbstractCue {
 	public init(startIndex: Int, endIndex: Int, results: [SearchResult]) {
 		super.init(startIndex: startIndex, endIndex: endIndex, offset: results[0].startIndex)
 		
