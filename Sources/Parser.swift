@@ -143,11 +143,11 @@ extension CueParser {
 		switch block {
 		// These block types can only ever be level-1
 		case is Heading, is EndBlock, is Description, is CommentBlock:
-			return root
+			return container
 		// A RegularCue is always level-2, with it's own initial parent CueBlock
 		case is RegularCue:
 			let cueBlockContainer = CueBlock(startIndex: block.startIndex, endIndex: block.endIndex)
-			root.addChild(cueBlockContainer)
+			container.addChild(cueBlockContainer)
 			return cueBlockContainer
 		// The same is true for the first line of a facsimile.
 		case is Facsimile:
@@ -158,7 +158,7 @@ extension CueParser {
 			
 			// First line. Initialize new container
 			let facsimileBlockContainer = FacsimileBlock(startIndex: block.startIndex, endIndex: block.endIndex)
-			root.addChild(facsimileBlockContainer)
+			container.addChild(facsimileBlockContainer)
 			return facsimileBlockContainer
 		default:
 			break
