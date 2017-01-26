@@ -30,6 +30,14 @@ public class Cue {
 		return root
 	}
 	
+	public func tableOfContents() {
+		// TODO: Return a tree of references to header nodes in the ast
+	}
+	
+	public func namedEntitiesDictionary() {
+		// TODO: Return a dictionary of names and their occurences in the document
+	}
+	
 }
 
 // MARK: - Block Parsing
