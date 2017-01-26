@@ -94,7 +94,7 @@ public class Facsimile: Block {
 	public init(startIndex: Int, endIndex: Int, result: SearchResult) {
 		super.init(startIndex: startIndex, endIndex: endIndex, offset: result.startIndex)
 		
-		let de = Delimiter(startIndex: result.startIndex, endIndex: result.endIndex)
+		let de = Delimiter(result)
 		addChild(de)
 		
 		let te = RawText(startIndex: result.endIndex, endIndex: endIndex)
@@ -113,7 +113,7 @@ public class Cue: Block {
 		let name = Name(startIndex: results[0].startIndex, endIndex: results[0].endIndex)
 		addChild(name)
 		
-		let del2 = Delimiter(startIndex: results[1].startIndex, endIndex: results[1].endIndex)
+		let del2 = Delimiter(results[1])
 		del2.type = .colon
 		addChild(del2)
 		
@@ -133,7 +133,7 @@ public class DualCue: Cue {
 	public init(startIndex: Int, endIndex: Int, results: [SearchResult]) {
 		super.init(startIndex: startIndex, endIndex: endIndex, offset: results[0].startIndex)
 		
-		let del = Delimiter(startIndex: results[0].startIndex, endIndex: results[0].endIndex)
+		let del = Delimiter(results[0])
 		del.type = .dual
 		addChild(del)
 		
