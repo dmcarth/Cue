@@ -126,13 +126,16 @@ extension Node {
 		
 		let opts = NodeSearchOptions(deepSearch: false, searchPredicate: nil)
 		var searchIndex = startingIndex
+		let safeEndIndex = min(endingIndex, endIndex)
 		
-		while searchIndex < endIndex {
-			if let node = search(index: searchIndex, options: opts) {
-				nodes.append(node)
-				searchIndex = node.endIndex
-			} else {
-				break
+		if var node = search(index: searchIndex, options: opts) {
+			nodes.append(node)
+			searchIndex = node.endIndex
+			
+			while let next = node.next, searchIndex < safeEndIndex {
+				nodes.append(next)
+				searchIndex = next.endIndex
+				node = next
 			}
 		}
 		
