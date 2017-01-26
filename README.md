@@ -1,7 +1,7 @@
 # Cue
 Cue is a Markdown-style language for writing stories for print, screen, and stage.
 
-The library itself is still in early stages of development. 
+The library presented here for parsing Cue is still in early stages of development. 
 
 ## Dependencies
 A top priority of the Cue library has been the ability to run without any external dependencies. As a result, anything that can compile Swift can compile the Cue library.
@@ -10,13 +10,13 @@ A top priority of the Cue library has been the ability to run without any extern
 I recommend using the Swift Package Mangager to install Cue. 
 
 ## Usage
-The bread and butter of Cue is the CueParser class, which accepts a string and outputs an abstract syntax tree.
+The bread and butter of Cue is the Cue class, which accepts a string and outputs an abstract syntax tree.
 
 ```swift
-let parser = CueParser("Hello world!")
+let parser = Cue("Hello world!")
 let ast = parser.ast()
 // OR
-let ast = CueParser("Hello, again!").ast()
+let ast = Cue("Hello, again!").ast()
 ```
 
 The returned AST comes with a number of powerful methods for traversing and querying.
@@ -28,7 +28,7 @@ ast.enumerate { (node) in
 
 var current = ast.children.first
 while let next = current {
-	// Traverses all nodes of a single parent
+	// Traverses child nodes in sequence
 	current = next.next
 }
 
@@ -38,6 +38,9 @@ let opts = NodeSearchOptions(deepSearch: true, searchPredicate: { (node) in
 if let found = ast.search(index: 44, options: opts) {
 	// Finds and returns a node that matches the search query. If none, search returns nil.
 }
+
+let nodes = ast.childNodes(from: 0, to: 44)
+// Returns all children in the utf16 index range 0..<44
 ```
 
 All nodes in the AST contain a `startIndex` and an `endIndex`. These properties map to the utf16 indices in the original string where the node's content starts and ends. This is to enable maximum compatibility with NSRange in Foundation, but that may change in the future.

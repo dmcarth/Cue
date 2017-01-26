@@ -6,7 +6,7 @@
 //  Copyright © 2016 Dylan McArthur. All rights reserved.
 //
 
-public class CueParser {
+public class Cue {
 	
 	var data = [UInt16]()
 	
@@ -39,7 +39,7 @@ public class CueParser {
 }
 
 // MARK: - Block Parsing
-extension CueParser {
+extension Cue {
 	
 	func parseBlocks() {
 		// Enumerate lines
@@ -74,7 +74,7 @@ extension CueParser {
 		container.endIndex = max(container.endIndex, block.endIndex)
 		
 		// Only now can we parse first-line lyrics, because appropriateContainer() may have changed the original block
-		if let cb = block as? Cue {
+		if let cb = block as? AbstractCue {
 			guard cb.children.last! is RawText else {
 				return
 			}
@@ -210,7 +210,7 @@ extension CueParser {
 }
 
 // MARK: - Inline Parsing
-extension CueParser {
+extension Cue {
 	
 	func parseInlines(for block: Block, startingAt i: Int) {
 		var spans = InlineCollection()
@@ -322,7 +322,7 @@ extension CueParser {
 }
 
 // MARK: - Scanners
-extension CueParser {
+extension Cue {
 	
 	func scanForLineEnding(at i: Int) -> Bool {
 		let c = data[i]
