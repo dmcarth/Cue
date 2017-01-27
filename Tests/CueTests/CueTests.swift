@@ -6,10 +6,9 @@ class CueTests: XCTestCase {
     func testPerformanceExample() {
 		let fileURL = Bundle(for: CueTests.self).url(forResource: "war+peace", withExtension: "txt")!
 		let str = try! String(contentsOf: fileURL)
-		var parser = CueParser(str)
 		
 		self.measure {
-			_ = parser.parse()
+			_ = Cue(str)
 		}
 	}
 
