@@ -51,7 +51,7 @@ public class Node {
 	
 }
 
-// MARK: - Public Interface
+// MARK: - Search and Query
 extension Node {
 	
 	/// Binary search for the node containing a given index.

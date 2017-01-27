@@ -1,15 +1,12 @@
 //
-//  TOCNode.swift
+//  TableOfContentsItem.swift
 //  Cue
 //
 //  Created by Dylan McArthur on 1/26/17.
 //
 //
 
-public class TOCNode {
-	
-	public weak var parent: TOCNode?
-	public var children = [TOCNode]()
+public struct TableOfContentsItem {
 	
 	public enum ContentType {
 		case act

@@ -10,7 +10,7 @@ public class Cue {
 	
 	var data: [UInt16]
 	
-	var flatTableOfContents = [TOCNode]()
+	var flatTableOfContents = [TableOfContentsItem]()
 	
 	var root: Document
 	
@@ -32,8 +32,8 @@ public class Cue {
 		return root
 	}
 	
-	public func tableOfContents() -> [TOCNode] {
-		// FIXME: Return a tree of references to header nodes in the ast
+	public func tableOfContents() -> [TableOfContentsItem] {
+		// TODO: Return a tree of references to header nodes in the ast
 		return flatTableOfContents
 	}
 	
@@ -111,8 +111,8 @@ extension Cue {
 		if let results = scanForHeading(at: wc) {
 			let he = Header(startIndex: wc, endIndex: endOfLineCharNumber, results: results)
 			
-			let type = TOCNode.ContentType.init(keyword: results[0].keywordType!)
-			let toc = TOCNode(type: type, location: charNumber)
+			let type = TableOfContentsItem.ContentType.init(keyword: results[0].keywordType!)
+			let toc = TableOfContentsItem(type: type, location: charNumber)
 			flatTableOfContents.append(toc)
 			
 			return he
@@ -296,7 +296,7 @@ extension Cue {
 					spans.push(ref)
 					spans.push(del)
 					
-					let toc = TOCNode(type: .reference, location: last.endIndex)
+					let toc = TableOfContentsItem(type: .reference, location: last.endIndex)
 					flatTableOfContents.append(toc)
 					
 					break
