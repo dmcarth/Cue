@@ -10,13 +10,17 @@ A top priority of the Cue library has been the ability to run without any extern
 I recommend using the Swift Package Mangager to install Cue. 
 
 ## Usage
-The bread and butter of Cue is the Cue class, which accepts a string and outputs an abstract syntax tree.
+The bread and butter of the Cue library is the Cue class, which accepts a string and can output an abstract syntax tree and a table of contents.
 
 ```swift
+import Cue
+
 let parser = Cue("Hello world!")
 let ast = parser.ast()
+let toc = parser.tableOfContents()
 // OR
 let ast = Cue("Hello, again!").ast()
+let toc = Cue("Hello, again!").tableOfContents()
 ```
 
 The returned AST comes with a number of powerful methods for traversing and querying.
