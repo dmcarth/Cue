@@ -10,6 +10,8 @@ public class Cue {
 	
 	var data: [UInt16]
 	
+	var flatTableOfContents = [TOCNode]()
+	
 	var root: Document
 	
 	var lineNumber = 0
@@ -30,8 +32,9 @@ public class Cue {
 		return root
 	}
 	
-	public func tableOfContents() {
-		// TODO: Return a tree of references to header nodes in the ast
+	public func tableOfContents() -> [TOCNode] {
+		// FIXME: Return a tree of references to header nodes in the ast
+		return flatTableOfContents
 	}
 	
 	public func namedEntitiesDictionary() {
@@ -107,6 +110,10 @@ extension Cue {
 		
 		if let results = scanForHeading(at: wc) {
 			let he = Header(startIndex: wc, endIndex: endOfLineCharNumber, results: results)
+			
+			let type = TOCNode.ContentType.init(keyword: results[0].keywordType!)
+			let toc = TOCNode(type: type, location: charNumber)
+			flatTableOfContents.append(toc)
 			
 			return he
 		} else if scanForTheEnd(at: wc) {
@@ -206,6 +213,9 @@ extension Cue {
 		}
 		
 		block = Description(startIndex: charNumber, endIndex: endOfLineCharNumber)
+		if let last = flatTableOfContents.last, last.location == charNumber {
+			flatTableOfContents.removeLast()
+		}
 		return root
 	}
 	
@@ -285,6 +295,10 @@ extension Cue {
 					spans.push(last)
 					spans.push(ref)
 					spans.push(del)
+					
+					let toc = TOCNode(type: .reference, location: last.endIndex)
+					flatTableOfContents.append(toc)
+					
 					break
 				}
 				
