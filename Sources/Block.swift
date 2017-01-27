@@ -20,13 +20,7 @@ public class Block: Node {
 	}
 }
 
-public class Document: Block {
-	public convenience init(startIndex: Int, endIndex: Int) {
-		self.init(startIndex: startIndex, endIndex: endIndex, offset: startIndex)
-	}
-}
-
-public class Heading: Block {
+public class Header: Block {
 	public init(startIndex: Int, endIndex: Int, results: [SearchResult]) {
 		super.init(startIndex: startIndex, endIndex: endIndex, offset: results[0].startIndex)
 		
@@ -66,12 +60,6 @@ public class CommentBlock: Block {
 	}
 }
 
-public class FacsimileBlock: Block {
-	public init(startIndex: Int, endIndex: Int) {
-		super.init(startIndex: startIndex, endIndex: endIndex, offset: startIndex)
-	}
-}
-
 public class Facsimile: Block {
 	public init(startIndex: Int, endIndex: Int, result: SearchResult) {
 		super.init(startIndex: startIndex, endIndex: endIndex, offset: result.startIndex)
@@ -81,12 +69,6 @@ public class Facsimile: Block {
 		
 		let te = RawText(startIndex: result.endIndex, endIndex: endIndex)
 		addChild(te)
-	}
-}
-
-public class CueBlock: Block {
-	public init(startIndex: Int, endIndex: Int) {
-		super.init(startIndex: startIndex, endIndex: endIndex, offset: startIndex)
 	}
 }
 
@@ -120,12 +102,6 @@ public class DualCue: AbstractCue {
 		addChild(del)
 		
 		addDefaultChildren(for: Array(results.dropFirst()))
-	}
-}
-
-public class LyricBlock: Block {
-	public init(startIndex: Int, endIndex: Int) {
-		super.init(startIndex: startIndex, endIndex: endIndex, offset: startIndex)
 	}
 }
 

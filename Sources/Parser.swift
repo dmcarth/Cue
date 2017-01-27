@@ -84,7 +84,7 @@ extension Cue {
 			let last: Node = cb.children.last!
 			
 			if let result = scanForLyricPrefix(at: last.startIndex) {
-				let lyb = LyricBlock(startIndex: result.startIndex, endIndex: endOfLineCharNumber)
+				let lyb = LyricContainer(startIndex: result.startIndex, endIndex: endOfLineCharNumber)
 				let ly = Lyric(startIndex: result.startIndex, endIndex: endOfLineCharNumber, result: result)
 				lyb.addChild(ly)
 				
@@ -106,7 +106,7 @@ extension Cue {
 		let wc = scanForFirstNonspace(startingAt: charNumber)
 		
 		if let results = scanForHeading(at: wc) {
-			let he = Heading(startIndex: wc, endIndex: endOfLineCharNumber, results: results)
+			let he = Header(startIndex: wc, endIndex: endOfLineCharNumber, results: results)
 			
 			return he
 		} else if scanForTheEnd(at: wc) {
@@ -144,24 +144,24 @@ extension Cue {
 		
 		switch block {
 		// These block types can only ever be level-1
-		case is Heading, is EndBlock, is Description, is CommentBlock:
+		case is Header, is EndBlock, is Description, is CommentBlock:
 			return container
 		// A RegularCue is always level-2, with it's own initial parent CueBlock
 		case is RegularCue:
-			let cueBlockContainer = CueBlock(startIndex: block.startIndex, endIndex: block.endIndex)
-			container.addChild(cueBlockContainer)
-			return cueBlockContainer
+			let cueContainer = CueContainer(startIndex: block.startIndex, endIndex: block.endIndex)
+			container.addChild(cueContainer)
+			return cueContainer
 		// The same is true for the first line of a facsimile.
 		case is Facsimile:
 			// But the only way to know if this is a new line is to check the lastChild of the root, if present.
 			if let lastChild = root.children.last {
-				if lastChild is FacsimileBlock { break }
+				if lastChild is FacsimileContainer { break }
 			}
 			
 			// First line. Initialize new container
-			let facsimileBlockContainer = FacsimileBlock(startIndex: block.startIndex, endIndex: block.endIndex)
-			container.addChild(facsimileBlockContainer)
-			return facsimileBlockContainer
+			let facsimileContainer = FacsimileContainer(startIndex: block.startIndex, endIndex: block.endIndex)
+			container.addChild(facsimileContainer)
+			return facsimileContainer
 		default:
 			break
 		}
@@ -174,17 +174,17 @@ extension Cue {
 			
 			// If we're going to be adding the block to a deeply nested container, ensure that the container's parents are resized to include the new block.
 			switch container {
-			case is FacsimileBlock:
+			case is FacsimileContainer:
 				if block is Facsimile {
 					return container
 				}
-			case is CueBlock:
+			case is CueContainer:
 				if block is DualCue {
 					container.parent!.endIndex = block.endIndex
 					return container
 				}
 				break
-			case is LyricBlock:
+			case is LyricContainer:
 				if block is Lyric {
 					container.parent!.endIndex = block.endIndex
 					container.parent!.parent!.endIndex = block.endIndex
