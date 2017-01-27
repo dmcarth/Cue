@@ -54,19 +54,18 @@ struct InlineCollection: Collection {
 					// Create remainder and add to queue
 					var remainder: Inline
 					if let _ = newInline as? RawText {
-						remainder = RawText()
+						remainder = RawText(startIndex: currInline.endIndex, endIndex: oldEndIndex)
 					} else if let _ = newInline as? Emphasis {
-						remainder = Emphasis()
+						remainder = Emphasis(startIndex: currInline.endIndex, endIndex: oldEndIndex)
 					} else if let _ = newInline as? Reference {
-						remainder = Reference()
+						remainder = Reference(startIndex: currInline.endIndex, endIndex: oldEndIndex)
 					} else {
 						fatalError("\(self) found an impossible \(newInline) during self sorting")
 					}
-					remainder.startIndex = currInline.endIndex
-					remainder.endIndex = oldEndIndex
+					
 					queue.append(remainder)
 					
-					if newInline.endIndex-newInline.startIndex > 0 {
+					if newInline.endIndex.offset-newInline.startIndex.offset > 0 {
 						array.insert(newInline, at: idx)
 					}
 					

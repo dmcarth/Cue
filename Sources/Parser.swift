@@ -8,7 +8,7 @@
 
 public class Cue {
 	
-	var data: [UInt16]
+	var data: String.UTF16View
 	
 	var flatTableOfContents = [TableOfContentsItem]()
 	
@@ -16,14 +16,15 @@ public class Cue {
 	
 	var lineNumber = 0
 	
-	var charNumber = 0
+	var charNumber: HybridUTF16Index
 	
-	var endOfLineCharNumber: Int
+	var endOfLineCharNumber: HybridUTF16Index
 	
 	public init(_ string: String) {
-		self.data = [UInt16](string.utf16)
-		self.root = Document(startIndex: 0, endIndex: data.count)
-		self.endOfLineCharNumber = data.count
+		self.data = string.utf16
+		self.charNumber = HybridUTF16Index(source: data, index: data.startIndex, offset: 0)
+		self.endOfLineCharNumber = HybridUTF16Index(source: data, index: data.endIndex, offset: data.count)
+		self.root = Document(startIndex: charNumber, endIndex: endOfLineCharNumber)
 		
 		parseBlocks()
 	}
@@ -48,12 +49,13 @@ extension Cue {
 	
 	func parseBlocks() {
 		// Enumerate lines
-		while charNumber < data.count {
+		while charNumber.index < data.endIndex {
 			// Find line ending
 			endOfLineCharNumber = charNumber
-			while endOfLineCharNumber < data.count {
-				endOfLineCharNumber += 1
-				if scanForLineEnding(at: endOfLineCharNumber-1) {
+			while endOfLineCharNumber.index < data.endIndex {
+				let backtrack = endOfLineCharNumber
+				endOfLineCharNumber = endOfLineCharNumber.advanced()
+				if scanForLineEnding(at: backtrack) {
 					break
 				}
 			}
@@ -65,7 +67,7 @@ extension Cue {
 			charNumber = endOfLineCharNumber
 		}
 		
-		root.endIndex = data.count
+		root.endIndex = endOfLineCharNumber
 	}
 	
 	func processLine() {
@@ -117,7 +119,7 @@ extension Cue {
 			
 			return he
 		} else if scanForTheEnd(at: wc) {
-			let en = EndBlock(startIndex: wc, endIndex: endOfLineCharNumber, offset: 0)
+			let en = EndBlock(startIndex: wc, endIndex: endOfLineCharNumber, offset: wc)
 			
 			return en
 		} else if let result = scanForComment(at: wc) {
@@ -224,21 +226,21 @@ extension Cue {
 // MARK: - Inline Parsing
 extension Cue {
 	
-	func parseInlines(for block: Block, startingAt i: Int) {
+	func parseInlines(for block: Block, startingAt i: HybridUTF16Index) {
 		var spans = InlineCollection()
 		
 		var delimStack = DelimiterStack()
 		
 		var j = i
 		while j < endOfLineCharNumber {
-			let c = data[j]
+			let c = data[j.index]
 			
 			guard c == 0x002a || c == 0x005b || c == 0x005d else {
-				j += 1
+				j = j.advanced()
 				continue
 			}
 			
-			let del = Delimiter(startIndex: j, endIndex: j+1)
+			let del = Delimiter(startIndex: j, endIndex: j.advanced())
 			switch c {
 			case 0x002a:	// '*'
 				del.type = .emph
@@ -307,7 +309,7 @@ extension Cue {
 				break
 			}
 			
-			j += 1
+			j = j.advanced()
 		}
 		
 		guard !spans.isEmpty else { return }
@@ -340,25 +342,25 @@ extension Cue {
 // MARK: - Scanners
 extension Cue {
 	
-	func scanForLineEnding(at i: Int) -> Bool {
-		let c = data[i]
+	func scanForLineEnding(at i: HybridUTF16Index) -> Bool {
+		let c = data[i.index]
 		
 		return c == 0x000a || c == 0x000d // '\n', '\r'
 	}
 	
-	func scanForWhitespace(at i: Int) -> Bool {
-		let c = data[i]
+	func scanForWhitespace(at i: HybridUTF16Index) -> Bool {
+		let c = data[i.index]
 		
 		// ' ', '\t', newline
 		return c == 0x0020 || c == 0x0009 || scanForLineEnding(at: i)
 	}
 	
-	func scanForFirstNonspace(startingAt i: Int) -> Int {
+	func scanForFirstNonspace(startingAt i: HybridUTF16Index) -> HybridUTF16Index {
 		var j = i
 		
 		while j < endOfLineCharNumber {
 			if scanForWhitespace(at: j) {
-				j += 1
+				j = j.advanced()
 			} else {
 				break
 			}
@@ -367,14 +369,14 @@ extension Cue {
 		return j
 	}
 	
-	func scanForHyphen(startingAt i: Int) -> Int {
+	func scanForHyphen(startingAt i: HybridUTF16Index) -> HybridUTF16Index {
 		var j = i
 		
 		while j < endOfLineCharNumber {
-			if data[j] == 0x002d {	// '-'
+			if data[j.index] == 0x002d {	// '-'
 				break
 			} else {
-				j += 1
+				j = j.advanced()
 			}
 		}
 		
@@ -385,19 +387,19 @@ extension Cue {
 	/// Returns an array of SearchResults or nil if matching failed.
 	///
 	/// - returns: [0] covers the keyword, [1] covers whitespace, [2] covers the id, [3-4] covers the hyphen and title if present.
-	func scanForHeading(at i: Int) -> [SearchResult]? {
+	func scanForHeading(at i: HybridUTF16Index) -> [SearchResult]? {
 		var type: Keyword.KeywordType
 		var j = i
 		
 		if scanForActHeading(at: i) {
 			type = .act
-			j += 3
+			j = j.advanced(by: 3)
 		} else if scanForSceneHeading(at: i) {
 			type = .scene
-			j += 5
+			j = j.advanced(by: 5)
 		} else if scanForChapterHeading(at: i) {
 			type = .chapter
-			j += 7
+			j = j.advanced(by: 7)
 		} else {
 			return nil
 		}
@@ -416,7 +418,7 @@ extension Cue {
 		var results = [keyResult, wResult, idResult]
 		
 		if l < endOfLineCharNumber {
-			let m = scanForFirstNonspace(startingAt: l+1)
+			let m = scanForFirstNonspace(startingAt: l.advanced())
 			let hResult = SearchResult(startIndex: l, endIndex: m)
 			let titleResult = SearchResult(startIndex: m, endIndex: endOfLineCharNumber)
 			results.append(contentsOf: [hResult, titleResult])
@@ -425,62 +427,95 @@ extension Cue {
 		return results
 	}
 	
-	func scanForActHeading(at i: Int) -> Bool {
-		guard endOfLineCharNumber > i + 3 else {
+	func scanForActHeading(at i: HybridUTF16Index) -> Bool {
+		guard i.advanced(by: 3) < endOfLineCharNumber else {
 			return false
 		}
 		
-		if (data[i] == 0x0041 || data[i] == 0x0061) &&
-			(data[i+1] == 0x0063 || data[i+1] == 0x0043) &&
-			(data[i+2] == 0x0074 || data[i+2] == 0x0054) {	// 'A', 'c', 't' case insensitive
-			let wc = scanForFirstNonspace(startingAt: i+3)
-			
-			guard wc > i+3 else { return false }
-			
-			return true
+		// 'A', 'c', 't' case insensitive
+		var j = i
+		if data[j.index] == 0x0041 || data[j.index] == 0x0061 {
+			j.advance()
+			if data[j.index] == 0x0063 || data[j.index] == 0x0043 {
+				j.advance()
+				if data[j.index] == 0x0074 || data[j.index] == 0x0054 {
+					j.advance()
+					let wc = scanForFirstNonspace(startingAt: j)
+					
+					guard wc > j else { return false }
+					
+					return true
+				}
+			}
 		}
 		
 		return false
 	}
 	
-	func scanForChapterHeading(at i: Int) -> Bool {
-		guard endOfLineCharNumber > i + 7 else {
+	func scanForChapterHeading(at i: HybridUTF16Index) -> Bool {
+		guard i.advanced(by: 7) < endOfLineCharNumber else {
 			return false
 		}
 		
-		if (data[i] == 0x0043 || data[i] == 0x0063) &&
-			(data[i+1] == 0x0068 || data[i+1] == 0x0048) &&
-			(data[i+2] == 0x0061 || data[i+2] == 0x0041) &&
-			(data[i+3] == 0x0070 || data[i+3] == 0x0050) &&
-			(data[i+4] == 0x0074 || data[i+4] == 0x0054) &&
-			(data[i+5] == 0x0065 || data[i+5] == 0x0045) &&
-			(data[i+6] == 0x0072 || data[i+6] == 0x0052) {	// 'C', 'h', 'a', 'p', 't', 'e', 'r' case insensitive
-			let wc = scanForFirstNonspace(startingAt: i+7)
-			
-			guard wc > i+7 else { return false }
-			
-			return true
+		// 'C', 'h', 'a', 'p', 't', 'e', 'r' case insensitive
+		var j = i
+		if data[j.index] == 0x0043 || data[j.index] == 0x0063 {
+			j.advance()
+			if data[j.index] == 0x0068 || data[j.index] == 0x0048 {
+				j.advance()
+				if data[j.index] == 0x0061 || data[j.index] == 0x0041 {
+					j.advance()
+					if data[j.index] == 0x0070 || data[j.index] == 0x0050 {
+						j.advance()
+						if data[j.index] == 0x0074 || data[j.index] == 0x0054 {
+							j.advance()
+							if data[j.index] == 0x0065 || data[j.index] == 0x0045 {
+								j.advance()
+								if data[j.index] == 0x0072 || data[j.index] == 0x0052 {
+									j.advance()
+									let wc = scanForFirstNonspace(startingAt: j)
+									
+									guard wc > j else { return false }
+									
+									return true
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 		
 		return false
 	}
 	
-	func scanForSceneHeading(at i: Int) -> Bool {
-		guard endOfLineCharNumber > i + 5 else {
+	func scanForSceneHeading(at i: HybridUTF16Index) -> Bool {
+		guard i.advanced(by: 5) < endOfLineCharNumber else {
 			return false
 		}
 		
 		
-		if (data[i] == 0x0053 || data[i] == 0x0073) &&
-			(data[i+1] == 0x0063 || data[i+1] == 0x0043) &&
-			(data[i+2] == 0x0065 || data[i+2] == 0x0045) &&
-			(data[i+3] == 0x006e || data[i+3] == 0x004e) &&
-			(data[i+4] == 0x0065 || data[i+4] == 0x0045) {	// 'S', 'c', 'e', 'n', 'e' case insensititve
-			let wc = scanForFirstNonspace(startingAt: i+5)
-			
-			guard wc > i+5 else { return false }
-			
-			return true
+		// 'S', 'c', 'e', 'n', 'e' case insensititve
+		var j = i
+		if data[j.index] == 0x0053 || data[j.index] == 0x0073 {
+			j.advance()
+			if data[j.index] == 0x0063 || data[j.index] == 0x0043 {
+				j.advance()
+				if data[j.index] == 0x0065 || data[j.index] == 0x0045 {
+					j.advance()
+					if data[j.index] == 0x006e || data[j.index] == 0x004e {
+						j.advance()
+						if data[j.index] == 0x0065 || data[j.index] == 0x0045 {
+							j.advance()
+							let wc = scanForFirstNonspace(startingAt: j)
+							
+							guard wc > j else { return false }
+							
+							return true
+						}
+					}
+				}
+			}
 		}
 		
 		return false
@@ -489,7 +524,7 @@ extension Cue {
 	/// Returns an array of SearchResults or nil if matching failed.
 	///
 	/// - returns: [0] covers "//" and any additional "/", [1] covers whitespace (if any)
-	func scanForComment(at i: Int) -> [SearchResult]? {
+	func scanForComment(at i: HybridUTF16Index) -> [SearchResult]? {
 		var result1 = SearchResult(startIndex: i, endIndex: i)
 		
 		var j = i
@@ -497,7 +532,7 @@ extension Cue {
 		var matched = false
 		var breakingStatement = false
 		while j < endOfLineCharNumber {
-			let c = data[j]
+			let c = data[j.index]
 			
 			switch state {
 			case 0:
@@ -512,7 +547,7 @@ extension Cue {
 				
 				if c == 0x002f { // '/'
 					matched = true
-					result1.endIndex = j+1
+					result1.endIndex = j.advanced()
 					state = 2
 				} else {
 					return nil
@@ -521,7 +556,7 @@ extension Cue {
 			case 2:
 				
 				if c == 0x002f { // '/'
-					result1.endIndex = j+1
+					result1.endIndex = j.advanced()
 					break
 				} else {
 					breakingStatement = true
@@ -535,7 +570,7 @@ extension Cue {
 				break
 			}
 			
-			j += 1
+			j.advance()
 		}
 		
 		if matched {
@@ -551,13 +586,13 @@ extension Cue {
 	/// Returns a SearchResult or nil if matching failed.
 	///
 	/// - Returns: Result covers ">" and any whitespace
-	func scanForFacsimile(at i: Int) -> SearchResult? {
-		guard endOfLineCharNumber > i else {
+	func scanForFacsimile(at i: HybridUTF16Index) -> SearchResult? {
+		guard i < endOfLineCharNumber  else {
 			return nil
 		}
 		
-		if data[i] == 0x003e { // ">"
-			let j = scanForFirstNonspace(startingAt: i+1)
+		if data[i.index] == 0x003e { // ">"
+			let j = scanForFirstNonspace(startingAt: i.advanced())
 			
 			return SearchResult(startIndex: i, endIndex: j)
 		}
@@ -568,13 +603,13 @@ extension Cue {
 	/// Returns a SearchResult or nil if matching failed.
 	///
 	/// - returns: Result covers "~"
-	func scanForLyricPrefix(at i: Int) -> SearchResult? {
-		guard endOfLineCharNumber > i else {
+	func scanForLyricPrefix(at i: HybridUTF16Index) -> SearchResult? {
+		guard i < endOfLineCharNumber else {
 			return nil
 		}
 		
-		if data[i] == 0x007e {	// '~'
-			return SearchResult(startIndex: i, endIndex: i+1)
+		if data[i.index] == 0x007e {	// '~'
+			return SearchResult(startIndex: i, endIndex: i.advanced())
 		}
 		
 		return nil
@@ -583,17 +618,19 @@ extension Cue {
 	/// Returns an array of SearchResults or nil if matching failed.
 	///
 	/// - returns: [0] covers "^", [1] covers Cue name, [2] covers ":" and any whitespace
-	func scanForDualCue(at i: Int) -> [SearchResult]? {
-		guard endOfLineCharNumber > i + 2 else {
+	func scanForDualCue(at i: HybridUTF16Index) -> [SearchResult]? {
+		let j = i.advanced()
+		
+		guard j < endOfLineCharNumber else {
 			return nil
 		}
 		
-		if data[i] == 0x005e {	// '^'
-			guard let result2 = scanForCue(at: i+1) else {
+		if data[i.index] == 0x005e {	// '^'
+			guard let result2 = scanForCue(at: j) else {
 				return nil
 			}
 			
-			let result1 = SearchResult(startIndex: i, endIndex: i+1)
+			let result1 = SearchResult(startIndex: i, endIndex: j)
 			var results = [result1]
 			results.append(contentsOf: result2)
 			return results
@@ -605,7 +642,7 @@ extension Cue {
 	/// Returns an array of SearchResults or nil if matching failed.
 	///
 	/// - returns: [0] covers Cue name, [1] covers ":" and any whitespace
-	func scanForCue(at i: Int) -> [SearchResult]? {
+	func scanForCue(at i: HybridUTF16Index) -> [SearchResult]? {
 		var j = i
 		var state = 0
 		var matched = false
@@ -614,7 +651,7 @@ extension Cue {
 			switch state {
 			case 0:
 				// initial state
-				if data[j] != 0x003a && data[j] != 0x005b { // not ':' or '['
+				if data[j.index] != 0x003a && data[j.index] != 0x005b { // not ':' or '['
 					state = 1
 				} else {
 					return nil
@@ -622,9 +659,9 @@ extension Cue {
 				
 			case 1:
 				// find colon
-				if data[j] == 0x003a { // ':'
+				if data[j.index] == 0x003a { // ':'
 					matched = true
-				} else if j-i > 22 || data[j] == 0x005b { // cue can not be > 24 (23 chars + :), and should not contain brackets.
+				} else if j.offset-i.offset > 22 || data[j.index] == 0x005b { // cue can not be > 24 (23 chars + :), and should not contain brackets.
 					return nil
 				} else {
 					state = 1
@@ -636,31 +673,45 @@ extension Cue {
 			
 			if matched {
 				let result1 = SearchResult(startIndex: i, endIndex: j)
-				let wc = scanForFirstNonspace(startingAt: j+1)
+				let wc = scanForFirstNonspace(startingAt: j.advanced())
 				let result2 = SearchResult(startIndex: result1.endIndex, endIndex: wc)
 				
 				return [result1, result2]
 			}
 			
-			j += 1
+			j.advance()
 		}
 		
 		return nil
 	}
 	
-	func scanForTheEnd(at index: Int) -> Bool {
-		guard endOfLineCharNumber > index && index + 7 == data.count else {
+	func scanForTheEnd(at i: HybridUTF16Index) -> Bool {
+		guard i.advanced(by: 7).index == data.endIndex else {
 			return false
 		}
 		
-		if (data[index] == 0x0054 || data[index] == 0x0074) &&
-			(data[index+1] == 0x0048 || data[index+1] == 0x0068) &&
-			(data[index+2] == 0x0045 || data[index+2] == 0x0065) &&
-			(data[index+3] == 0x0020) &&
-			(data[index+4] == 0x0045 || data[index+4] == 0x0065) &&
-			(data[index+5] == 0x004e || data[index+5] == 0x006e) &&
-			(data[index+6] == 0x0044 || data[index+6] == 0x0064) {	// 'T', 'h', 'e', ' ', 'E', 'n', 'd' case insensitive
-			return true
+		// 'T', 'h', 'e', ' ', 'E', 'n', 'd' case insensitive
+		var j = i
+		if (data[j.index] == 0x0054 || data[j.index] == 0x0074) {
+			j.advance()
+			if (data[j.index] == 0x0048 || data[j.index] == 0x0068) {
+				j.advance()
+				if (data[j.index] == 0x0045 || data[j.index] == 0x0065) {
+					j.advance()
+					if (data[j.index] == 0x0020) {
+						j.advance()
+						if (data[j.index] == 0x0045 || data[j.index] == 0x0065) {
+							j.advance()
+							if (data[j.index] == 0x004e || data[j.index] == 0x006e) {
+								j.advance()
+								if (data[j.index] == 0x0044 || data[j.index] == 0x0064) {
+									return true
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 		
 		return false

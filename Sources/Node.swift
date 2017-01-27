@@ -13,16 +13,14 @@ public class Node {
 	public weak var previous: Node?
 	public var children = [Node]()
 	
-	public var startIndex = 0
-	public var endIndex = 0
+	public var startIndex: HybridUTF16Index
+	public var endIndex: HybridUTF16Index
 	
 	public var isLeaf: Bool {
 		return children.isEmpty
 	}
 	
-	public init() {}
-	
-	public init(startIndex: Int, endIndex: Int) {
+	public init(startIndex: HybridUTF16Index, endIndex: HybridUTF16Index) {
 		self.startIndex = startIndex
 		self.endIndex = endIndex
 	}
@@ -62,7 +60,7 @@ extension Node {
 	///      - deepSearch: A Bool causing search to recursively find the most specific match. Default value is true.
 	///      - predicate: A closure causing search to return early if a matching node is found.
 	/// - Returns: Node containing a given index, nil if out of bounds
-	public func search(index: Int, options: NodeSearchOptions) -> Node? {
+	public func search(index: HybridUTF16Index, options: NodeSearchOptions) -> Node? {
 		guard index >= self.startIndex && index < endIndex else {
 			return nil
 		}
@@ -121,7 +119,7 @@ extension Node {
 		}
 	}
 	
-	public func childNodes(from startingIndex: Int, to endingIndex: Int) -> [Node] {
+	public func childNodes(from startingIndex: HybridUTF16Index, to endingIndex: HybridUTF16Index) -> [Node] {
 		var nodes = [Node]()
 		
 		let opts = NodeSearchOptions(deepSearch: false, searchPredicate: nil)

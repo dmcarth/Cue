@@ -7,11 +7,11 @@
 //
 
 public struct SearchResult: Equatable {
-	public var startIndex: Int
-	public var endIndex: Int
+	public var startIndex: HybridUTF16Index
+	public var endIndex: HybridUTF16Index
 	public var keywordType: Keyword.KeywordType?
 	
-	public init(startIndex: Int, endIndex: Int, keywordType: Keyword.KeywordType? = nil) {
+	public init(startIndex: HybridUTF16Index, endIndex: HybridUTF16Index, keywordType: Keyword.KeywordType? = nil) {
 		self.startIndex = startIndex
 		self.endIndex = endIndex
 		self.keywordType = keywordType
