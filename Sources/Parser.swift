@@ -292,10 +292,6 @@ extension Cue {
 					spans.push(last)
 					spans.push(ref)
 					spans.push(del)
-					
-					let toc = TableOfContentsItem(type: .reference, location: last.endIndex)
-					flatTableOfContents.append(toc)
-					
 					break
 				}
 				
