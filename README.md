@@ -17,16 +17,17 @@ import Cue
 
 let parser = Cue("Hello world!")
 
-// Abstract syntax tree
 let ast = parser.ast 
+// An abstract syntax tree
 
+let table = parser.tableOfContents
 // An array representing a table of contents
-let toc = parser.tableOfContents
 
+let names = parser.namedEntitiesDictionary
 // A dictionary of names and their occurences in the original string
-let names= parser.namedEntitiesDictionary
 ```
 
+### Abstract Syntax Tree
 The returned AST comes with a number of powerful methods for traversing and querying.
 
 ```swift
@@ -43,15 +44,15 @@ while let next = current {
 let opts = NodeSearchOptions(deepSearch: true, searchPredicate: { (node) in
 	return node is Description
 })
-if let found = ast.search(index: 44, options: opts) {
+if let found = ast.search(index: searchIndex, options: opts) {
 	// Finds and returns a node that matches the search query. If none, search returns nil.
 }
 
-let nodes = ast.childNodes(from: 0, to: 44)
-// Returns all children in the utf16 index range 0..<44
+let nodes = ast.childNodes(from: startOfRange, to: endOfRange)
+// Returns all children in the given range
 ```
 
-All nodes in the AST contain a `startIndex` and an `endIndex`. These properties map to the utf16 indices in the original string where the node's content starts and ends. This is to enable maximum compatibility with NSRange in Foundation, but that may change in the future.
+All nodes in the AST contain a `startIndex` and an `endIndex`. These properties map to the utf16 indices in the original string where the node's content starts and ends. This is to enable maximum compatibility with NSRange in Foundation and in environments where NSRange is unavailable.
 
 ## Syntax
 Cue is designed to be intuitive and invisible whenever possible. It should look more or less exactly the same as when it's printed on a book or in a script. 
