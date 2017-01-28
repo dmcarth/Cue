@@ -16,11 +16,11 @@ The bread and butter of the Cue library is the Cue class, which accepts a string
 import Cue
 
 let parser = Cue("Hello world!")
-let ast = parser.ast()
-let toc = parser.tableOfContents()
+let ast = parser.ast
+let toc = parser.tableOfContents
 // OR
-let ast = Cue("Hello, again!").ast()
-let toc = Cue("Hello, again!").tableOfContents()
+let ast = Cue("Hello, again!").ast
+let toc = Cue("Hello, again!").tableOfContents
 ```
 
 The returned AST comes with a number of powerful methods for traversing and querying.

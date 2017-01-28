@@ -39,11 +39,11 @@ extension Cue {
 	}
 	
 	var tableOfContents: [TableOfContentsItem] {
-		return flatTableOfContents
+		return TableOfContents(self).contents
 	}
 	
 	var namedEntitiesDictionary: [String: Array<String.UTF16Index>] {
-		return NamedEntities(root).map
+		return NamedEntities(self).map
 	}
 	
 }
@@ -116,10 +116,6 @@ extension Cue {
 		
 		if let results = scanForHeading(at: wc) {
 			let he = Header(startIndex: wc, endIndex: endOfLineCharNumber, results: results)
-			
-			let type = TableOfContentsItem.ContentType.init(keyword: results[0].keywordType!)
-			let toc = TableOfContentsItem(type: type, location: charNumber)
-			flatTableOfContents.append(toc)
 			
 			return he
 		} else if scanForTheEnd(at: wc) {
@@ -219,9 +215,6 @@ extension Cue {
 		}
 		
 		block = Description(startIndex: charNumber, endIndex: endOfLineCharNumber)
-		if let last = flatTableOfContents.last, last.location == charNumber {
-			flatTableOfContents.removeLast()
-		}
 		return root
 	}
 	
