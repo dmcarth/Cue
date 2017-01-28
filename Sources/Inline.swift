@@ -13,6 +13,7 @@ public class Keyword: Inline {
 		case act
 		case chapter
 		case scene
+		case page
 	}
 	var type: KeywordType = .act
 }

@@ -23,6 +23,8 @@ public struct TableOfContentsItem {
 				self = .chapter
 			case .scene:
 				self = .scene
+			case .page:
+				self = .page
 			}
 		}
 	}

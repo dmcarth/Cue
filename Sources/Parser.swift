@@ -391,6 +391,9 @@ extension Cue {
 		} else if scanForChapterHeading(at: i) {
 			type = .chapter
 			j.advance(in: data, by: 7)
+		} else if scanForPage(at: i) {
+			type = .page
+			j.advance(in: data, by: 4)
 		} else {
 			return nil
 		}
@@ -489,6 +492,30 @@ extension Cue {
 						if data[j] == 0x0065 {
 							return true
 						}
+					}
+				}
+			}
+		}
+		
+		return false
+	}
+	
+	func scanForPage(at i: String.UTF16Index) -> Bool {
+		guard i.advanced(in: data, by: 4) < endOfLineCharNumber else {
+			return false
+		}
+		
+		
+		// 'P', 'a', 'g', 'e'
+		var j = i
+		if data[j] == 0x0050 {
+			j.advance(in: data)
+			if data[j] == 0x0061 {
+				j.advance(in: data)
+				if data[j] == 0x0067 {
+					j.advance(in: data)
+					if data[j] == 0x0065 {
+						return true
 					}
 				}
 			}

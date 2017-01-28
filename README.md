@@ -64,9 +64,12 @@ Headers, for example, are marked by their own keywords and an identifier:
 Act I
 Chapter 1
 Scene The First
+Page 💯
 ```
 
-The identifier can be anything: roman numerals, raw text, emoji, you pick.
+You can use all or none of these headers to subdivide a document into smaller parts. 
+
+Note that the identifier can be anything: roman numerals, raw text, emoji, or anything else.
 
 In addition, you can optionally give each header a title by adding a hyphen.
 
