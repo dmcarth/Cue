@@ -28,9 +28,9 @@ public struct TableOfContentsItem {
 	}
 	
 	public var type: ContentType
-	public var location: HybridUTF16Index
+	public var location: String.UTF16Index
 	
-	public init(type: ContentType, location: HybridUTF16Index) {
+	public init(type: ContentType, location: String.UTF16Index) {
 		self.type = type
 		self.location = location
 	}

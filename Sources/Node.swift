@@ -13,14 +13,14 @@ public class Node {
 	public weak var previous: Node?
 	public var children = [Node]()
 	
-	public var startIndex: HybridUTF16Index
-	public var endIndex: HybridUTF16Index
+	public var startIndex: String.UTF16Index
+	public var endIndex: String.UTF16Index
 	
 	public var isLeaf: Bool {
 		return children.isEmpty
 	}
 	
-	public init(startIndex: HybridUTF16Index, endIndex: HybridUTF16Index) {
+	public init(startIndex: String.UTF16Index, endIndex: String.UTF16Index) {
 		self.startIndex = startIndex
 		self.endIndex = endIndex
 	}
@@ -60,7 +60,7 @@ extension Node {
 	///      - deepSearch: A Bool causing search to recursively find the most specific match. Default value is true.
 	///      - predicate: A closure causing search to return early if a matching node is found.
 	/// - Returns: Node containing a given index, nil if out of bounds
-	public func search(index: HybridUTF16Index, options: NodeSearchOptions) -> Node? {
+	public func search(index: String.UTF16Index, options: NodeSearchOptions) -> Node? {
 		guard index >= self.startIndex && index < endIndex else {
 			return nil
 		}
@@ -119,12 +119,12 @@ extension Node {
 		}
 	}
 	
-	public func childNodes(from startingIndex: HybridUTF16Index, to endingIndex: HybridUTF16Index) -> [Node] {
+	public func childNodes(from startingIndex: String.UTF16Index, to endingIndex: String.UTF16Index) -> [Node] {
 		var nodes = [Node]()
 		
 		let opts = NodeSearchOptions(deepSearch: false, searchPredicate: nil)
 		var searchIndex = startingIndex
-		let safeEndIndex = min(endingIndex, endIndex)
+		let safeEndIndex = min(endIndex, endingIndex)
 		
 		if var node = search(index: searchIndex, options: opts) {
 			nodes.append(node)

@@ -65,7 +65,7 @@ struct InlineCollection: Collection {
 					
 					queue.append(remainder)
 					
-					if newInline.endIndex.offset-newInline.startIndex.offset > 0 {
+					if newInline.endIndex == newInline.startIndex {
 						array.insert(newInline, at: idx)
 					}
 					

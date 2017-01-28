@@ -9,8 +9,9 @@
 /* Begin PBXBuildFile section */
 		107BCD131E3AE1D700A183F5 /* Container.swift in Sources */ = {isa = PBXBuildFile; fileRef = 107BCD121E3AE1D700A183F5 /* Container.swift */; };
 		10EACB001E3B0DC0002C9DC2 /* TableOfContentsItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10EACAFF1E3B0DC0002C9DC2 /* TableOfContentsItem.swift */; };
-		10EACB051E3BC545002C9DC2 /* HybridUTF16Index.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10EACB041E3BC545002C9DC2 /* HybridUTF16Index.swift */; };
+		10EACB051E3BC545002C9DC2 /* String Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10EACB041E3BC545002C9DC2 /* String Extensions.swift */; };
 		10EACB081E3BD852002C9DC2 /* war+peace.txt in Resources */ = {isa = PBXBuildFile; fileRef = 1058884D1E13934500169907 /* war+peace.txt */; };
+		10EACB0E1E3C17C1002C9DC2 /* NamedEntities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10EACB0D1E3C17C1002C9DC2 /* NamedEntities.swift */; };
 		OBJ_30 /* Block.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_9 /* Block.swift */; };
 		OBJ_32 /* DelimiterStack.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_11 /* DelimiterStack.swift */; };
 		OBJ_33 /* Inline.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_12 /* Inline.swift */; };
@@ -37,7 +38,8 @@
 		1058884D1E13934500169907 /* war+peace.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "war+peace.txt"; sourceTree = "<group>"; };
 		107BCD121E3AE1D700A183F5 /* Container.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Container.swift; sourceTree = "<group>"; };
 		10EACAFF1E3B0DC0002C9DC2 /* TableOfContentsItem.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TableOfContentsItem.swift; sourceTree = "<group>"; };
-		10EACB041E3BC545002C9DC2 /* HybridUTF16Index.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HybridUTF16Index.swift; sourceTree = "<group>"; };
+		10EACB041E3BC545002C9DC2 /* String Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "String Extensions.swift"; sourceTree = "<group>"; };
+		10EACB0D1E3C17C1002C9DC2 /* NamedEntities.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = NamedEntities.swift; sourceTree = "<group>"; };
 		10F9685C1E148D9E00D21E4B /* LinuxMain.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LinuxMain.swift; sourceTree = "<group>"; };
 		10F9685F1E148E6D00D21E4B /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		OBJ_11 /* DelimiterStack.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DelimiterStack.swift; sourceTree = "<group>"; };
@@ -137,7 +139,8 @@
 			children = (
 				1058883F1E13931300169907 /* AST */,
 				10EACAFF1E3B0DC0002C9DC2 /* TableOfContentsItem.swift */,
-				10EACB041E3BC545002C9DC2 /* HybridUTF16Index.swift */,
+				10EACB0D1E3C17C1002C9DC2 /* NamedEntities.swift */,
+				10EACB041E3BC545002C9DC2 /* String Extensions.swift */,
 				OBJ_16 /* Parser.swift */,
 				OBJ_17 /* SearchResult.swift */,
 				OBJ_11 /* DelimiterStack.swift */,
@@ -226,6 +229,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
+				10EACB0E1E3C17C1002C9DC2 /* NamedEntities.swift in Sources */,
 				OBJ_30 /* Block.swift in Sources */,
 				OBJ_32 /* DelimiterStack.swift in Sources */,
 				OBJ_33 /* Inline.swift in Sources */,
@@ -233,7 +237,7 @@
 				OBJ_35 /* Node.swift in Sources */,
 				OBJ_36 /* NodeSearchOptions.swift in Sources */,
 				10EACB001E3B0DC0002C9DC2 /* TableOfContentsItem.swift in Sources */,
-				10EACB051E3BC545002C9DC2 /* HybridUTF16Index.swift in Sources */,
+				10EACB051E3BC545002C9DC2 /* String Extensions.swift in Sources */,
 				OBJ_37 /* Parser.swift in Sources */,
 				107BCD131E3AE1D700A183F5 /* Container.swift in Sources */,
 				OBJ_38 /* SearchResult.swift in Sources */,
