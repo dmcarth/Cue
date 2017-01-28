@@ -10,12 +10,12 @@ struct NamedEntities {
 	
 	var map: [String: Array<String.UTF16Index>]
 	
-	init(_ ast: Node) {
+	init(_ parser: Cue) {
 		var map = [String: Array<String.UTF16Index>]()
 		
-		ast.enumerate { (node) in
+		parser.root.enumerate { (node) in
 			if node is Name {
-				let name = String(data[node.startIndex..<node.endIndex])!
+				let name = String(parser.data[node.startIndex..<node.endIndex])!
 				
 				var referencesForName = map[name] ?? []
 				
