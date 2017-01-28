@@ -10,8 +10,6 @@ public class Cue {
 	
 	var data: String.UTF16View
 	
-	var flatTableOfContents = [TableOfContentsItem]()
-	
 	var root: Document
 	
 	var lineNumber = 0

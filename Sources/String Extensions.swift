@@ -1,5 +1,5 @@
 //
-//  HybridUTF16Index.swift
+//  String Extensions.swift
 //  Cue
 //
 //  Created by Dylan McArthur on 1/27/17.
