@@ -12,8 +12,6 @@ public class Cue {
 	
 	var flatTableOfContents = [TableOfContentsItem]()
 	
-	var namedEntities = NamedEntities()
-	
 	var root: Document
 	
 	var lineNumber = 0
@@ -31,16 +29,30 @@ public class Cue {
 		parseBlocks()
 	}
 	
+}
+
+// MARK: - Views
+extension Cue {
+	
 	public func ast() -> Document {
 		return root
 	}
 	
 	public func tableOfContents() -> [TableOfContentsItem] {
-		// TODO: Return a tree of references to header nodes in the ast
 		return flatTableOfContents
 	}
 	
 	public func namedEntitiesDictionary() -> [String: Array<String.UTF16Index>] {
+		var namedEntities = NamedEntities()
+		
+		root.enumerate { (node) in
+			if node is Name {
+				let name = String(data[node.startIndex..<node.endIndex])!
+				
+				namedEntities.addReference(to: name, at: node.startIndex)
+			}
+		}
+		
 		return namedEntities.names
 	}
 	
@@ -139,19 +151,9 @@ extension Cue {
 		} else if let results = scanForDualCue(at: wc) {
 			let du = DualCue(startIndex: charNumber, endIndex: endOfLineCharNumber, results: results)
 			
-			let nameResult = results[1]
-			if let name = String(data[nameResult.startIndex..<nameResult.endIndex]) {
-				namedEntities.addReference(to: name, at: nameResult.startIndex)
-			}
-			
 			return du
 		} else if let results = scanForCue(at: wc) {
 			let cu = RegularCue(startIndex: charNumber, endIndex: endOfLineCharNumber, results: results)
-			
-			let nameResult = results[0]
-			if let name = String(data[nameResult.startIndex..<nameResult.endIndex]) {
-				namedEntities.addReference(to: name, at: nameResult.startIndex)
-			}
 			
 			return cu
 		}
