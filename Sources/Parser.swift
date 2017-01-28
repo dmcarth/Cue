@@ -34,26 +34,16 @@ public class Cue {
 // MARK: - Views
 extension Cue {
 	
-	public func ast() -> Document {
+	var ast: Document {
 		return root
 	}
 	
-	public func tableOfContents() -> [TableOfContentsItem] {
+	var tableOfContents: [TableOfContentsItem] {
 		return flatTableOfContents
 	}
 	
-	public func namedEntitiesDictionary() -> [String: Array<String.UTF16Index>] {
-		var namedEntities = NamedEntities()
-		
-		root.enumerate { (node) in
-			if node is Name {
-				let name = String(data[node.startIndex..<node.endIndex])!
-				
-				namedEntities.addReference(to: name, at: node.startIndex)
-			}
-		}
-		
-		return namedEntities.names
+	var namedEntitiesDictionary: [String: Array<String.UTF16Index>] {
+		return NamedEntities(root).map
 	}
 	
 }

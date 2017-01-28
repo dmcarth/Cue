@@ -8,16 +8,24 @@
 
 struct NamedEntities {
 	
-	var names = [String: Array<String.UTF16Index>]()
+	var map: [String: Array<String.UTF16Index>]
 	
-	init() {}
-	
-	mutating func addReference(to name: String, at location:  String.UTF16Index) {
-		var referencesForName = names[name] ?? []
+	init(_ ast: Node) {
+		var map = [String: Array<String.UTF16Index>]()
 		
-		referencesForName.append(location)
+		ast.enumerate { (node) in
+			if node is Name {
+				let name = String(data[node.startIndex..<node.endIndex])!
+				
+				var referencesForName = map[name] ?? []
+				
+				referencesForName.append(node.startIndex)
+				
+				map[name] = referencesForName
+			}
+		}
 		
-		names[name] = referencesForName
+		self.map = map
 	}
 	
 }
