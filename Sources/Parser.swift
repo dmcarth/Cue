@@ -32,15 +32,15 @@ public class Cue {
 // MARK: - Views
 extension Cue {
 	
-	var ast: Document {
+	public var ast: Node {
 		return root
 	}
 	
-	var tableOfContents: [TableOfContentsItem] {
+	public var tableOfContents: [TableOfContentsItem] {
 		return TableOfContents(self).contents
 	}
 	
-	var namedEntitiesDictionary: [String: Array<String.UTF16Index>] {
+	public var namedEntitiesDictionary: [String: Array<String.UTF16Index>] {
 		return NamedEntities(self).map
 	}
 	
