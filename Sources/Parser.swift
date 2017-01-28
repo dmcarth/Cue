@@ -423,13 +423,13 @@ extension Cue {
 			return false
 		}
 		
-		// 'A', 'c', 't' case insensitive
+		// 'A', 'c', 't'
 		var j = i
-		if data[j] == 0x0041 || data[j] == 0x0061 {
+		if data[j] == 0x0041 {
 			j.advance(in: data)
-			if data[j] == 0x0063 || data[j] == 0x0043 {
+			if data[j] == 0x0063 {
 				j.advance(in: data)
-				if data[j] == 0x0074 || data[j] == 0x0054 {
+				if data[j] == 0x0074 {
 					return true
 				}
 			}
@@ -443,21 +443,21 @@ extension Cue {
 			return false
 		}
 		
-		// 'C', 'h', 'a', 'p', 't', 'e', 'r' case insensitive
+		// 'C', 'h', 'a', 'p', 't', 'e', 'r'
 		var j = i
-		if data[j] == 0x0043 || data[j] == 0x0063 {
+		if data[j] == 0x0043 {
 			j.advance(in: data)
-			if data[j] == 0x0068 || data[j] == 0x0048 {
+			if data[j] == 0x0068 {
 				j.advance(in: data)
-				if data[j] == 0x0061 || data[j] == 0x0041 {
+				if data[j] == 0x0061 {
 					j.advance(in: data)
-					if data[j] == 0x0070 || data[j] == 0x0050 {
+					if data[j] == 0x0070 {
 						j.advance(in: data)
-						if data[j] == 0x0074 || data[j] == 0x0054 {
+						if data[j] == 0x0074 {
 							j.advance(in: data)
-							if data[j] == 0x0065 || data[j] == 0x0045 {
+							if data[j] == 0x0065 {
 								j.advance(in: data)
-								if data[j] == 0x0072 || data[j] == 0x0052 {
+								if data[j] == 0x0072 {
 									return true
 								}
 							}
@@ -476,17 +476,17 @@ extension Cue {
 		}
 		
 		
-		// 'S', 'c', 'e', 'n', 'e' case insensititve
+		// 'S', 'c', 'e', 'n', 'e'
 		var j = i
-		if data[j] == 0x0053 || data[j] == 0x0073 {
+		if data[j] == 0x0053 {
 			j.advance(in: data)
-			if data[j] == 0x0063 || data[j] == 0x0043 {
+			if data[j] == 0x0063 {
 				j.advance(in: data)
-				if data[j] == 0x0065 || data[j] == 0x0045 {
+				if data[j] == 0x0065 {
 					j.advance(in: data)
-					if data[j] == 0x006e || data[j] == 0x004e {
+					if data[j] == 0x006e {
 						j.advance(in: data)
-						if data[j] == 0x0065 || data[j] == 0x0045 {
+						if data[j] == 0x0065 {
 							return true
 						}
 					}
@@ -668,21 +668,21 @@ extension Cue {
 			return false
 		}
 		
-		// 'T', 'h', 'e', ' ', 'E', 'n', 'd' case insensitive
+		// 'T', 'h', 'e', ' ', 'E', 'n', 'd'
 		var j = i
-		if (data[j] == 0x0054 || data[j] == 0x0074) {
+		if data[j] == 0x0054 {
 			j.advance(in: data)
-			if (data[j] == 0x0048 || data[j] == 0x0068) {
+			if data[j] == 0x0068 {
 				j.advance(in: data)
-				if (data[j] == 0x0045 || data[j] == 0x0065) {
+				if data[j] == 0x0065 {
 					j.advance(in: data)
-					if (data[j] == 0x0020) {
+					if data[j] == 0x0020 {
 						j.advance(in: data)
-						if (data[j] == 0x0045 || data[j] == 0x0065) {
+						if data[j] == 0x0045 {
 							j.advance(in: data)
-							if (data[j] == 0x004e || data[j] == 0x006e) {
+							if data[j] == 0x006e {
 								j.advance(in: data)
-								if (data[j] == 0x0044 || data[j] == 0x0064) {
+								if data[j] == 0x0064 {
 									return true
 								}
 							}
