@@ -69,7 +69,7 @@ Page 💯
 
 You can use all or none of these headers to subdivide a document into smaller parts. 
 
-Note that the identifier can be anything: roman numerals, raw text, emoji, or anything else.
+Note that the identifier can be anything: roman numerals, raw text, emoji, or anything else that suits your fancy.
 
 In addition, you can optionally give each header a title by adding a hyphen.
 
