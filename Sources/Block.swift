@@ -21,12 +21,16 @@ public class Block: Node {
 }
 
 public class Header: Block {
+	var type: Keyword.KeywordType = .act
+	
 	public init(startIndex: String.UTF16Index, endIndex: String.UTF16Index, results: [SearchResult]) {
 		super.init(startIndex: startIndex, endIndex: endIndex, offset: results[0].startIndex)
 		
 		let key = Keyword(results[0])
 		key.type = results[0].keywordType!
 		addChild(key)
+		
+		self.type = key.type
 		
 		let del = Delimiter(results[1])
 		del.type = .whitespace
