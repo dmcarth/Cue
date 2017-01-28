@@ -451,11 +451,6 @@ extension Cue {
 			if data[j] == 0x0063 || data[j] == 0x0043 {
 				j.advance(in: data)
 				if data[j] == 0x0074 || data[j] == 0x0054 {
-					j.advance(in: data)
-					let wc = scanForFirstNonspace(startingAt: j)
-					
-					guard wc > j else { return false }
-					
 					return true
 				}
 			}
@@ -484,11 +479,6 @@ extension Cue {
 							if data[j] == 0x0065 || data[j] == 0x0045 {
 								j.advance(in: data)
 								if data[j] == 0x0072 || data[j] == 0x0052 {
-									j.advance(in: data)
-									let wc = scanForFirstNonspace(startingAt: j)
-									
-									guard wc > j else { return false }
-									
 									return true
 								}
 							}
@@ -518,11 +508,6 @@ extension Cue {
 					if data[j] == 0x006e || data[j] == 0x004e {
 						j.advance(in: data)
 						if data[j] == 0x0065 || data[j] == 0x0045 {
-							j.advance(in: data)
-							let wc = scanForFirstNonspace(startingAt: j)
-							
-							guard wc > j else { return false }
-							
 							return true
 						}
 					}
