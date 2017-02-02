@@ -6,12 +6,7 @@
 //
 //
 
-protocol Codec {
-	associatedtype CodeUnit: Integer
-	static func fromASCII(_ char: UInt8) -> CodeUnit
-}
-
-extension Codec {
+extension UTF16 {
 	static var linefeed: CodeUnit { return fromASCII(0x0a) }
 	static var carriage: CodeUnit { return fromASCII(0x0d) }
 	static var space: CodeUnit { return fromASCII(0x20) }
@@ -43,7 +38,7 @@ extension Codec {
 	static var t: CodeUnit { return fromASCII(0x74) }
 }
 
-extension UTF16: Codec {
+extension UTF16 {
 	static func fromASCII(_ char: UInt8) -> UInt16 {
 		return UInt16(char)
 	}

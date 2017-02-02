@@ -57,6 +57,7 @@ extension Cue {
 extension Cue {
 	
 	func parseBlocks() {
+		
 		// Enumerate lines
 		while charNumber < data.endIndex {
 			// Find line ending
@@ -531,53 +532,77 @@ extension Cue {
 		return CueBlock(start: del, name: cueResults[0].range, space: cueResults[1].range, content: cueResults[1].range.lowerBound..<endOfLineCharNumber)
 	}
 	
-	/// Returns an array of SearchResults or nil if matching failed.
-	///
-	/// - returns: [0] covers Cue name, [1] covers ":" and any whitespace
 	func scanForCue(at i: Index) -> [SearchResult]? {
 		var j = i
-		var state = 0
-		var matched = false
 		var distance = 0
 		while j < endOfLineCharNumber {
+			let c = data[j]
 			
-			switch state {
-			case 0:
-				// initial state
-				if data[j] != UTF16.colon && data[j] != UTF16.leftBracket { // not ':' or '['
-					state = 1
-				} else {
-					return nil
-				}
-				
-			case 1:
-				// find colon
-				if data[j] == UTF16.colon { // ':'
-					matched = true
-				} else if distance >= 23 || data[j] == UTF16.leftBracket { // cue can not be > 24 (23 chars + :), and should not contain brackets.
-					return nil
-				} else {
-					state = 1
-				}
-				
-			default:
-				return nil
+			guard distance <= 24 else { break }
+			
+			if c == UTF16.colon {
+				let nameResult = SearchResult(range: i..<j)
+				var k = scanForFirstNonspace(startingAt: data.index(after: j))
+				let colonResult = SearchResult(range: j..<k)
+				return [nameResult, colonResult]
+			} else if c == UTF16.leftBracket {
+				break
 			}
 			
-			if matched {
-				let result1 = SearchResult(range: i..<j)
-				let wc = scanForFirstNonspace(startingAt: data.index(after: j))
-				let result2 = SearchResult(range: result1.range.upperBound..<wc)
-				
-				return [result1, result2]
-			}
-			
-			j = data.index(after: j)
 			distance += 1
+			j = data.index(after: j)
 		}
 		
 		return nil
 	}
+	
+//	/// Returns an array of SearchResults or nil if matching failed.
+//	///
+//	/// - returns: [0] covers Cue name, [1] covers ":" and any whitespace
+//	func scanForCue(at i: Index) -> [SearchResult]? {
+//		var j = i
+//		var state = 0
+//		var matched = false
+//		var distance = 0
+//		while j < endOfLineCharNumber {
+//			
+//			switch state {
+//			case 0:
+//				// initial state
+//				if data[j] != UTF16.colon && data[j] != UTF16.leftBracket { // not ':' or '['
+//					state = 1
+//				} else {
+//					return nil
+//				}
+//				
+//			case 1:
+//				// find colon
+//				if data[j] == UTF16.colon { // ':'
+//					matched = true
+//				} else if distance >= 23 || data[j] == UTF16.leftBracket { // cue can not be > 24 (23 chars + :), and should not contain brackets.
+//					return nil
+//				} else {
+//					state = 1
+//				}
+//				
+//			default:
+//				return nil
+//			}
+//			
+//			if matched {
+//				let result1 = SearchResult(range: i..<j)
+//				let wc = scanForFirstNonspace(startingAt: data.index(after: j))
+//				let result2 = SearchResult(range: result1.range.upperBound..<wc)
+//				
+//				return [result1, result2]
+//			}
+//			
+//			j = data.index(after: j)
+//			distance += 1
+//		}
+//		
+//		return nil
+//	}
 	
 	func scanForTheEnd(at i: Index) -> Bool {
 		guard data.index(i, offsetBy: 7) == data.endIndex else {

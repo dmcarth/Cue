@@ -6,10 +6,10 @@ class CueTests: XCTestCase {
     func testPerformanceExample() {
 		let fileURL = Bundle(for: CueTests.self).url(forResource: "war+peace", withExtension: "txt")!
 		let str = try! String(contentsOf: fileURL)
-		let bytes = [UInt16](str.utf16)
+//		let bytes = [UInt16](str.utf16)
 		
 		self.measure {
-			_ = Cue(bytes)
+			_ = Cue(str)
 		}
 	}
 
