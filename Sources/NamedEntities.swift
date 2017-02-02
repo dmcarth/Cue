@@ -6,26 +6,27 @@
 //
 //
 
-struct NamedEntities {
-	
-	var map: [String: Array<String.UTF16Index>]
-	
-	init(_ parser: Cue) {
-		var map = [String: Array<String.UTF16Index>]()
-		
-		parser.root.enumerate { (node) in
-			if node is Name {
-				let name = String(parser.data[node.startIndex..<node.endIndex])!
-				
-				var referencesForName = map[name] ?? []
-				
-				referencesForName.append(node.startIndex)
-				
-				map[name] = referencesForName
-			}
-		}
-		
-		self.map = map
-	}
-	
-}
+//struct NamedEntities {
+//	
+//	var map: [String: Array<Int>]
+//	
+//	init(_ parser: Cue) {
+//		var map = [String: Array<Int>]()
+//		
+//		parser.root.enumerate { (node) in
+//			if let cue = node as? CueBlock {
+//				let bytes = Array(parser.data[cue.name.range])
+//				let name = String(bytes)
+//				
+//				var referencesForName = map[name] ?? []
+//				
+//				referencesForName.append(cue.name.range.lowerBound)
+//				
+//				map[name] = referencesForName
+//			}
+//		}
+//		
+//		self.map = map
+//	}
+//	
+//}

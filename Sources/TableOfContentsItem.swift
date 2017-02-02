@@ -8,33 +8,35 @@
 
 public struct TableOfContentsItem {
 	
-	public enum ContentType {
-		case act
-		case chapter
-		case scene
-		case page
-		case reference
-		
-		init(keyword: Keyword.KeywordType) {
-			switch keyword {
-			case .act:
-				self = .act
-			case .chapter:
-				self = .chapter
-			case .scene:
-				self = .scene
-			case .page:
-				self = .page
-			}
-		}
-	}
+	public var type: TableOfContentsType
+	public var location: Int
 	
-	public var type: ContentType
-	public var location: String.UTF16Index
-	
-	public init(type: ContentType, location: String.UTF16Index) {
+	public init(type: TableOfContentsType, location: Int) {
 		self.type = type
 		self.location = location
 	}
 	
 }
+
+
+public enum TableOfContentsType {
+	case act
+	case chapter
+	case scene
+	case page
+	case reference
+	
+	init(keyword: HeaderBlock.HeaderType) {
+		switch keyword {
+		case .act:
+			self = .act
+		case .chapter:
+			self = .chapter
+		case .scene:
+			self = .scene
+		case .page:
+			self = .page
+		}
+	}
+}
+

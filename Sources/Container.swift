@@ -2,27 +2,29 @@
 //  Container.swift
 //  Cue
 //
-//  Created by Dylan McArthur on 1/26/17.
+//  Created by Dylan McArthur on 1/31/17.
 //
 //
 
-public class Container: Node {
+public class AbstractContainer: AbstractNode {
+	
+	fileprivate(set) var contents = [AbstractNode]()
+	
+	override public var children: [AbstractNode] {
+		return contents
+	}
 	
 }
 
-public class Document: Container {
+extension AbstractContainer {
+	
+	func addChild(_ child: AbstractNode) {
+		if let last = contents.last {
+			last.next = child
+		}
+		
+		contents.append(child)
+		child.parent = self
+	}
 	
 }
-
-public class FacsimileContainer: Container {
-	
-}
-
-public class CueContainer: Container {
-	
-}
-
-public class LyricContainer: Container {
-	
-}
-

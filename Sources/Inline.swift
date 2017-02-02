@@ -6,7 +6,7 @@
 //  Copyright © 2016 Dylan McArthur. All rights reserved.
 //
 
-public class Inline: Node {}
+public class Inline<Input: BidirectionalCollection>: Node<Input> {}
 
 public class Keyword: Inline {
 	public enum KeywordType {

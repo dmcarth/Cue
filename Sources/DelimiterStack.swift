@@ -6,26 +6,24 @@
 //  Copyright © 2016 Dylan McArthur. All rights reserved.
 //
 
-struct DelimiterStack {
-	private var array = [Delimiter]()
+class InlineMarker {
 	
-	var isEmpty: Bool {
-		return array.isEmpty
+	var previous: InlineMarker?
+	
+	enum MarkerType {
+		case asterisk
+		case openBracket
+		case closeBracket
+		case comment
 	}
 	
-	var count: Int {
-		return array.count
+	var type: MarkerType
+	
+	var range: Range<Int>
+
+	init(type: MarkerType, range: Range<Int>) {
+		self.type = type
+		self.range = range
 	}
 	
-	mutating func push(_ del: Delimiter) {
-		array.append(del)
-	}
-	
-	func peek() -> Delimiter? {
-		return array.last
-	}
-	
-	mutating func pop() -> Delimiter? {
-		return array.popLast()
-	}
 }

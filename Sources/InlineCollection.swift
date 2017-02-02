@@ -7,7 +7,7 @@
 //
 
 struct InlineCollection: Collection {
-	private var array = [Inline]()
+	private var array = [AbstractNode]()
 	
 	var startIndex: Int {
 		return 0
@@ -17,7 +17,7 @@ struct InlineCollection: Collection {
 		return array.endIndex
 	}
 	
-	subscript(_ pos: Int) -> Inline {
+	subscript(_ pos: Int) -> AbstractNode {
 		return array[pos]
 	}
 	
@@ -25,8 +25,8 @@ struct InlineCollection: Collection {
 		return i + 1
 	}
 	
-	// Ensure all inlines are of equal depth, the purpose of this structure is to represent a tree-like structure as a 2D array.
-	mutating func push(_ inline: Inline) {
+	// Ensure all inlines are of equal depth, the purpose of this structure is to represent a tree-like structure more like a 2D array.
+	mutating func push(_ inline: AbstractNode) {
 		guard !array.isEmpty else {
 			array.append(inline)
 			return
@@ -39,33 +39,39 @@ struct InlineCollection: Collection {
 			let currInline = array[idx]
 			guard let newInline = queue.first else { return }
 			
-			if exclusion(currInline, newInline) {
-				if newInline.endIndex < currInline.startIndex {
+			if !currInline.range.overlaps(newInline.range) {
+				if newInline.range.upperBound < currInline.range.lowerBound {
 					array.insert(newInline, at: idx)
 					queue.removeFirst()
 				}
 			} else {
-				if newInline.startIndex > currInline.startIndex {
-					fatalError("\(self) found invalid overlap when comparing \(newInline) and \(currInline)")
+				if newInline.range.lowerBound > currInline.range.lowerBound {
+					fatalError("\(self) found invalid overlap when comparing \(newInline) and \(currInline). Unprepared to push inlines the do not extend beyond both sides of the current inline.")
 				} else {
-					let oldEndIndex = newInline.endIndex
-					newInline.endIndex = currInline.startIndex
+					// Clip newInline by the beginning of the current inline
+					let oldEndIndexForNewInline = newInline.range.upperBound
+					newInline.range = newInline.range.lowerBound..<currInline.range.lowerBound
 					
 					// Create remainder and add to queue
-					var remainder: Inline
-					if let _ = newInline as? RawText {
-						remainder = RawText(startIndex: currInline.endIndex, endIndex: oldEndIndex)
-					} else if let _ = newInline as? Emphasis {
-						remainder = Emphasis(startIndex: currInline.endIndex, endIndex: oldEndIndex)
-					} else if let _ = newInline as? Reference {
-						remainder = Reference(startIndex: currInline.endIndex, endIndex: oldEndIndex)
+					var remainder: AbstractNode
+					let remainderRange: Range = currInline.range.upperBound..<oldEndIndexForNewInline
+					if let _ = newInline as? Literal {
+						remainder = Literal(range: currInline.range.upperBound..<oldEndIndexForNewInline)
+					} else if let newEm = newInline as? Emphasis {
+						// adjust delimiters
+						remainder = Emphasis(start: remainderRange.lowerBound..<remainderRange.lowerBound, stop: newEm.delimiters.1.range)
+						newEm.delimiters.0.range = currInline.range.lowerBound..<currInline.range.lowerBound
+					} else if let newRef = newInline as? Reference {
+						// adjust delimiters
+						remainder = Reference(start: remainderRange.lowerBound..<remainderRange.lowerBound, stop: newRef.delimiters.1.range)
+						newRef.delimiters.0.range = currInline.range.lowerBound..<currInline.range.lowerBound
 					} else {
 						fatalError("\(self) found an impossible \(newInline) during self sorting")
 					}
 					
 					queue.append(remainder)
 					
-					if newInline.endIndex == newInline.startIndex {
+					if newInline.range.isEmpty {
 						array.insert(newInline, at: idx)
 					}
 					
@@ -77,11 +83,6 @@ struct InlineCollection: Collection {
 		}
 		
 		array.append(contentsOf: queue)
-	}
-	
-	private func exclusion(_ lhs: Node, _ rhs: Node) -> Bool {
-		return lhs.endIndex <= rhs.startIndex ||
-				lhs.startIndex >= rhs.endIndex
 	}
 }
 

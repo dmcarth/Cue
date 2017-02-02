@@ -6,133 +6,52 @@
 //  Copyright © 2016 Dylan McArthur. All rights reserved.
 //
 
-public class Node {
+public class AbstractNode: Enumerable, Searchable {
 	
-	public weak var parent: Node?
-	public weak var next: Node?
-	public weak var previous: Node?
-	public var children = [Node]()
+	public weak var parent: AbstractNode?
 	
-	public var startIndex: String.UTF16Index
-	public var endIndex: String.UTF16Index
+	public weak var next: AbstractNode?
 	
-	public var isLeaf: Bool {
-		return children.isEmpty
+	public var children: [AbstractNode] {
+		return []
 	}
 	
-	public init(startIndex: String.UTF16Index, endIndex: String.UTF16Index) {
-		self.startIndex = startIndex
-		self.endIndex = endIndex
+	public var range: Range<Int>
+	
+	public var lineNumber = 0
+	
+	public init(range: Range<Int>) {
+		self.range = range
 	}
 	
-	public convenience init(_ result: SearchResult) {
-		self.init(startIndex: result.startIndex, endIndex: result.endIndex)
-	}
-	
-	internal func addChild(_ child: Node) {
-		child.parent = self
-		if let last = children.last {
-			child.previous = last
-			last.next = child
-		}
-		self.children.append(child)
-	}
-	
-	internal func removeLastChild() {
-		guard !children.isEmpty else { return }
-		
-		children.removeLast()
-		if let last = children.last {
-			last.next = nil
+	public func compare(to index: Int) -> SearchComparison {
+		if index < range.lowerBound {
+			return .greaterThan
+		} else if index >= range.upperBound {
+			return .lessThan
+		} else {
+			return .contains
 		}
 	}
 	
 }
 
-// MARK: - Search and Query
-extension Node {
+extension AbstractNode {
 	
-	/// Binary search for the node containing a given index.
-	///
-	/// - Parameters:
-	///   - index: A utf16 byte index.
-	///   - options: A NodeSearchOptions object allowing fine grain control of search.
-	///      - deepSearch: A Bool causing search to recursively find the most specific match. Default value is true.
-	///      - predicate: A closure causing search to return early if a matching node is found.
-	/// - Returns: Node containing a given index, nil if out of bounds
-	public func search(index: String.UTF16Index, options: NodeSearchOptions) -> Node? {
-		guard index >= self.startIndex && index < endIndex else {
-			return nil
-		}
+	func childNodes(from startIndex: Int, to endIndex: Int) -> [AbstractNode] {
+		var nodes = [AbstractNode]()
 		
-		var lowerBound = 0
-		var upperBound = children.count
+		let opts = SearchOptions(deepSearch: false)
 		
-		while lowerBound < upperBound {
-			let midIndex = lowerBound + (upperBound - lowerBound) / 2
-			let midChild = children[midIndex]
-			
-			if index < midChild.startIndex {
-				upperBound = midIndex
-			} else if index >= midChild.endIndex {
-				lowerBound = midIndex + 1
-			} else {
-				// We've found a match!
-				
-				// If a custom search predicate has been provided, that takes precedence over everything else
-				if let predicate = options.predicate{
-					if predicate(midChild) {
-						return midChild
-					}
-				}
-				
-				if options.deepSearchEnabled {
-					if let deepMatch = midChild.search(index: index, options: options) {
-						return deepMatch
-					}
-				}
-				
-				// Checking for nil ensures that a search with a predicate will only return if the matching node passes the given predicate
-				if options.predicate == nil {
-					return midChild
-				}
-				
-				// Search matched the index but not the options, break the loop
-				break
-			}
-		}
-		
-		return nil
-	}
-	
-	public func enumerate(_ handler: (_ node: Node)->Void) {
-		let isLeaf = children.isEmpty
-		handler(self)
-		
-		// This enables us to manipulate the node within the handler without creating an infinite loop
-		guard !isLeaf else {
-			return
-		}
-		
-		for c in children {
-			c.enumerate(handler)
-		}
-	}
-	
-	public func childNodes(from startingIndex: String.UTF16Index, to endingIndex: String.UTF16Index) -> [Node] {
-		var nodes = [Node]()
-		
-		let opts = NodeSearchOptions(deepSearch: false, searchPredicate: nil)
-		var searchIndex = startingIndex
-		let safeEndIndex = min(endIndex, endingIndex)
-		
-		if var node = search(index: searchIndex, options: opts) {
+		if var node = searchChildren(for: startIndex, options: opts) {
 			nodes.append(node)
-			searchIndex = node.endIndex
+			
+			var searchIndex = node.range.upperBound
+			let safeEndIndex = min(range.upperBound, endIndex)
 			
 			while let next = node.next, searchIndex < safeEndIndex {
 				nodes.append(next)
-				searchIndex = next.endIndex
+				searchIndex = node.range.upperBound
 				node = next
 			}
 		}
@@ -143,18 +62,18 @@ extension Node {
 }
 
 // MARK: - Debug Functions
-extension Node: Equatable {
+extension AbstractNode: Equatable {
 	
-	func debugString() -> String {
-		var s = "(\(type(of: self))) \(startIndex) \(endIndex))"
-		if !isLeaf {
-			s += "{" + children.map { $0.debugString() }.joined(separator: ",") + "}"
+	var debugString: String {
+		var s = "(\(type(of: self))) \(range))"
+		if !children.isEmpty {
+			s += "{" + children.map { $0.debugString }.joined(separator: ",") + "}"
 		}
 		return s
 	}
 	
-	public static func ==(lhs: Node, rhs: Node) -> Bool {
-		return lhs.debugString() == rhs.debugString()
+	public static func ==(lhs: AbstractNode, rhs: AbstractNode) -> Bool {
+		return lhs.debugString == rhs.debugString
 	}
 	
 }

@@ -6,18 +6,25 @@
 //  Copyright © 2016 Dylan McArthur. All rights reserved.
 //
 
-public struct SearchResult: Equatable {
-	public var startIndex: String.UTF16Index
-	public var endIndex: String.UTF16Index
-	public var keywordType: Keyword.KeywordType?
+public struct SearchResult {
 	
-	public init(startIndex: String.UTF16Index, endIndex: String.UTF16Index, keywordType: Keyword.KeywordType? = nil) {
-		self.startIndex = startIndex
-		self.endIndex = endIndex
+	public typealias Index = Int
+	
+	public var range: Range<Index>
+	
+	public var keywordType: HeaderBlock.HeaderType?
+	
+	public init(range: Range<Index>, keywordType: HeaderBlock.HeaderType?=nil) {
+		self.range = range
 		self.keywordType = keywordType
 	}
 	
+}
+
+extension SearchResult: Equatable {
+	
 	public static func ==(lhs: SearchResult, rhs: SearchResult) -> Bool {
-		return lhs.startIndex == rhs.startIndex && lhs.endIndex == rhs.endIndex && lhs.keywordType == rhs.keywordType
+		return lhs.range == rhs.range && lhs.keywordType == rhs.keywordType
 	}
+	
 }

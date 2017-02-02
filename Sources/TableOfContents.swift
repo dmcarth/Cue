@@ -14,18 +14,15 @@ struct TableOfContents {
 		var contents = [TableOfContentsItem]()
 		
 		parser.root.enumerate { (node) in
-			switch node {
-			case is Header:
-				let type = TableOfContentsItem.ContentType.init(keyword: (node as! Header).type)
-				let item = TableOfContentsItem(type: type, location: node.startIndex)
+			if let header = node as? HeaderBlock {
+				let type = TableOfContentsType.init(keyword: header.type)
+				let item = TableOfContentsItem(type: type, location: header.range.lowerBound)
 				
 				contents.append(item)
-			case is Reference:
-				let item = TableOfContentsItem(type: .reference, location: node.startIndex)
+			} else if let reference = node as? Reference {
+				let item = TableOfContentsItem(type: .reference, location: reference.range.lowerBound)
 				
 				contents.append(item)
-			default:
-				break
 			}
 		}
 		

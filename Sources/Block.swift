@@ -6,10 +6,11 @@
 //  Copyright © 2016 Dylan McArthur. All rights reserved.
 //
 
-public class Block: Node {
+public class Block<Input: BidirectionalCollection>: Node<Input> {
+	
 	public var lineNumber = 0
 	
-	public init(startIndex: String.UTF16Index, endIndex: String.UTF16Index, offset: String.UTF16Index) {
+	public init(startIndex: Input.Index, endIndex: Input.Index, offset: Input.Index) {
 		super.init(startIndex: startIndex, endIndex: endIndex)
 		
 		if offset > startIndex {
@@ -18,12 +19,13 @@ public class Block: Node {
 			addChild(del)
 		}
 	}
+	
 }
 
-public class Header: Block {
+public class Header<Input: BidirectionalCollection>: Block<Input> {
 	var type: Keyword.KeywordType = .act
 	
-	public init(startIndex: String.UTF16Index, endIndex: String.UTF16Index, results: [SearchResult]) {
+	public init(startIndex: Input.Index, endIndex: Input.Index, results: [SearchResult]) {
 		super.init(startIndex: startIndex, endIndex: endIndex, offset: results[0].startIndex)
 		
 		let key = Keyword(results[0])
@@ -49,7 +51,7 @@ public class Header: Block {
 }
 
 public class CommentBlock: Block {
-	public init(startIndex: String.UTF16Index, endIndex: String.UTF16Index, results: [SearchResult]) {
+	public init(startIndex: Input.Index, endIndex: Input.Index, results: [SearchResult]) {
 		super.init(startIndex: startIndex, endIndex: endIndex, offset: results[0].startIndex)
 		
 		let cont1 = CommentText(results[0])
@@ -65,7 +67,7 @@ public class CommentBlock: Block {
 }
 
 public class Facsimile: Block {
-	public init(startIndex: String.UTF16Index, endIndex: String.UTF16Index, result: SearchResult) {
+	public init(startIndex: Input.Index, endIndex: Input.Index, result: SearchResult) {
 		super.init(startIndex: startIndex, endIndex: endIndex, offset: result.startIndex)
 		
 		let de = Delimiter(result)
@@ -91,14 +93,14 @@ public class AbstractCue: Block {
 }
 
 public class RegularCue: AbstractCue {
-	public init(startIndex: String.UTF16Index, endIndex: String.UTF16Index, results: [SearchResult]) {
+	public init(startIndex: Input.Index, endIndex: Input.Index, results: [SearchResult]) {
 		super.init(startIndex: startIndex, endIndex: endIndex, offset: results[0].startIndex)
 		
 		addDefaultChildren(for: results)
 	}
 }
 public class DualCue: AbstractCue {
-	public init(startIndex: String.UTF16Index, endIndex: String.UTF16Index, results: [SearchResult]) {
+	public init(startIndex: Input.Index, endIndex: Input.Index, results: [SearchResult]) {
 		super.init(startIndex: startIndex, endIndex: endIndex, offset: results[0].startIndex)
 		
 		let del = Delimiter(results[0])
@@ -110,7 +112,7 @@ public class DualCue: AbstractCue {
 }
 
 public class Lyric: Block {
-	public init(startIndex: String.UTF16Index, endIndex: String.UTF16Index, result: SearchResult) {
+	public init(startIndex: Input.Index, endIndex: Input.Index, result: SearchResult) {
 		super.init(startIndex: startIndex, endIndex: endIndex, offset: result.startIndex)
 		
 		let delim = Delimiter(result)
@@ -123,7 +125,7 @@ public class Lyric: Block {
 }
 
 public class Description: Block {
-	public init(startIndex: String.UTF16Index, endIndex: String.UTF16Index) {
+	public init(startIndex: Input.Index, endIndex: Input.Index) {
 		super.init(startIndex: startIndex, endIndex: endIndex, offset: startIndex)
 		
 		let te = RawText(startIndex: startIndex, endIndex: endIndex)
