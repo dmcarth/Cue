@@ -26,7 +26,7 @@ public enum TableOfContentsType {
 	case page
 	case reference
 	
-	init(keyword: HeaderBlock.HeaderType) {
+	init(keyword: HeaderType) {
 		switch keyword {
 		case .act:
 			self = .act

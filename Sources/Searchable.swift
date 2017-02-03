@@ -6,42 +6,57 @@
 //
 //
 
-public enum SearchComparison {
+enum SearchComparison {
 	case lessThan
 	case contains
 	case greaterThan
 }
 
-public protocol Searchable {
-	
-	func compare(to index: Int) -> SearchComparison
-	
-}
-
-public struct SearchOptions {
+public struct SearchOptions<Index: Comparable> {
 	
 	/// Enables search to traverse nodes deeper than level-1
 	public var deepSearchEnabled: Bool
 	
 	/// Causes search to return on the first node matching this predicate. If no match is found, search will return nil.
-	public var predicate: ((AbstractNode)->Bool)?
+	public var predicate: ((Node<Index>)->Bool)?
 	
-	public init(deepSearch: Bool = true, predicate: ((AbstractNode)->Bool)?=nil) {
+	public init(deepSearch: Bool = true, predicate: ((Node<Index>)->Bool)?=nil) {
 		self.deepSearchEnabled = deepSearch
 		self.predicate = predicate
 	}
 	
 }
 
-extension Searchable where Self: Enumerable {
+extension Node {
 	
-	public func searchChildren(for index: Int, options: SearchOptions) -> AbstractNode? {
-		guard compare(to: index) == .contains else { return nil }
+	public func childNodes(from lowerBound: Index, to upperBound: Index) -> [Node<Index>] {
+		var nodes = [Node<Index>]()
 		
-		return _searchChildren(for: index, options: options)
+		let opts = SearchOptions<Index>(deepSearch: false)
+		
+		if var node = search(for: lowerBound, options: opts) {
+			nodes.append(node)
+			
+			var searchIndex = node.range.upperBound
+			var safeUpperBound = min(range.upperBound, upperBound)
+			
+			while let next = node.next, searchIndex < safeUpperBound {
+				nodes.append(next)
+				searchIndex = node.range.upperBound
+				node = next
+			}
+		}
+		
+		return nodes
 	}
 	
-	private func _searchChildren(for index: Int, options: SearchOptions) -> AbstractNode? {
+	public func search(for index: Index, options: SearchOptions<Index>) -> Node<Index>? {
+		guard compare(to: index) == .contains else { return nil }
+		
+		return _search(for: index, options: options)
+	}
+	
+	private func _search(for index: Index, options: SearchOptions<Index>) -> Node<Index>? {
 		var lower = 0
 		var upper = children.count
 		
@@ -52,9 +67,9 @@ extension Searchable where Self: Enumerable {
 			
 			switch comparison {
 			case .greaterThan:
-				upper = midIndex
+				lower = midIndex
 			case .lessThan:
-				lower = midIndex + 1
+				upper = midIndex + 1
 			case .contains:
 				// We found a match!
 				
@@ -64,12 +79,12 @@ extension Searchable where Self: Enumerable {
 				}
 				
 				if options.deepSearchEnabled {
-					if let deepMatch = child._searchChildren(for: index, options: options) {
+					if let deepMatch = child._search(for: index, options: options) {
 						return deepMatch
 					}
 				}
 				
-				// Checking for nil ensures that a search with a predicate will only return if the matching node passes the given predicate
+				// Checking for nil ensures that a search with a predicate will only return if the matching node passes the given predicate. A search without a predicate will prioritize depth first.
 				if options.predicate == nil {
 					return child
 				}
@@ -80,6 +95,16 @@ extension Searchable where Self: Enumerable {
 		}
 		
 		return nil
+	}
+	
+	private func compare(to index: Index) -> SearchComparison {
+		if index < range.lowerBound {
+			return .greaterThan
+		} else if index >= range.upperBound {
+			return .lessThan
+		} else {
+			return .contains
+		}
 	}
 	
 }

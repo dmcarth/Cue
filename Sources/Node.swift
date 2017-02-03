@@ -6,73 +6,81 @@
 //  Copyright © 2016 Dylan McArthur. All rights reserved.
 //
 
-public class AbstractNode: Enumerable, Searchable {
+public final class Node<Index: Comparable> {
 	
-	public weak var parent: AbstractNode?
+	public weak var next: Node<Index>?
 	
-	public weak var next: AbstractNode?
+	public var children: ContiguousArray<Node<Index>> = []
 	
-	public var children: [AbstractNode] {
-		return []
-	}
+	public var range: Range<Index>
 	
-	public var range: Range<Int>
+	public var type: NodeType
 	
-	public var lineNumber = 0
-	
-	public init(range: Range<Int>) {
+	public init(type: NodeType, range: Range<Index>) {
+		self.type = type
 		self.range = range
 	}
 	
-	public func compare(to index: Int) -> SearchComparison {
-		if index < range.lowerBound {
-			return .greaterThan
-		} else if index >= range.upperBound {
-			return .lessThan
-		} else {
-			return .contains
+	func addChild(_ child: Node<Index>) {
+		if let last = children.last {
+			last.next = child
 		}
+		
+		children.append(child)
+	}
+	
+	func replaceLastChild(with newChild: Node<Index>) {
+		if !children.isEmpty {
+			children.removeLast()
+		}
+		
+		addChild(newChild)
 	}
 	
 }
 
-extension AbstractNode {
-	
-	func childNodes(from startIndex: Int, to endIndex: Int) -> [AbstractNode] {
-		var nodes = [AbstractNode]()
-		
-		let opts = SearchOptions(deepSearch: false)
-		
-		if var node = searchChildren(for: startIndex, options: opts) {
-			nodes.append(node)
-			
-			var searchIndex = node.range.upperBound
-			let safeEndIndex = min(range.upperBound, endIndex)
-			
-			while let next = node.next, searchIndex < safeEndIndex {
-				nodes.append(next)
-				searchIndex = node.range.upperBound
-				node = next
-			}
-		}
-		
-		return nodes
-	}
-	
+public enum NodeType {
+	case document
+	case headerBlock(HeaderType)
+	case descriptionBlock
+	case cueContainer
+	case cueBlock(Bool)
+	case lyricContainer
+	case lyricBlock
+	case facsimileContainer
+	case facsimileBlock
+	case endBlock
+	case textStream
+	case literal
+	case comment
+	case emphasis
+	case reference
+	case delimiter
+}
+
+public enum HeaderType {
+	case act
+	case chapter
+	case scene
+	case page
+}
+
+public enum CueType {
+	case regular, dual
 }
 
 // MARK: - Debug Functions
-extension AbstractNode: Equatable {
+extension Node: Equatable {
 	
-	var debugString: String {
-		var s = "(\(type(of: self))) \(range))"
+	public var debugString: String {
+		var s = "(Node<\(type)>) \(range))"
 		if !children.isEmpty {
-			s += "{" + children.map { $0.debugString }.joined(separator: ",") + "}"
+			s += "{ " + children.map { $0.debugString }.joined(separator: ", ") + "}"
 		}
 		return s
 	}
 	
-	public static func ==(lhs: AbstractNode, rhs: AbstractNode) -> Bool {
+	public static func ==(lhs: Node, rhs: Node) -> Bool {
 		return lhs.debugString == rhs.debugString
 	}
 	
