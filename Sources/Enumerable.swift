@@ -6,24 +6,18 @@
 //
 //
 
-//public protocol Enumerable {
-//	
-//	var children: [AbstractNode] { get }
-//	
-//}
-//
-//extension Enumerable {
-//	
-//	public func enumerate(_ handler: (Enumerable)->Void) {
-//		let isLeaf = children.isEmpty
-//		
-//		handler(self)
-//		
-//		guard !isLeaf else { return }
-//		
-//		for child in children {
-//			child.enumerate(handler)
-//		}
-//	}
-//	
-//}
+extension Node {
+	
+	public func enumerate(_ handler: (Node)->Void) {
+		let isLeaf = children.isEmpty
+		
+		handler(self)
+		
+		guard !isLeaf else { return }
+		
+		for child in children {
+			child.enumerate(handler)
+		}
+	}
+	
+}

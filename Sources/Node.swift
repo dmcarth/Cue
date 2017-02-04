@@ -44,7 +44,8 @@ public enum NodeType {
 	case headerBlock(HeaderType)
 	case descriptionBlock
 	case cueContainer
-	case cueBlock(Bool)
+	case cueBlock(Bool) //isDual
+	case name
 	case lyricContainer
 	case lyricBlock
 	case facsimileContainer
@@ -63,10 +64,6 @@ public enum HeaderType {
 	case chapter
 	case scene
 	case page
-}
-
-public enum CueType {
-	case regular, dual
 }
 
 // MARK: - Debug Functions

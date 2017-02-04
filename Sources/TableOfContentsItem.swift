@@ -6,12 +6,13 @@
 //
 //
 
-public struct TableOfContentsItem {
+public struct TableOfContentsItem<Index: Comparable> {
 	
 	public var type: TableOfContentsType
-	public var location: Int
 	
-	public init(type: TableOfContentsType, location: Int) {
+	public var location: Index
+	
+	public init(type: TableOfContentsType, location: Index) {
 		self.type = type
 		self.location = location
 	}

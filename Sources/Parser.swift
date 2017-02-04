@@ -35,11 +35,6 @@ public final class Cue<S: BidirectionalCollection, C: Codec> where
 		parseBlocks()
 	}
 	
-//	public convenience init(_ string: String) {
-//		let bytes = [UInt16](string.utf16)
-//		self.init<UTF16>(input: bytes)
-//	}
-	
 }
 
 // MARK: - Views
@@ -49,13 +44,26 @@ extension Cue {
 		return root
 	}
 	
-//	public var tableOfContents: [TableOfContentsItem] {
-//		return TableOfContents(self).contents
-//	}
+	public var tableOfContents: [TableOfContentsItem<Index>] {
+		var contents = [TableOfContentsItem<Index>]()
+		
+		root.enumerate { (node) in
+			if case .headerBlock(let type) = node.type {
+				let itemType = TableOfContentsType.init(keyword: type)
+				let item = TableOfContentsItem(type: itemType, location: node.range.lowerBound)
+				contents.append(item)
+			} else if case .reference = node.type {
+				let item = TableOfContentsItem(type: .reference, location: node.range.lowerBound)
+				contents.append(item)
+			}
+		}
+		
+		return contents
+	}
 	
-//	public var namedEntitiesDictionary: [String: Array<Index>] {
-//		return NamedEntities(self).map
-//	}
+	public var namedEntitiesDictionary: [String: Array<Index>] {
+		return NamedEntities(self).map
+	}
 	
 }
 
@@ -556,7 +564,7 @@ extension Cue {
 			let caret = Node(type: .delimiter, range: delRange)
 			cue.addChild(caret)
 		}
-		let name = Node(type: .literal, range: cueResults[0].range)
+		let name = Node(type: .name, range: cueResults[0].range)
 		cue.addChild(name)
 		let colon = Node(type: .delimiter, range: cueResults[1].range)
 		cue.addChild(colon)

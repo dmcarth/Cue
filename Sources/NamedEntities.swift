@@ -6,27 +6,32 @@
 //
 //
 
-//struct NamedEntities {
-//	
-//	var map: [String: Array<Int>]
-//	
-//	init(_ parser: Cue) {
-//		var map = [String: Array<Int>]()
-//		
-//		parser.root.enumerate { (node) in
-//			if let cue = node as? CueBlock {
-//				let bytes = Array(parser.data[cue.name.range])
-//				let name = String(bytes)
-//				
-//				var referencesForName = map[name] ?? []
-//				
-//				referencesForName.append(cue.name.range.lowerBound)
-//				
-//				map[name] = referencesForName
-//			}
-//		}
-//		
-//		self.map = map
-//	}
-//	
-//}
+struct NamedEntities<S: BidirectionalCollection, C: Codec> where
+	S.Iterator.Element == C.CodeUnit,
+	S.SubSequence: BidirectionalCollection,
+	S.SubSequence.Iterator.Element == S.Iterator.Element
+{
+	
+	typealias Index = S.Index
+	
+	var map: [String: Array<Index>]
+	
+	init(_ parser: Cue<S, C>) {
+		var map = [String: Array<Index>]()
+		
+		parser.root.enumerate { (node) in
+			if case .name = node.type {
+				let name = C.string(from: parser.data[node.range])
+				
+				var referencesForName = map[name] ?? []
+				
+				referencesForName.append(node.range.lowerBound)
+				
+				map[name] = referencesForName
+			}
+		}
+		
+		self.map = map
+	}
+	
+}
