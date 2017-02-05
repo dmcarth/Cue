@@ -69,7 +69,7 @@ public enum HeaderType {
 // MARK: - Debug Functions
 extension Node: Equatable {
 	
-	public var debugString: String {
+	var debugString: String {
 		var s = "(Node<\(type)>) \(range))"
 		if !children.isEmpty {
 			s += "{ " + children.map { $0.debugString }.joined(separator: ", ") + "}"

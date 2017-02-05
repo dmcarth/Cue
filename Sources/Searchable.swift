@@ -38,7 +38,7 @@ extension Node {
 			nodes.append(node)
 			
 			var searchIndex = node.range.upperBound
-			var safeUpperBound = min(range.upperBound, upperBound)
+			let safeUpperBound = min(range.upperBound, upperBound)
 			
 			while let next = node.next, searchIndex < safeUpperBound {
 				nodes.append(next)

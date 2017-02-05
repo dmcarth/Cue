@@ -21,7 +21,9 @@ struct NamedEntities<S: BidirectionalCollection, C: Codec> where
 		
 		parser.root.enumerate { (node) in
 			if case .name = node.type {
-				let name = C.string(from: parser.data[node.range])
+				let scalars = C.scalars(from: parser.data[node.range])
+				let view = String.UnicodeScalarView(scalars)
+				let name = String(view)
 				
 				var referencesForName = map[name] ?? []
 				

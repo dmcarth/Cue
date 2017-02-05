@@ -45,20 +45,7 @@ extension Cue {
 	}
 	
 	public var tableOfContents: [TableOfContentsItem<Index>] {
-		var contents = [TableOfContentsItem<Index>]()
-		
-		root.enumerate { (node) in
-			if case .headerBlock(let type) = node.type {
-				let itemType = TableOfContentsType.init(keyword: type)
-				let item = TableOfContentsItem(type: itemType, location: node.range.lowerBound)
-				contents.append(item)
-			} else if case .reference = node.type {
-				let item = TableOfContentsItem(type: .reference, location: node.range.lowerBound)
-				contents.append(item)
-			}
-		}
-		
-		return contents
+		return TableOfContents(self).contents
 	}
 	
 	public var namedEntitiesDictionary: [String: Array<Index>] {

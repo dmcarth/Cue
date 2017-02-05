@@ -9,7 +9,7 @@
 public protocol Codec {
 	associatedtype CodeUnit: Comparable
 	static func fromASCII(_ char: UInt8) -> CodeUnit
-	static func string<S: Sequence>(from units: S) -> String where S.Iterator.Element == CodeUnit
+	static func scalars<S: Sequence>(from units: S) -> [UnicodeScalar] where S.Iterator.Element == CodeUnit
 }
 
 extension Codec {
@@ -50,14 +50,14 @@ extension UTF16: Codec {
 		return UInt16(char)
 	}
 	
-	public static func string<S : Sequence>(from units: S) -> String where S.Iterator.Element == UInt16 {
+	public static func scalars<S : Sequence>(from units: S) -> [UnicodeScalar] where S.Iterator.Element == UInt16 {
 		var codec = UTF16()
 		var iter = units.makeIterator()
-		var s = ""
+		var scalars = [UnicodeScalar]()
 		while case .scalarValue(let v) = codec.decode(&iter) {
-			s.unicodeScalars.append(v)
+			scalars.append(v)
 		}
-		return s
+		return scalars
 	}
 	
 }
