@@ -15,7 +15,7 @@ The bread and butter of the Cue library is the Cue class, which accepts a string
 ```swift
 import Cue
 
-let parser = Cue("Hello world!")
+let parser = Cue(input: "Hello world!".utf16, codec: UTF16.self)
 
 let ast = parser.ast 
 // An abstract syntax tree
@@ -41,8 +41,8 @@ while let next = current {
 	current = next.next
 }
 
-let opts = NodeSearchOptions(deepSearch: true, searchPredicate: { (node) in
-	return node is Description
+let opts = SearchOptions(deepSearch: true, searchPredicate: { (node) in
+	return node.type == .descriptionBlock
 })
 if let found = ast.search(index: searchIndex, options: opts) {
 	// Finds and returns a node that matches the search query. If none, search returns nil.
@@ -52,7 +52,7 @@ let nodes = ast.childNodes(from: startOfRange, to: endOfRange)
 // Returns all children in the given range
 ```
 
-All nodes in the AST contain a `startIndex` and an `endIndex`. These properties map to the utf16 indices in the original string where the node's content starts and ends. This is to enable maximum compatibility with NSRange in Foundation and in environments where NSRange is unavailable.
+All nodes in the AST contain a `Range<Index>` property where the `lowerBound` and `upperBound` correspond to the indices in the given input where the node's content starts and ends.
 
 ## Syntax
 Cue is designed to be intuitive and invisible whenever possible. It should look more or less exactly the same as when it's printed on a book or in a script. 
