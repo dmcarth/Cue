@@ -10,12 +10,12 @@ A top priority of the Cue library has been the ability to run without any extern
 I recommend using the Swift Package Mangager to install Cue. 
 
 ## Usage
-The bread and butter of the Cue library is the Cue class, which accepts a string and provides a number of views onto the parsed data.
+The bread and butter of the Cue library is the Cue class, which accepts a string and provides a handful of views onto the parsed data.
 
 ```swift
 import Cue
 
-let parser = Cue(input: "Hello world!".utf16, codec: UTF16.self)
+let parser = Cue("Hello world!")
 
 let ast = parser.ast 
 // An abstract syntax tree
@@ -23,8 +23,11 @@ let ast = parser.ast
 let table = parser.tableOfContents
 // An array representing a table of contents
 
+let html = parser.html()
+// Transforms the parsed input into HTML.
+
 let names = parser.namedEntitiesDictionary
-// A dictionary of names and their occurences in the original string
+// A dictionary of names, counting their occurences in the original string
 ```
 
 ### Abstract Syntax Tree
@@ -32,7 +35,11 @@ The returned AST comes with a number of powerful methods for traversing and quer
 
 ```swift
 ast.enumerate { (node) in
-	// Performs a depth-first traversal
+	// Performs a depth-first traversal. Does not support transformation.
+}
+
+ast.walk { (event, node, shouldBreak) in
+	// Performs a depth-first traversal. Supports tree transformation.
 }
 
 var current = ast.children.first
@@ -42,9 +49,9 @@ while let next = current {
 }
 
 let opts = SearchOptions(deepSearch: true, searchPredicate: { (node) in
-	return node.type == .descriptionBlock
+	return node is Description
 })
-if let found = ast.search(index: searchIndex, options: opts) {
+if let found = ast.search(for: searchIndex, options: opts) {
 	// Finds and returns a node that matches the search query. If none, search returns nil.
 }
 
@@ -52,7 +59,7 @@ let nodes = ast.childNodes(from: startOfRange, to: endOfRange)
 // Returns all children in the given range
 ```
 
-All nodes in the AST contain a `Range<Index>` property where the `lowerBound` and `upperBound` correspond to the indices in the given input where the node's content starts and ends.
+All nodes in the AST contain a `range` property where the `lowerBound` and `upperBound` correspond to the utf16 byte index where the node's content starts and ends. An additional `rangeIncludingMarkers` property extends `range` to include any delimiters and extra whitespace.
 
 ## Syntax
 Cue is designed to be intuitive and invisible whenever possible. It should look more or less exactly the same as when it's printed on a book or in a script. 
@@ -166,8 +173,6 @@ You can also write comments.
 ```
 // Lines beginning with two or more slashes are considered comments.
 ```
-
-All comments are block elements, meaning that they take over the entire line they're on. If a line does not begin with `//` it can not be a comment.
 
 ### Ending
 Every great work deserves closure. When you've reached the end of your story simply put:
