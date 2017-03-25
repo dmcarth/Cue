@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "OBJ_25"
+               BlueprintIdentifier = "OBJ_32"
                BuildableName = "Cue.framework"
                BlueprintName = "Cue"
                ReferencedContainer = "container:Cue.xcodeproj">
@@ -23,17 +23,16 @@
       </BuildActionEntries>
    </BuildAction>
    <TestAction
-      buildConfiguration = "Release"
+      buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      shouldUseLaunchSchemeArgsEnv = "YES"
-      codeCoverageEnabled = "YES">
+      shouldUseLaunchSchemeArgsEnv = "YES">
       <Testables>
          <TestableReference
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "OBJ_40"
+               BlueprintIdentifier = "OBJ_55"
                BuildableName = "CueTests.xctest"
                BlueprintName = "CueTests"
                ReferencedContainer = "container:Cue.xcodeproj">
@@ -56,7 +55,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "OBJ_25"
+            BlueprintIdentifier = "OBJ_32"
             BuildableName = "Cue.framework"
             BlueprintName = "Cue"
             ReferencedContainer = "container:Cue.xcodeproj">
