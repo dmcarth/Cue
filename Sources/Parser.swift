@@ -6,17 +6,15 @@
 //  Copyright © 2016 Dylan McArthur. All rights reserved.
 //
 
-public final class Cue<S: BidirectionalCollection, C: Codec> where
-	S.Iterator.Element == C.CodeUnit,
-	S.SubSequence: BidirectionalCollection,
-	S.SubSequence.Iterator.Element == S.Iterator.Element
-{
+public final class Cue {
 	
-	public typealias Index = S.Index
+	public typealias Index = Int
 	
-	let data: S
+	typealias C = UTF16
 	
-	let root: Node<Index>
+	let data: [UInt16]
+	
+	let root: Document
 	
 	var lineNumber = 0
 	
@@ -24,13 +22,11 @@ public final class Cue<S: BidirectionalCollection, C: Codec> where
 	
 	var endOfLineCharNumber: Index
 	
-	@_specialize(String.UTF16View, UTF16)
-	@_specialize(Array<UInt16>, UTF16)
-	public init(input: S, codec: C.Type) {
-		self.data = input
+	public init(_ str: String) {
+		self.data = [UInt16](str.utf16)
 		self.charNumber = data.startIndex
 		self.endOfLineCharNumber = data.endIndex
-		self.root = Node(type: .document, range: charNumber..<endOfLineCharNumber)
+		self.root = Document(range: charNumber..<endOfLineCharNumber)
 		
 		parseBlocks()
 	}
@@ -40,16 +36,20 @@ public final class Cue<S: BidirectionalCollection, C: Codec> where
 // MARK: - Views
 extension Cue {
 	
-	public var ast: Node<Index> {
+	public var ast: Document {
 		return root
 	}
 	
-	public var tableOfContents: [TableOfContentsItem<Index>] {
+	public var tableOfContents: [TableOfContentsItem] {
 		return TableOfContents(self).contents
 	}
 	
 	public var namedEntitiesDictionary: [String: Array<Index>] {
 		return NamedEntities(self).map
+	}
+	
+	public func html() -> String {
+		return HTMLMarkupRenderer(parser: self).output
 	}
 	
 }
@@ -83,134 +83,122 @@ extension Cue {
 	func processLine() {
 		// First we parse the current line as a block node.
 		var block = blockForLine()
-//		block.lineNumber = lineNumber
 		
 		// Then we try to find an appropriate container node. If none can be found, block will be replaced.
 		let container = appropriateContainer(for: &block)
 		container.addChild(block)
 		
 		// Only now can we parse first-line lyrics, because appropriateContainer() may have changed the current block
-		if case .cueBlock(_) = block.type {
-			guard let last = block.children.last else { return }
-			
-			guard case .textStream = last.type else { return }
-			
-			if let result = scanForLyricPrefix(at: last.range.lowerBound) {
-				let lyricContainer = Node(type: .lyricContainer, range: result.range.lowerBound..<endOfLineCharNumber)
-				let lyricBlock = Node(type: .lyricBlock, range: result.range.lowerBound..<endOfLineCharNumber)
-				let tilde = Node(type: .delimiter, range: result.range)
-				lyricBlock.addChild(tilde)
-				let stream = Node(type: .textStream, range: result.range.upperBound..<endOfLineCharNumber)
-				lyricBlock.addChild(stream)
+		if let cueBlock = block as? CueBlock {
+			if let result = scanForLyricPrefix(at: cueBlock.direction.range.lowerBound) {
+				let lyricContainer = LyricContainer(range: result.range.lowerBound..<endOfLineCharNumber)
+				let lyricBlock = LyricBlock(left: result.range, body: result.range.upperBound..<endOfLineCharNumber)
 				lyricContainer.addChild(lyricBlock)
 				
-				block.replaceLastChild(with: lyricContainer)
+				cueBlock.direction.children = [lyricContainer]
 				
 				// Lyrics are deeply nested. We may as well parse their inlines now rather than add an edge case later.
-				parseInlines(for: stream)
+				parseInlines(for: lyricBlock)
 			}
 		}
 		
-		// Parse TextStream into a stream of inlines. Except for in deeply nested nodes, TextStream, if present, will always be the last child of the current block.
-		if let last = block.children.last {
-			guard case .textStream = last.type else { return }
-			
-			parseInlines(for: last)
+		// Parse inlines as appropriate
+		switch block {
+		case is FacsimileBlock, is Description, is LyricBlock:
+			parseInlines(for: block)
+		case let header as Header:
+			if let title = header.title {
+				parseInlines(for: title)
+			}
+		case let cue as CueBlock:
+			let direction = cue.direction
+			if direction.children.isEmpty {
+				parseInlines(for: direction)
+			}
+		default:
+			break
 		}
 	}
 	
-	func blockForLine() -> Node<Index> {
+	func blockForLine() -> Node {
 		let wc = scanForFirstNonspace(startingAt: charNumber)
 		
 		if let header = scanForHeading(at: wc) {
 			
 			return header
 		} else if scanForTheEnd(at: wc) {
-			let end = Node(type: .endBlock, range: wc..<endOfLineCharNumber)
+			let end = EndBlock(range: charNumber..<endOfLineCharNumber)
 			
 			return end
 		} else if let result = scanForFacsimile(at: wc) {
-			let facsimile = Node(type: .facsimileBlock, range: wc..<endOfLineCharNumber)
-			let angle = Node(type: .delimiter, range: result.range)
-			facsimile.addChild(angle)
-			let stream = Node(type: .textStream, range: result.range.upperBound..<endOfLineCharNumber)
-			facsimile.addChild(stream)
+			let facsimile = FacsimileBlock(left: charNumber..<result.range.upperBound, body: result.range.upperBound..<endOfLineCharNumber)
 			
 			return facsimile
 		} else if let result = scanForLyricPrefix(at: wc) {
-			let lyricBlock = Node(type: .lyricBlock, range: wc..<endOfLineCharNumber)
-			let tilde = Node(type: .delimiter, range: result.range)
-			lyricBlock.addChild(tilde)
-			let stream = Node(type: .textStream, range: result.range.upperBound..<endOfLineCharNumber)
-			lyricBlock.addChild(stream)
+			let lyricBlock = LyricBlock(left: charNumber..<result.range.upperBound, body: result.range.upperBound..<endOfLineCharNumber)
 			
 			return lyricBlock
 		} else if let cueBlock = scanForDualCue(at: wc) {
 			return cueBlock
 		}
 		
-		let description = Node(type: .descriptionBlock, range: charNumber..<endOfLineCharNumber)
-		let stream = Node(type: .textStream, range: charNumber..<endOfLineCharNumber)
-		description.addChild(stream)
+		let description = Description(range: charNumber..<endOfLineCharNumber)
 		return description
 	}
 	
-	func appropriateContainer(for block: inout Node<Index>) -> Node<Index> {
-		switch block.type {
+	func appropriateContainer(for block: inout Node) -> Node {
+		switch block {
 		// These block types can only ever be level-1
-		case .headerBlock, .descriptionBlock, .endBlock:
+		case is Header, is Description, is EndBlock:
 			return root
 			
 		// A CueBlock is always level-2, but regular cues need their own initial parent CueContainer
-		case .cueBlock(let isDual):
-			if isDual {
-				let cueContainer = Node(type: .cueContainer, range: block.range)
+		case is CueBlock:
+			if !(block is DualCue) {
+				let cueContainer = CueContainer(range: block.rangeIncludingMarkers)
 				root.addChild(cueContainer)
 				
 				return cueContainer
-			} else if let last = root.children.last {
-				guard case .cueContainer = last.type else { break }
-				
+			} else if let last = root.children.last as? CueContainer {
+				last.extendLengthToInclude(node: block)
 				return last
 			}
 			
 		// FacsimileBlocks are also always level-2
-		case .facsimileBlock:
+		case is FacsimileBlock:
 			// If last child of root is a FacsimileContainer and the current block is a FacsimileBlock, then attach the current block to this container
-			if let last = root.children.last {
-				if case .facsimileContainer = last.type {
-					return last
-				}
+			if let last = root.children.last as? FacsimileContainer {
+				last.extendLengthToInclude(node: block)
+				return last
 			}
 			
 			// First line. Initialize new container
-			let facsimileContainer = Node(type: .facsimileContainer, range: block.range)
+			let facsimileContainer = FacsimileContainer(range: block.rangeIncludingMarkers)
 			root.addChild(facsimileContainer)
+			
 			return facsimileContainer
 			
-		// Lyric Blocks are always level-4. Any LyricBlock that comes to us at this point is guaranteed to be not be a first line so we can ignore that edge case
-		case .lyricBlock:
-			guard let cueContainer = root.children.last else { break }
+		// Lyric Blocks are always level-4. Any LyricBlock that comes to us at this point is guaranteed not to be a first line so we can ignore that edge case
+		case is LyricBlock:
+			guard let cueContainer = root.children.last as? CueContainer else { break }
 			
-			guard case .cueContainer = cueContainer.type else { break }
+			guard let cueBlock = cueContainer.children.last as? CueBlock else { break }
 			
-			guard let cueBlock = cueContainer.children.last else { break }
+			let direction = cueBlock.direction
 			
-			guard case .cueBlock = cueBlock.type else { break }
+			guard let content = direction.children.last as? LyricContainer else { break }
 			
-			guard let content = cueBlock.children.last else { break }
-			
-			guard case .lyricContainer = content.type else { break }
-			
+			content.extendLengthToInclude(node: block)
+			direction.extendLengthToInclude(node: content)
+			cueBlock.extendLengthToInclude(node: direction)
+			cueContainer.extendLengthToInclude(node: cueBlock)
 			return content
 		default:
 			break
 		}
 		
 		// Invalid syntax, time to fail gracefully
-		block = Node(type: .descriptionBlock, range: charNumber..<endOfLineCharNumber)
-		let stream = Node(type: .textStream, range: charNumber..<endOfLineCharNumber)
-		block.addChild(stream)
+		block = Description(range: charNumber..<endOfLineCharNumber)
 		return root
 	}
 	
@@ -219,10 +207,10 @@ extension Cue {
 // MARK: - Inline Parsing
 extension Cue {
 	
-	func parseInlines(for stream: Node<Index>) {
+	func parseInlines(for stream: Node) {
 		let i = stream.range.lowerBound
 		
-		var queue = Queue<Node<Index>>()
+		var queue = Queue<Node>()
 		
 		var stack = DelimiterStack<Index>()
 		
@@ -237,11 +225,7 @@ extension Cue {
 				let marker = InlineMarker(type: .asterisk, range: j..<k)
 				
 				if let last = stack.popToOpeningAsterisk() {
-					let em = Node(type: .emphasis, range: last.range.lowerBound..<marker.range.upperBound)
-					let d1 = Node(type: .delimiter, range: last.range)
-					em.addChild(d1)
-					let d2 = Node(type: .delimiter, range: marker.range)
-					em.addChild(d2)
+					let em = Emphasis(left: last.range, body: last.range.upperBound..<marker.range.lowerBound, right: marker.range)
 					queue.enqueue(em)
 					break
 				}
@@ -257,11 +241,7 @@ extension Cue {
 				let marker = InlineMarker(type: .closeBracket, range: j..<k)
 				
 				if let last = stack.popToOpeningBracket() {
-					let ref = Node(type: .reference, range: last.range.lowerBound..<marker.range.upperBound)
-					let d1 = Node(type: .delimiter, range: last.range)
-					ref.addChild(d1)
-					let d2 = Node(type: .delimiter, range: marker.range)
-					ref.addChild(d2)
+					let ref = Reference(left: last.range, body: last.range.upperBound..<marker.range.lowerBound, right: marker.range)
 					queue.enqueue(ref)
 					break
 				}
@@ -270,7 +250,8 @@ extension Cue {
 				guard k < endOfLineCharNumber else { break }
 				
 				if data[k] == C.slash {
-					let com = Node(type: .comment,range: j..<endOfLineCharNumber)
+					let l = data.index(after: k)
+					let com = Comment(left: j..<l, body: l..<endOfLineCharNumber)
 					queue.enqueue(com)
 					foundBreakingStatement = true
 				}
@@ -287,18 +268,20 @@ extension Cue {
 		j = i
 		
 		while let next = queue.dequeue() {
-			if next.range.lowerBound > j {
-				let lit = Node(type: .literal, range: j..<next.range.lowerBound)
+			let nextRange = next.rangeIncludingMarkers
+			
+			if nextRange.lowerBound > j {
+				let lit = Literal(range: j..<nextRange.lowerBound)
 				stream.addChild(lit)
 			}
 			
 			stream.addChild(next)
 			
-			j = next.range.upperBound
+			j = nextRange.upperBound
 		}
 		
 		if j < endOfLineCharNumber {
-			let lit = Node(type: .literal, range: j..<endOfLineCharNumber)
+			let lit = Literal(range: j..<endOfLineCharNumber)
 			stream.addChild(lit)
 		}
 	}
@@ -348,12 +331,8 @@ extension Cue {
 		return j
 	}
 	
-	
-	/// Returns an array of SearchResults or nil if matching failed.
-	///
-	/// - returns: [0] covers the keyword, [1] covers whitespace, [2] covers the id, [3-4] covers the hyphen and title if present.
-	func scanForHeading(at i: Index) -> Node<Index>? {
-		var type: HeaderType
+	func scanForHeading(at i: Index) -> Node? {
+		var type: Header.HeaderType
 		var j = i
 		
 		if scanForActHeading(at: i) {
@@ -383,23 +362,19 @@ extension Cue {
 		}
 		let idRange: Range<Index> = k..<l
 		
-		let header = Node(type: .headerBlock(type), range: i..<endOfLineCharNumber)
-		let key = Node(type: .literal, range: keyRange)
-		header.addChild(key)
-		let id = Node(type: .literal, range: idRange)
-		header.addChild(id)
+		let key = Keyword(range: keyRange)
+		let id = Identifier(range: idRange)
 		
+		var title: Title? = nil
 		if m < endOfLineCharNumber {
 			let n = scanForFirstNonspace(startingAt: m)
 			let hyphenRange: Range<Index> = l..<n
 			let titleRange: Range<Index> = n..<endOfLineCharNumber
 			
-			let hyphen = Node(type: .delimiter, range: hyphenRange)
-			header.addChild(hyphen)
-			let title = Node(type: .textStream, range: titleRange)
-			header.addChild(title)
+			title = Title(left: hyphenRange, body: titleRange)
 		}
 		
+		let header = Header(type: type, keyword: key, identifier: id, title: title)
 		return header
 	}
 	
@@ -503,7 +478,7 @@ extension Cue {
 	/// Returns a SearchResult or nil if matching failed.
 	///
 	/// - Returns: Result covers ">" and any whitespace
-	func scanForFacsimile(at i: Index) -> SearchResult<Index>? {
+	func scanForFacsimile(at i: Index) -> SearchResult? {
 		guard i < endOfLineCharNumber  else {
 			return nil
 		}
@@ -520,7 +495,7 @@ extension Cue {
 	/// Returns a SearchResult or nil if matching failed.
 	///
 	/// - returns: Result covers "~"
-	func scanForLyricPrefix(at i: Index) -> SearchResult<Index>? {
+	func scanForLyricPrefix(at i: Index) -> SearchResult? {
 		guard i < endOfLineCharNumber else {
 			return nil
 		}
@@ -532,7 +507,7 @@ extension Cue {
 		return nil
 	}
 	
-	func scanForDualCue(at i: Index) -> Node<Index>? {
+	func scanForDualCue(at i: Index) -> Node? {
 		let j = data.index(after: i)
 		
 		guard j < endOfLineCharNumber else {
@@ -544,24 +519,22 @@ extension Cue {
 			del = i..<j
 		}
 		
-		guard let cueResults = scanForCue(at: j) else { return nil }
+		guard let cueResults = scanForCue(at: del?.upperBound ?? i) else { return nil }
 		
-		let cue = Node(type: .cueBlock(del != nil), range: i..<endOfLineCharNumber)
-		if let delRange = del {
-			let caret = Node(type: .delimiter, range: delRange)
-			cue.addChild(caret)
+		let name = Name(body: cueResults[0].range, right: cueResults[1].range)
+		let direction = Direction(range: cueResults[1].range.upperBound..<endOfLineCharNumber)
+		
+		var cue: CueBlock
+		if let del = del {
+			cue = DualCue(left: del, name: name, direction: direction)
+		} else {
+			cue = CueBlock(name: name, direction: direction)
 		}
-		let name = Node(type: .name, range: cueResults[0].range)
-		cue.addChild(name)
-		let colon = Node(type: .delimiter, range: cueResults[1].range)
-		cue.addChild(colon)
-		let stream = Node(type: .textStream, range: cueResults[1].range.lowerBound..<endOfLineCharNumber)
-		cue.addChild(stream)
 		
 		return cue
 	}
 	
-	func scanForCue(at i: Index) -> [SearchResult<Index>]? {
+	func scanForCue(at i: Index) -> [SearchResult]? {
 		var j = i
 		var distance = 0
 		while j < endOfLineCharNumber {
@@ -585,60 +558,11 @@ extension Cue {
 		return nil
 	}
 	
-//	/// Returns an array of SearchResults or nil if matching failed.
-//	///
-//	/// - returns: [0] covers Cue name, [1] covers ":" and any whitespace
-//	func scanForCue(at i: Index) -> [SearchResult]? {
-//		var j = i
-//		var state = 0
-//		var matched = false
-//		var distance = 0
-//		while j < endOfLineCharNumber {
-//			
-//			switch state {
-//			case 0:
-//				// initial state
-//				if data[j] != C.colon && data[j] != C.leftBracket { // not ':' or '['
-//					state = 1
-//				} else {
-//					return nil
-//				}
-//				
-//			case 1:
-//				// find colon
-//				if data[j] == C.colon { // ':'
-//					matched = true
-//				} else if distance >= 23 || data[j] == C.leftBracket { // cue can not be > 24 (23 chars + :), and should not contain brackets.
-//					return nil
-//				} else {
-//					state = 1
-//				}
-//				
-//			default:
-//				return nil
-//			}
-//			
-//			if matched {
-//				let result1 = SearchResult(range: i..<j)
-//				let wc = scanForFirstNonspace(startingAt: data.index(after: j))
-//				let result2 = SearchResult(range: result1.range.upperBound..<wc)
-//				
-//				return [result1, result2]
-//			}
-//			
-//			j = data.index(after: j)
-//			distance += 1
-//		}
-//		
-//		return nil
-//	}
-	
 	func scanForTheEnd(at i: Index) -> Bool {
 		guard data.index(i, offsetBy: 7) == data.endIndex else {
 			return false
 		}
 		
-		// 'T', 'h', 'e', ' ', 'E', 'n', 'd'
 		var j = i
 		if data[j] == C.T {
 			j = data.index(after: j)

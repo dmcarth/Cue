@@ -6,13 +6,13 @@
 //  Copyright © 2016 Dylan McArthur. All rights reserved.
 //
 
-public struct SearchResult<Index: Comparable> {
+public struct SearchResult {
 	
-	public var range: Range<Index>
+	public var range: Range<Int>
 	
-	public var keywordType: HeaderType?
+	public var keywordType: Header.HeaderType?
 	
-	public init(range: Range<Index>, keywordType: HeaderType?=nil) {
+	public init(range: Range<Int>, keywordType: Header.HeaderType?=nil) {
 		self.range = range
 		self.keywordType = keywordType
 	}

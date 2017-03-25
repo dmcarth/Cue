@@ -6,13 +6,13 @@
 //
 //
 
-public struct TableOfContentsItem<Index: Comparable> {
+public struct TableOfContentsItem {
 	
 	public var type: TableOfContentsType
 	
-	public var location: Index
+	public var location: Int
 	
-	public init(type: TableOfContentsType, location: Index) {
+	public init(type: TableOfContentsType, location: Int) {
 		self.type = type
 		self.location = location
 	}
@@ -27,7 +27,7 @@ public enum TableOfContentsType {
 	case page
 	case reference
 	
-	init(keyword: HeaderType) {
+	init(keyword: Header.HeaderType) {
 		switch keyword {
 		case .act:
 			self = .act

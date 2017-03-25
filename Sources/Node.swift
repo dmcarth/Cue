@@ -6,71 +6,82 @@
 //  Copyright © 2016 Dylan McArthur. All rights reserved.
 //
 
-public final class Node<Index: Comparable> {
+import Foundation
+
+public class Node {
 	
-	public weak var next: Node<Index>?
+	public weak var parent: Node?
 	
-	public var children: ContiguousArray<Node<Index>> = []
+	public weak var next: Node?
 	
-	public var range: Range<Index>
+	public var children = [Node]()
 	
-	public var type: NodeType
+	public let offset: Int
 	
-	public init(type: NodeType, range: Range<Index>) {
-		self.type = type
-		self.range = range
+	public internal(set) var length: Int
+	
+	public init(range: Range<Int>) {
+		self.offset = range.lowerBound
+		self.length = range.upperBound - range.lowerBound
 	}
 	
-	func addChild(_ child: Node<Index>) {
+	func addChild(_ child: Node) {
 		if let last = children.last {
 			last.next = child
 		}
 		
+		child.parent = self
 		children.append(child)
 	}
 	
-	func replaceLastChild(with newChild: Node<Index>) {
-		if !children.isEmpty {
-			children.removeLast()
-		}
-		
-		addChild(newChild)
+}
+
+// MARK: - Range
+extension Node {
+	
+	public var isEmpty: Bool {
+		return range.isEmpty
 	}
 	
-}
-
-public enum NodeType {
-	case document
-	case headerBlock(HeaderType)
-	case descriptionBlock
-	case cueContainer
-	case cueBlock(Bool) //isDual
-	case name
-	case lyricContainer
-	case lyricBlock
-	case facsimileContainer
-	case facsimileBlock
-	case endBlock
-	case textStream
-	case literal
-	case comment
-	case emphasis
-	case reference
-	case delimiter
-}
-
-public enum HeaderType {
-	case act
-	case chapter
-	case scene
-	case page
+	public var range: Range<Int> {
+		return offset..<offset+length
+	}
+	
+	public var rangeIncludingMarkers: Range<Int> {
+		var lowerBound = offset
+		if let left = (self as? LeftDelimited)?.leftDelimiter {
+			lowerBound = left.offset
+		}
+		
+		var upperBound = offset + length
+		if let right = (self as? RightDelimited)?.rightDelimiter {
+			upperBound = right.offset + right.length
+		}
+		
+		return lowerBound..<upperBound
+	}
+	
+	func extendLengthToInclude(node: Node) {
+		length = node.range.upperBound - offset
+	}
+	
+	public var nsRange: NSRange {
+		return NSMakeRange(offset, length)
+	}
+	
+	public var nsRangeIncludingMarkers: NSRange {
+		let expandedRange = rangeIncludingMarkers
+		
+		return NSMakeRange(expandedRange.lowerBound, expandedRange.upperBound - expandedRange.lowerBound)
+	}
+	
 }
 
 // MARK: - Debug Functions
 extension Node: Equatable {
 	
-	var debugString: String {
-		var s = "(Node<\(type)>) \(range))"
+	public var debugString: String {
+		var s = "(\(type(of: self)) \(range))"
 		if !children.isEmpty {
 			s += "{ " + children.map { $0.debugString }.joined(separator: ", ") + "}"
 		}

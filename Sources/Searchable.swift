@@ -12,15 +12,15 @@ enum SearchComparison {
 	case greaterThan
 }
 
-public struct SearchOptions<Index: Comparable> {
+public struct SearchOptions {
 	
 	/// Enables search to traverse nodes deeper than level-1
 	public var deepSearchEnabled: Bool
 	
 	/// Causes search to return on the first node matching this predicate. If no match is found, search will return nil.
-	public var predicate: ((Node<Index>)->Bool)?
+	public var predicate: ((Node)->Bool)?
 	
-	public init(deepSearch: Bool = true, predicate: ((Node<Index>)->Bool)?=nil) {
+	public init(deepSearch: Bool = false, predicate: ((Node)->Bool)?=nil) {
 		self.deepSearchEnabled = deepSearch
 		self.predicate = predicate
 	}
@@ -29,10 +29,10 @@ public struct SearchOptions<Index: Comparable> {
 
 extension Node {
 	
-	public func childNodes(from lowerBound: Index, to upperBound: Index) -> [Node<Index>] {
-		var nodes = [Node<Index>]()
+	public func childNodes(from lowerBound: Int, to upperBound: Int) -> [Node] {
+		var nodes = [Node]()
 		
-		let opts = SearchOptions<Index>(deepSearch: false)
+		let opts = SearchOptions(deepSearch: false)
 		
 		if var node = search(for: lowerBound, options: opts) {
 			nodes.append(node)
@@ -50,26 +50,27 @@ extension Node {
 		return nodes
 	}
 	
-	public func search(for index: Index, options: SearchOptions<Index>) -> Node<Index>? {
+	public func search(for index: Int, options: SearchOptions) -> Node? {
 		guard compare(to: index) == .contains else { return nil }
 		
 		return _search(for: index, options: options)
 	}
 	
-	private func _search(for index: Index, options: SearchOptions<Index>) -> Node<Index>? {
+	private func _search(for index: Int, options: SearchOptions) -> Node? {
 		var lower = 0
 		var upper = children.count
 		
+		var foundBreakingStatement = false
 		while lower < upper {
-			let midIndex = lower + (upper - lower) / 2
+			let midIndex = (lower + upper) / 2
 			let child = children[midIndex]
 			let comparison = child.compare(to: index)
 			
 			switch comparison {
 			case .greaterThan:
-				lower = midIndex
+				upper = midIndex
 			case .lessThan:
-				upper = midIndex + 1
+				lower = midIndex + 1
 			case .contains:
 				// We found a match!
 				
@@ -90,14 +91,18 @@ extension Node {
 				}
 				
 				// Search matched the index but none of the options, break the loop
-				break
+				foundBreakingStatement = true
 			}
+			
+			if foundBreakingStatement { break }
 		}
 		
 		return nil
 	}
 	
-	private func compare(to index: Index) -> SearchComparison {
+	private func compare(to index: Int) -> SearchComparison {
+		let range = rangeIncludingMarkers
+		
 		if index < range.lowerBound {
 			return .greaterThan
 		} else if index >= range.upperBound {

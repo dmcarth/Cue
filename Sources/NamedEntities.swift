@@ -6,22 +6,18 @@
 //
 //
 
-struct NamedEntities<S: BidirectionalCollection, C: Codec> where
-	S.Iterator.Element == C.CodeUnit,
-	S.SubSequence: BidirectionalCollection,
-	S.SubSequence.Iterator.Element == S.Iterator.Element
-{
+struct NamedEntities {
 	
-	typealias Index = S.Index
+	typealias Index = Int
 	
 	var map: [String: Array<Index>]
 	
-	init(_ parser: Cue<S, C>) {
+	init(_ parser: Cue) {
 		var map = [String: Array<Index>]()
 		
 		parser.root.enumerate { (node) in
-			if case .name = node.type {
-				let scalars = C.scalars(from: parser.data[node.range])
+			if node is Name {
+				let scalars = Cue.C.scalars(from: parser.data[node.range])
 				let view = String.UnicodeScalarView(scalars)
 				let name = String(view)
 				
