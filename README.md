@@ -1,16 +1,20 @@
 # Cue
-Cue is a Markdown-style language for writing stories for print, screen, and stage.
+Cue is a Markdown-style language for writing stories for print, screen, and stage. For more information on the spec go to www.dylanthejoel.com/cue.
 
-The library presented here for parsing Cue is still in early stages of development. 
+This library is for parsing and interpreting Cue. While the Cue spec continues to develop, the API will also continue to undergo changes. Until the Cue spec reaches 1.0, it should be considered unstable.
 
 ## Dependencies
-A top priority of the Cue library has been the ability to run without any external dependencies. As a result, anything that can compile Swift can compile the Cue library.
+Every attempt has been made to remove the need for external dependencies. As a result, anything that can compile Swift can compile the Cue library.
 
 ## Installation
-I recommend using the Swift Package Mangager to install Cue. 
+It is strongly recommended that you use the Swift Package Manager to install Cue. To do so, add this line to your dependencies in `Package.swift`:
+
+```swift
+.Package(url: "https://github.com/dmcarth/Cue.git", majorVersion: 0, minor: 4)
+```
 
 ## Usage
-The bread and butter of the Cue library is the Cue class, which accepts a string and provides a handful of views onto the parsed data.
+The bread and butter of the Cue library is the Cue class, which accepts a string and provides some useful views onto the parsed data.
 
 ```swift
 import Cue
@@ -30,36 +34,10 @@ let names = parser.namedEntitiesDictionary
 // A dictionary of names, counting their occurences in the original string
 ```
 
-### Abstract Syntax Tree
-The returned AST comes with a number of powerful methods for traversing and querying.
+### Rendering
+Cue uses its own internal HTML renderer to output HTML, but it also defines two public protocols for rendering Cue: `Renderer` and `MarkupRenderer`. 
 
-```swift
-ast.enumerate { (node) in
-	// Performs a depth-first traversal. Does not support transformation.
-}
-
-ast.walk { (event, node, shouldBreak) in
-	// Performs a depth-first traversal. Supports tree transformation.
-}
-
-var current = ast.children.first
-while let next = current {
-	// Traverses child nodes in sequence
-	current = next.next
-}
-
-let opts = SearchOptions(deepSearch: true, searchPredicate: { (node) in
-	return node is Description
-})
-if let found = ast.search(for: searchIndex, options: opts) {
-	// Finds and returns a node that matches the search query. If none, search returns nil.
-}
-
-let nodes = ast.childNodes(from: startOfRange, to: endOfRange)
-// Returns all children in the given range
-```
-
-All nodes in the AST contain a `range` property where the `lowerBound` and `upperBound` correspond to the utf16 byte index where the node's content starts and ends. An additional `rangeIncludingMarkers` property extends `range` to include any delimiters and extra whitespace.
+For more information on rendering Cue, such as for syntax highlighting or for a custom HTML renderer, please see the docs.
 
 ## Syntax
 Cue is designed to be intuitive and invisible whenever possible. It should look more or less exactly the same as when it's printed on a book or in a script. 
