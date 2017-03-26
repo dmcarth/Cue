@@ -18,7 +18,7 @@ public class MarkupContext {
 	
 	internal var needsNewLine = false
 	
-	internal func append(_ aString: String) {
+	public func append(_ aString: String) {
 		if needsNewLine {
 			string.append("\n")
 			addIndent()
@@ -36,11 +36,11 @@ public class MarkupContext {
 		string.append(pad)
 	}
 	
-	internal func pushIndent() {
+	public func pushIndent() {
 		indent += 1
 	}
 	
-	internal func popIndent() {
+	public func popIndent() {
 		guard indent > 0 else { return }
 		
 		indent -= 1
@@ -48,10 +48,6 @@ public class MarkupContext {
 	
 	public func setNeedsNewLine() {
 		needsNewLine = true
-	}
-	
-	public func startNewLine() {
-		append("\n")
 	}
 	
 	public func nextID(for type: Header.HeaderType) -> String? {
@@ -76,16 +72,15 @@ extension HTMLMarkupRenderer {
 	
 	func renderTag(_ tag: String, class name: String?, event: WalkerEvent, context: MarkupContext) {
 		if event == .enter {
-			let attr = (name != nil) ? " class=\"\(name!)\"" : ""
+			let classAttr = (name != nil) ? " class=\"\(name!)\"" : ""
 			
-			context.addIndent()
-			renderText("<\(tag)\(attr)>", in: context)
+			context.append("<\(tag)\(classAttr)>")
 			context.setNeedsNewLine()
 			context.pushIndent()
 		} else {
 			context.popIndent()
 			context.setNeedsNewLine()
-			renderText("</\(tag)>", in: context)
+			context.append("</\(tag)>")
 			context.setNeedsNewLine()
 		}
 	}
