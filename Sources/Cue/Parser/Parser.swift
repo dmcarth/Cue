@@ -63,7 +63,7 @@ extension Cue {
 			endOfLineCharNumber = charNumber
 			while endOfLineCharNumber < data.endIndex {
 				let backtrack = endOfLineCharNumber
-				endOfLineCharNumber = data.index(after: endOfLineCharNumber)
+				endOfLineCharNumber += 1
 				if scanForLineEnding(at: backtrack) {
 					break
 				}
@@ -225,7 +225,7 @@ extension Cue {
 		while j < nodeRange.upperBound {
 			let c = data[j]
 			
-			let k = data.index(after: j)
+			let k = j + 1
 			switch c {
 			case C.asterisk:
 				let marker = InlineMarker(type: .asterisk, range: j..<k)
@@ -256,7 +256,7 @@ extension Cue {
 				guard k < endOfLineCharNumber else { break }
 				
 				if data[k] == C.slash {
-					let l = data.index(after: k)
+					let l = k + 1
 					let com = Comment(left: j..<l, body: l..<nodeRange.upperBound)
 					queue.enqueue(com)
 					foundBreakingStatement = true
@@ -314,7 +314,7 @@ extension Cue {
 		
 		while j < endOfLineCharNumber {
 			if scanForWhitespace(at: j) {
-				j = data.index(after: j)
+				j += 1
 			} else {
 				break
 			}
@@ -330,7 +330,7 @@ extension Cue {
 			if data[j] == C.hyphen {
 				break
 			} else {
-				j = data.index(after: j)
+				j += 1
 			}
 		}
 		
@@ -341,7 +341,7 @@ extension Cue {
 		var j = i
 		
 		while j > charNumber, j > clamp {
-			let backtrack = data.index(before: j)
+			let backtrack = j - 1
 			
 			if scanForWhitespace(at: backtrack) {
 				j = backtrack
@@ -354,7 +354,7 @@ extension Cue {
 	}
 	
 	func scanForBreak(at i: Int) -> HorizontalBreak? {
-		guard data.index(i, offsetBy: 3) < endOfLineCharNumber else {
+		guard i + 3 < endOfLineCharNumber else {
 			return nil
 		}
 		
@@ -365,7 +365,7 @@ extension Cue {
 				break
 			}
 			
-			j = data.index(after: j)
+			j += 1
 			distance += 1
 		}
 		
@@ -384,16 +384,16 @@ extension Cue {
 			return h
 		} else if scanForActHeading(at: i) {
 			type = .act
-			j = data.index(j, offsetBy: 3)
+			j += 3
 		} else if scanForSceneHeading(at: i) {
 			type = .scene
-			j = data.index(j, offsetBy: 5)
+			j += 5
 		} else if scanForChapterHeading(at: i) {
 			type = .chapter
-			j = data.index(j, offsetBy: 7)
+			j += 7
 		} else if scanForPage(at: i) {
 			type = .page
-			j = data.index(j, offsetBy: 4)
+			j += 4
 		} else {
 			return nil
 		}
@@ -403,7 +403,7 @@ extension Cue {
 		guard k < endOfLineCharNumber else { return nil }
 		
 		var l = scanForHyphen(startingAt: k)
-		var m = data.index(after: l)
+		var m = l + 1
 		l = scanBackwardForFirstNonspace(startingAt: l)
 		let idRange: Range<Int> = k..<l
 		
@@ -427,14 +427,14 @@ extension Cue {
 	func scanForForcedHeader(at i: Int) -> Header? {
 		guard data[i] == C.period else { return nil }
 		
-		let j = data.index(after: i)
+		let j = i + 1
 		var k = j
 		while k < endOfLineCharNumber {
 			if scanForWhitespace(at: k) {
 				break
 			}
 			
-			k = data.index(after: k)
+			k += 1
 		}
 		let key = Keyword(range: j..<k)
 		var id: Identifier? = nil
@@ -445,7 +445,7 @@ extension Cue {
 		var hyphenEnd = idStart
 		if idStart < endOfLineCharNumber {
 			hyphenStart = scanForHyphen(startingAt: idStart)
-			hyphenEnd = data.index(after: hyphenStart)
+			hyphenEnd = hyphenStart + 1
 			hyphenStart = scanBackwardForFirstNonspace(startingAt: hyphenStart)
 			id = Identifier(range: idStart..<hyphenStart)
 		}
@@ -461,15 +461,15 @@ extension Cue {
 	}
 	
 	func scanForActHeading(at i: Int) -> Bool {
-		guard data.index(i, offsetBy: 3) < endOfLineCharNumber else {
+		guard i + 3 < endOfLineCharNumber else {
 			return false
 		}
 		
 		var j = i
 		if data[j] == C.A {
-			j = data.index(after: j)
+			j += 1
 			if data[j] == C.c {
-				j = data.index(after: j)
+				j += 1
 				if data[j] == C.t {
 					return true
 				}
@@ -480,23 +480,23 @@ extension Cue {
 	}
 	
 	func scanForChapterHeading(at i: Int) -> Bool {
-		guard data.index(i, offsetBy: 7) < endOfLineCharNumber else {
+		guard i + 7 < endOfLineCharNumber else {
 			return false
 		}
 		
 		var j = i
 		if data[j] == C.C {
-			j = data.index(after: j)
+			j += 1
 			if data[j] == C.h {
-				j = data.index(after: j)
+				j += 1
 				if data[j] == C.a {
-					j = data.index(after: j)
+					j += 1
 					if data[j] == C.p {
-						j = data.index(after: j)
+						j += 1
 						if data[j] == C.t {
-							j = data.index(after: j)
+							j += 1
 							if data[j] == C.e {
-								j = data.index(after: j)
+								j += 1
 								if data[j] == C.r {
 									return true
 								}
@@ -511,19 +511,19 @@ extension Cue {
 	}
 	
 	func scanForSceneHeading(at i: Int) -> Bool {
-		guard data.index(i, offsetBy: 5) < endOfLineCharNumber else {
+		guard i + 5 < endOfLineCharNumber else {
 			return false
 		}
 		
 		var j = i
 		if data[j] == C.S {
-			j = data.index(after: j)
+			j += 1
 			if data[j] == C.c {
-				j = data.index(after: j)
+				j += 1
 				if data[j] == C.e {
-					j = data.index(after: j)
+					j += 1
 					if data[j] == C.n {
-						j = data.index(after: j)
+						j += 1
 						if data[j] == C.e {
 							return true
 						}
@@ -536,17 +536,17 @@ extension Cue {
 	}
 	
 	func scanForPage(at i: Int) -> Bool {
-		guard data.index(i, offsetBy: 4) < endOfLineCharNumber else {
+		guard i + 4 < endOfLineCharNumber else {
 			return false
 		}
 		
 		var j = i
 		if data[j] == C.P {
-			j = data.index(after: j)
+			j += 1
 			if data[j] == C.a {
-				j = data.index(after: j)
+				j += 1
 				if data[j] == C.g {
-					j = data.index(after: j)
+					j += 1
 					if data[j] == C.e {
 						return true
 					}
@@ -563,7 +563,7 @@ extension Cue {
 		}
 		
 		if data[i] == C.rightAngle { // ">"
-			let j = scanForFirstNonspace(startingAt: data.index(after: i))
+			let j = scanForFirstNonspace(startingAt: i + 1)
 			let k = scanBackwardForFirstNonspace(startingAt: endOfLineCharNumber)
 			
 			return FacsimileBlock(start: charNumber, body: j..<k, end: endOfLineCharNumber)
@@ -578,7 +578,7 @@ extension Cue {
 		}
 		
 		if data[i] == C.tilde {	// '~'
-			let j = data.index(after: i)
+			let j = i + 1
 			let k = scanBackwardForFirstNonspace(startingAt: endOfLineCharNumber)
 			
 			return LyricBlock(start: charNumber, body: j..<k, end: endOfLineCharNumber)
@@ -588,7 +588,7 @@ extension Cue {
 	}
 	
 	func scanForDualCue(at i: Int) -> CueBlock? {
-		let j = data.index(after: i)
+		let j = i + 1
 		
 		guard j < endOfLineCharNumber else {
 			return nil
@@ -625,7 +625,7 @@ extension Cue {
 			
 			if c == C.colon {
 				let nameResult = SearchResult(range: i..<j)
-				let k = scanForFirstNonspace(startingAt: data.index(after: j))
+				let k = scanForFirstNonspace(startingAt: j + 1)
 				let colonResult = SearchResult(range: j..<k)
 				return [nameResult, colonResult]
 			} else if c == C.openBracket {
@@ -633,30 +633,30 @@ extension Cue {
 			}
 			
 			distance += 1
-			j = data.index(after: j)
+			j += 1
 		}
 		
 		return nil
 	}
 	
 	func scanForTheEnd(at i: Int) -> EndBlock? {
-		guard data.index(i, offsetBy: 7) == data.endIndex else {
+		guard i + 7 == data.endIndex else {
 			return nil
 		}
 		
 		var j = i
 		if data[j] == C.T {
-			j = data.index(after: j)
+			j += 1
 			if data[j] == C.h {
-				j = data.index(after: j)
+				j += 1
 				if data[j] == C.e {
-					j = data.index(after: j)
+					j += 1
 					if data[j] == C.space {
-						j = data.index(after: j)
+						j += 1
 						if data[j] == C.E {
-							j = data.index(after: j)
+							j += 1
 							if data[j] == C.n {
-								j = data.index(after: j)
+								j += 1
 								if data[j] == C.d {
 									return EndBlock(start: charNumber, body: i..<i+7, end: endOfLineCharNumber)
 								}
