@@ -2,7 +2,7 @@
 Cue uses its own internal HTML renderer to output HTML, but it also defines two public protocols for rendering Cue: `Renderer` and `MarkupRenderer`. Between these two protocols you should be able to render Cue into just about any format imaginable. The details behind using and implementing these two protocols are wildly different, however, and really deserve their own sections.
 
 ## Markup Rendering
-`MarkupRenderer` is ideally suited for rendering other plain text markup languages like XML, LaTeX, or HTML. It renders onto a `MarkupContext` which you must initialize yourself before calling `render(in:)`. This context will then be passed through each of the rendering callbacks. When rendering is completed, you can retrieve the results of the render from `context.string` property.
+`MarkupRenderer` is ideally suited for rendering other plain text markup languages like XML, LaTeX, or HTML. It renders onto a `MarkupContext` which you must initialize yourself before passing it on to `render(in:)`. This context will then be passed through each of the rendering methods. When rendering is completed, you can retrieve the results of the render from the context's `string` property.
 
 `MarkupContext` is a specialized class designed to create beautiful, well formed markup. To render onto this context, you call `context.append(_:)`. To get the literal string content of an AST node (excluding markup), call `stringFromNode(_:)` from the renderer. 
 
@@ -28,7 +28,7 @@ func renderTag(_ tag: String, class name: String?, event: WalkerEvent, context: 
 ```
 
 ## General Purpose Rendering
-The `Renderer` protocol requires a little more work upfront, but in exchange you gain much greater flexibility. Unlike `MarkupRenderer`, you are responsible for defining the context type of your renderer, enabling you to output the results of the Cue parser in far more than just plain text. A syntax highlighter would use this protocol.
+The `Renderer` protocol requires a little more work up front, but in exchange you gain much greater flexibility. Unlike `MarkupRenderer`, you are responsible for defining the context type of your renderer, enabling you to output the results of the Cue parser in far more than just plain text. A syntax highlighter would use this protocol.
 
 ```swift
 struct CGRenderer: Renderer {
