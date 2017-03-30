@@ -34,6 +34,15 @@ public class Node {
 		children.append(child)
 	}
 	
+	func removeLastChild() {
+		guard !children.isEmpty else { return }
+		
+		children.removeLast()
+		if let last = children.last {
+			last.next = nil
+		}
+	}
+	
 }
 
 // MARK: - Range

@@ -144,7 +144,7 @@ extension HTMLMarkupRenderer {
 		renderTag("div", class: "name", event: event, context: context)
 	}
 	
-	func renderDirectionTags(for direction: Direction, event: WalkerEvent, in context: MarkupContext) {
+	func renderDirectionTags(for direction: DirectionBlock, event: WalkerEvent, in context: MarkupContext) {
 		renderTag("div", class: "direction", event: event, context: context)
 	}
 	

@@ -90,12 +90,13 @@ extension Cue {
 		
 		// Only now can we parse first-line lyrics, because appropriateContainer() may have changed the current block
 		if let cueBlock = block as? CueBlock {
-			if let result = scanForLyricPrefix(at: cueBlock.direction.range.lowerBound) {
-				let lyricContainer = LyricContainer(range: result.range.lowerBound..<endOfLineCharNumber)
-				let lyricBlock = LyricBlock(left: result.range, body: result.range.upperBound..<endOfLineCharNumber)
+			if let lyricBlock = scanForLyric(at: cueBlock.direction.range.lowerBound) {
+				let lyricContainer = LyricContainer(range: lyricBlock.range.lowerBound..<endOfLineCharNumber)
 				lyricContainer.addChild(lyricBlock)
 				
-				cueBlock.direction.children = [lyricContainer]
+				cueBlock.removeLastChild()
+				cueBlock.addChild(lyricContainer)
+				cueBlock.direction = lyricContainer
 				
 				// Lyrics are deeply nested. We may as well parse their inlines now rather than add an edge case later.
 				parseInlines(for: lyricBlock)
@@ -123,26 +124,26 @@ extension Cue {
 	func blockForLine() -> Node {
 		let wc = scanForFirstNonspace(startingAt: charNumber)
 		
-		if let header = scanForHeading(at: wc) {
+		if let header = scanForHeader(at: wc) {
 			
 			return header
-		} else if scanForTheEnd(at: wc) {
-			let end = EndBlock(range: charNumber..<endOfLineCharNumber)
+		} else if let end = scanForTheEnd(at: wc) {
 			
 			return end
-		} else if let result = scanForFacsimile(at: wc) {
-			let facsimile = FacsimileBlock(left: charNumber..<result.range.upperBound, body: result.range.upperBound..<endOfLineCharNumber)
+		} else if let facsimile = scanForFacsimile(at: wc) {
 			
 			return facsimile
-		} else if let result = scanForLyricPrefix(at: wc) {
-			let lyricBlock = LyricBlock(left: charNumber..<result.range.upperBound, body: result.range.upperBound..<endOfLineCharNumber)
+		} else if let lyricBlock = scanForLyric(at: wc) {
 			
 			return lyricBlock
 		} else if let cueBlock = scanForDualCue(at: wc) {
+			
 			return cueBlock
 		}
 		
-		let description = Description(range: charNumber..<endOfLineCharNumber)
+		let ewc = scanBackwardForFirstNonspace(startingAt: endOfLineCharNumber)
+		
+		let description = Description(start: charNumber, body: wc..<ewc, end: endOfLineCharNumber)
 		return description
 	}
 	
@@ -153,8 +154,8 @@ extension Cue {
 			return root
 			
 		// A CueBlock is always level-2, but regular cues need their own initial parent CueContainer
-		case is CueBlock:
-			if !(block is DualCue) {
+		case let cueBlock as CueBlock:
+			if !cueBlock.isDual {
 				let cueContainer = CueContainer(range: block.rangeIncludingMarkers)
 				root.addChild(cueContainer)
 				
@@ -197,8 +198,11 @@ extension Cue {
 			break
 		}
 		
+		let wc = scanForFirstNonspace(startingAt: charNumber)
+		let ewc = scanBackwardForFirstNonspace(startingAt: endOfLineCharNumber)
+		
 		// Invalid syntax, time to fail gracefully
-		block = Description(range: charNumber..<endOfLineCharNumber)
+		block = Description(start: charNumber, body: wc..<ewc, end: endOfLineCharNumber)
 		return root
 	}
 	
@@ -331,7 +335,23 @@ extension Cue {
 		return j
 	}
 	
-	func scanForHeading(at i: Index) -> Node? {
+	func scanBackwardForFirstNonspace(startingAt i: Index) -> Index {
+		var j = i
+		
+		while j > charNumber {
+			let backtrack = data.index(before: j)
+			
+			if scanForWhitespace(at: backtrack) {
+				j = backtrack
+			} else {
+				break
+			}
+		}
+		
+		return j
+	}
+	
+	func scanForHeader(at i: Index) -> Header? {
 		var type: Header.HeaderType
 		var j = i
 		
@@ -357,9 +377,7 @@ extension Cue {
 		
 		var l = scanForHyphen(startingAt: k)
 		let m = data.index(after: l)
-		while scanForWhitespace(at: data.index(before: l)), l > i {
-			l = data.index(before: l)
-		}
+		l = scanBackwardForFirstNonspace(startingAt: l)
 		let idRange: Range<Index> = k..<l
 		
 		let key = Keyword(range: keyRange)
@@ -369,12 +387,12 @@ extension Cue {
 		if m < endOfLineCharNumber {
 			let n = scanForFirstNonspace(startingAt: m)
 			let hyphenRange: Range<Index> = l..<n
-			let titleRange: Range<Index> = n..<endOfLineCharNumber
+			let titleRange: Range<Index> = n..<m
 			
 			title = Title(left: hyphenRange, body: titleRange)
 		}
 		
-		let header = Header(type: type, keyword: key, identifier: id, title: title)
+		let header = Header(type: type, start: charNumber, keyword: key, identifier: id, title: title, end: endOfLineCharNumber)
 		return header
 	}
 	
@@ -475,39 +493,37 @@ extension Cue {
 		return false
 	}
 	
-	/// Returns a SearchResult or nil if matching failed.
-	///
-	/// - Returns: Result covers ">" and any whitespace
-	func scanForFacsimile(at i: Index) -> SearchResult? {
+	func scanForFacsimile(at i: Index) -> FacsimileBlock? {
 		guard i < endOfLineCharNumber  else {
 			return nil
 		}
 		
 		if data[i] == C.rightAngle { // ">"
 			let j = scanForFirstNonspace(startingAt: data.index(after: i))
+			let k = scanBackwardForFirstNonspace(startingAt: endOfLineCharNumber)
 			
-			return SearchResult(range: i..<j)
+			return FacsimileBlock(start: charNumber, body: j..<k, end: endOfLineCharNumber)
 		}
 		
 		return nil
 	}
 	
-	/// Returns a SearchResult or nil if matching failed.
-	///
-	/// - returns: Result covers "~"
-	func scanForLyricPrefix(at i: Index) -> SearchResult? {
+	func scanForLyric(at i: Index) -> LyricBlock? {
 		guard i < endOfLineCharNumber else {
 			return nil
 		}
 		
 		if data[i] == C.tilde {	// '~'
-			return SearchResult(range: i..<data.index(after: i))
+			let j = data.index(after: i)
+			let k = scanBackwardForFirstNonspace(startingAt: endOfLineCharNumber)
+			
+			return LyricBlock(start: charNumber, body: j..<k, end: endOfLineCharNumber)
 		}
 		
 		return nil
 	}
 	
-	func scanForDualCue(at i: Index) -> Node? {
+	func scanForDualCue(at i: Index) -> CueBlock? {
 		let j = data.index(after: i)
 		
 		guard j < endOfLineCharNumber else {
@@ -516,19 +532,20 @@ extension Cue {
 		
 		var del: Range<Index>? = nil
 		if data[i] == C.caret {	// '^'
-			del = i..<j
+			del = charNumber..<j
 		}
 		
 		guard let cueResults = scanForCue(at: del?.upperBound ?? i) else { return nil }
 		
 		let name = Name(body: cueResults[0].range, right: cueResults[1].range)
-		let direction = Direction(range: cueResults[1].range.upperBound..<endOfLineCharNumber)
+		let ewc = scanBackwardForFirstNonspace(startingAt: endOfLineCharNumber)
+		let direction = DirectionBlock(body: cueResults[1].range.upperBound..<ewc, end: endOfLineCharNumber)
 		
 		var cue: CueBlock
 		if let del = del {
-			cue = DualCue(left: del, name: name, direction: direction)
+			cue = CueBlock(left: del, isDual: true, name: name, direction: direction)
 		} else {
-			cue = CueBlock(name: name, direction: direction)
+			cue = CueBlock(left: charNumber..<cueResults[0].range.lowerBound, isDual: false, name: name, direction: direction)
 		}
 		
 		return cue
@@ -558,9 +575,9 @@ extension Cue {
 		return nil
 	}
 	
-	func scanForTheEnd(at i: Index) -> Bool {
+	func scanForTheEnd(at i: Index) -> EndBlock? {
 		guard data.index(i, offsetBy: 7) == data.endIndex else {
-			return false
+			return nil
 		}
 		
 		var j = i
@@ -577,7 +594,7 @@ extension Cue {
 							if data[j] == C.n {
 								j = data.index(after: j)
 								if data[j] == C.d {
-									return true
+									return EndBlock(start: charNumber, body: i..<i+7, end: endOfLineCharNumber)
 								}
 							}
 						}
@@ -586,7 +603,7 @@ extension Cue {
 			}
 		}
 		
-		return false
+		return nil
 	}
 	
 }

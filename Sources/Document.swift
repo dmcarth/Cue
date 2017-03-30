@@ -26,18 +26,33 @@ public final class Document: Node {
 	
 }
 
-public final class EndBlock: Node {
+public final class EndBlock: Node, LeftDelimited, RightDelimited {
+	
+	public var leftDelimiter: Delimiter
+	
+	public var rightDelimiter: Delimiter
+	
+	init(start: Int, body: Range<Int>, end: Int) {
+		self.leftDelimiter = Delimiter(range: start..<body.lowerBound)
+		self.rightDelimiter = Delimiter(range: body.upperBound..<end)
+		super.init(range: body)
+	}
 	
 }
 
 // MARK: Headers
-public final class Header: Node {
+public final class Header: Node, LeftDelimited, RightDelimited {
 	
-	public enum HeaderType: Int {
-		case act, chapter, scene, page
+	public enum HeaderType {
+		case act
+		case chapter
+		case scene
+		case page
 	}
 	
 	public var type: HeaderType
+	
+	public var leftDelimiter: Delimiter
 	
 	public var keyword: Keyword
 	
@@ -45,14 +60,18 @@ public final class Header: Node {
 	
 	public var title: Title?
 	
-	init(type: HeaderType, keyword: Keyword, identifier: Identifier, title: Title?=nil) {
+	public var rightDelimiter: Delimiter
+	
+	init(type: HeaderType, start: Int, keyword: Keyword, identifier: Identifier, title: Title?=nil, end: Int) {
+		self.leftDelimiter = Delimiter(range: start..<keyword.offset)
 		self.type = type
 		self.keyword = keyword
 		self.identifier = identifier
 		self.title = title
 		
-		let upperBound = (title != nil) ? title!.range.upperBound : identifier.range.upperBound
-		super.init(range: keyword.range.lowerBound..<upperBound)
+		let titleUpper = (title != nil) ? title!.range.upperBound : identifier.range.upperBound
+		self.rightDelimiter = Delimiter(range: titleUpper..<end)
+		super.init(range: keyword.range.lowerBound..<end)
 		
 		addChild(keyword)
 		addChild(identifier)
@@ -87,35 +106,30 @@ public final class CueContainer: Node {
 	
 }
 
-public class CueBlock: Node {
+public class CueBlock: Node, LeftDelimited {
+	
+	public var leftDelimiter: Delimiter
+	
+	public var isDual: Bool
 	
 	public var name: Name
 	
-	public var direction: Direction
+	public var direction: Node
 	
 	public var isSelfDescribing: Bool {
 		return direction.isEmpty
 	}
 	
-	init(name: Name, direction: Direction) {
+	init(left: Range<Int>, isDual: Bool, name: Name, direction: Node) {
+		self.leftDelimiter = Delimiter(range: left)
+		self.isDual = isDual
 		self.name = name
 		self.direction = direction
 		
-		super.init(range: name.range.lowerBound..<direction.range.upperBound)
+		super.init(range: name.range.lowerBound..<direction.rangeIncludingMarkers.upperBound)
 		
 		addChild(name)
 		addChild(direction)
-	}
-	
-}
-
-public final class DualCue: CueBlock, LeftDelimited {
-	
-	public var leftDelimiter: Delimiter
-	
-	init(left: Range<Int>, name: Name, direction: Direction) {
-		self.leftDelimiter = Delimiter(range: left)
-		super.init(name: name, direction: direction)
 	}
 	
 }
@@ -131,22 +145,30 @@ public final class Name: Node, RightDelimited {
 	
 }
 
-public final class Direction: Node { // contains either lyricContainer or inlines
+public final class DirectionBlock: Node, RightDelimited {
+	
+	public var rightDelimiter: Delimiter
+	
+	init(body: Range<Int>, end: Int) {
+		self.rightDelimiter = Delimiter(range: body.upperBound..<end)
+		super.init(range: body)
+	}
 	
 }
-
-
 
 public final class LyricContainer: Node {
 	
 }
 
-public final class LyricBlock: Node, LeftDelimited { // contains inlines directly
+public final class LyricBlock: Node, LeftDelimited, RightDelimited { // contains inlines directly
 	
 	public var leftDelimiter: Delimiter
 	
-	init(left: Range<Int>, body: Range<Int>) {
-		self.leftDelimiter = Delimiter(range: left)
+	public var rightDelimiter: Delimiter
+	
+	init(start: Int, body: Range<Int>, end: Int) {
+		self.leftDelimiter = Delimiter(range: start..<body.lowerBound)
+		self.rightDelimiter = Delimiter(range: body.upperBound..<end)
 		super.init(range: body)
 	}
 	
@@ -159,12 +181,15 @@ public final class FacsimileContainer: Node {
 	
 }
 
-public final class FacsimileBlock: Node, LeftDelimited { // contains inlines directly
+public final class FacsimileBlock: Node, LeftDelimited, RightDelimited { // contains inlines directly
 	
 	public var leftDelimiter: Delimiter
 	
-	init(left: Range<Int>, body: Range<Int>) {
-		self.leftDelimiter = Delimiter(range: left)
+	public var rightDelimiter: Delimiter
+	
+	init(start: Int, body: Range<Int>, end: Int) {
+		self.leftDelimiter = Delimiter(range: start..<body.lowerBound)
+		self.rightDelimiter = Delimiter(range: body.upperBound..<end)
 		super.init(range: body)
 	}
 	
@@ -173,7 +198,17 @@ public final class FacsimileBlock: Node, LeftDelimited { // contains inlines dir
 
 
 // MARK: Description
-public final class Description: Node { // contains inlines directly
+public final class Description: Node, LeftDelimited, RightDelimited { // contains inlines directly
+	
+	public var leftDelimiter: Delimiter
+	
+	public var rightDelimiter: Delimiter
+	
+	init(start: Int, body: Range<Int>, end: Int) {
+		self.leftDelimiter = Delimiter(range: start..<body.lowerBound)
+		self.rightDelimiter = Delimiter(range: body.upperBound..<end)
+		super.init(range: body)
+	}
 	
 }
 

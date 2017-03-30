@@ -17,7 +17,7 @@ public protocol MarkupRenderer {
 	func renderCueContainerTags(for cueContainer: CueContainer, event: WalkerEvent, in context: MarkupContext)
 	func renderCueBlockTags(for cueBlock: CueBlock, event: WalkerEvent, in context: MarkupContext)
 	func renderNameTags(for name: Name, event: WalkerEvent, in context: MarkupContext)
-	func renderDirectionTags(for direction: Direction, event: WalkerEvent, in context: MarkupContext)
+	func renderDirectionTags(for direction: DirectionBlock, event: WalkerEvent, in context: MarkupContext)
 	func renderLyricContainerTags(for lyricContainer: LyricContainer, event: WalkerEvent, in context: MarkupContext)
 	func renderLyricBlockTags(for lyricBlock: LyricBlock, event: WalkerEvent, in context: MarkupContext)
 	func renderFacsimileContainerTags(for facsimileContainer: FacsimileContainer, event: WalkerEvent, in context: MarkupContext)
@@ -90,7 +90,7 @@ extension MarkupRenderer {
 					renderLiteralNode(name, in: context)
 				}
 				
-			case let dir as Direction:
+			case let dir as DirectionBlock:
 				renderDirectionTags(for: dir, event: event, in: context)
 				
 			case let lyC as LyricContainer:
@@ -129,17 +129,17 @@ extension MarkupRenderer {
 		for char in string.characters {
 			switch char {
 			case "<":
-				sanitized += "&lt"
+				sanitized += "&lt;"
 			case ">":
-				sanitized += "&gt"
+				sanitized += "&gt;"
 			case "&":
-				sanitized += "&amp"
+				sanitized += "&amp;"
 			case "\"":
-				sanitized += "&quot"
+				sanitized += "&quot;"
 			case "\'":
-				sanitized += "&#x27"
+				sanitized += "&#x27;"
 			case "/":
-				sanitized += "&#x2F"
+				sanitized += "&#x2F;"
 			default:
 				
 				sanitized.append(char)
