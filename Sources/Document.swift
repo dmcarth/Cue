@@ -26,6 +26,10 @@ public final class Document: Node {
 	
 }
 
+public final class HorizontalBreak: Node {
+	
+}
+
 public final class EndBlock: Node, LeftDelimited, RightDelimited {
 	
 	public var leftDelimiter: Delimiter

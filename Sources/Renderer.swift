@@ -21,6 +21,7 @@ public protocol Renderer {
 	func renderLyrics(_ lyricContainer: LyricContainer, in context: Context)
 	func renderFacsimiles(_ facsimileContainer: FacsimileContainer, in context: Context)
 	func renderEndBlock(_ endBlock: EndBlock, in context: Context)
+	func renderHorizontalBreak(_ horizontalBreak: HorizontalBreak, in context: Context)
 	
 	// Inline callbacks
 	func renderLiteral(_ literal: Literal, in context: Context)
@@ -66,6 +67,8 @@ extension Renderer {
 				renderFacsimiles(facsimileContainer, in: context)
 			case let endBlock as EndBlock:
 				renderEndBlock(endBlock, in: context)
+			case let horizontalBreak as HorizontalBreak:
+				renderHorizontalBreak(horizontalBreak, in: context)
 			default:
 				print("error: unknown block \(node)")
 			}

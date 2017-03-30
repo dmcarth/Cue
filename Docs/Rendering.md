@@ -60,7 +60,7 @@ The result looks like this:
 </div>
 ```
 
-Most of the required methods for `MarkupRender` follow the same format: they pass a node and a `WalkerEvent` to indicate whether the renderer is entering or exiting the given node. The only exception is `renderReference(_:in:)`, which is only called once per reference.
+Most of the required methods for `MarkupRender` follow the same format: they pass a node and a `WalkerEvent` to indicate whether the renderer is entering or exiting the given node. The only exceptions are `renderReference(_:in:)` and `renderHorizontalBreak(_:in:)`, which are only called when entering.
 
 For a full list of the requirements see MarkupRenderer.swift. 
 

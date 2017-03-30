@@ -124,7 +124,10 @@ extension Cue {
 	func blockForLine() -> Node {
 		let wc = scanForFirstNonspace(startingAt: charNumber)
 		
-		if let header = scanForHeader(at: wc) {
+		if let br = scanForBreak(at: wc) {
+			
+			return br
+		} else if let header = scanForHeader(at: wc) {
 			
 			return header
 		} else if let end = scanForTheEnd(at: wc) {
@@ -150,7 +153,7 @@ extension Cue {
 	func appropriateContainer(for block: inout Node) -> Node {
 		switch block {
 		// These block types can only ever be level-1
-		case is Header, is Description, is EndBlock:
+		case is Header, is Description, is EndBlock, is HorizontalBreak:
 			return root
 			
 		// A CueBlock is always level-2, but regular cues need their own initial parent CueContainer
@@ -350,6 +353,29 @@ extension Cue {
 		}
 		
 		return j
+	}
+	
+	func scanForBreak(at i: Index) -> HorizontalBreak? {
+		guard data.index(i, offsetBy: 3) < endOfLineCharNumber else {
+			return nil
+		}
+		
+		var j = i
+		var distance = 0
+		while j < endOfLineCharNumber {
+			if data[j] != C.hyphen {
+				break
+			}
+			
+			j = data.index(after: j)
+			distance += 1
+		}
+		
+		guard distance >= 3, scanForFirstNonspace(startingAt: j) == endOfLineCharNumber else {
+			return nil
+		}
+		
+		return HorizontalBreak(range: charNumber..<endOfLineCharNumber)
 	}
 	
 	func scanForHeader(at i: Index) -> Header? {

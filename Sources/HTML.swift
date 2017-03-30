@@ -74,6 +74,7 @@ extension HTMLMarkupRenderer {
 		if event == .enter {
 			let classAttr = (name != nil) ? " class=\"\(name!)\"" : ""
 			
+			context.setNeedsNewLine()
 			context.append("<\(tag)\(classAttr)>")
 			context.setNeedsNewLine()
 			context.pushIndent()
@@ -167,6 +168,12 @@ extension HTMLMarkupRenderer {
 	
 	func renderEndBlockTags(for endBlock: EndBlock, event: WalkerEvent, in context: MarkupContext) {
 		renderTag("div", class: "end", event: event, context: context)
+	}
+	
+	func renderHorizontalBreak(_ hrBreak: HorizontalBreak, in context: MarkupContext) {
+		context.setNeedsNewLine()
+		context.append("<hr>")
+		context.setNeedsNewLine()
 	}
 	
 }

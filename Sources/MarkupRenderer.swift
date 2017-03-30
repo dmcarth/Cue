@@ -23,6 +23,7 @@ public protocol MarkupRenderer {
 	func renderFacsimileContainerTags(for facsimileContainer: FacsimileContainer, event: WalkerEvent, in context: MarkupContext)
 	func renderFacsimileBlockTags(for facsimileBlock: FacsimileBlock, event: WalkerEvent, in context: MarkupContext)
 	func renderEndBlockTags(for endBlock: EndBlock, event: WalkerEvent, in context: MarkupContext)
+	func renderHorizontalBreak(_ hrBreak: HorizontalBreak, in context: MarkupContext)
 }
 
 extension MarkupRenderer {
@@ -54,6 +55,11 @@ extension MarkupRenderer {
 					}
 					
 					shouldBreak = true
+				}
+				
+			case let br as HorizontalBreak:
+				if entering {
+					renderHorizontalBreak(br, in: context)
 				}
 				
 			case let desc as Description:

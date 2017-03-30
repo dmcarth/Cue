@@ -126,16 +126,25 @@ The begining of a letter (or sign, *et al.*) is marked with a right angle bracke
 > The Dursleys
 ```
 
+### Thematic Break
+A line of three or more hyphens becomes a break.
+
+```
+It was the last she ever saw of him.
+---
+Five years later, Buttercup was betrothed to a prince...
+```
+
 ### Whitespace
 Whitespace in Cue is generally ignored, allowing you to align lyrics and cues however you please.
 
 ```
-       Jack:	~This is
-				~a stanza of music
-Christopher:	~Aligned by the begining
-				~Of each lyric line
-	   Jill:	~And by the end
-				~Of each cue name
+       Jack:    ~This is
+                ~a stanza of music
+Christopher:    ~Aligned by the begining
+                ~Of each lyric line
+       Jill:    ~And by the end
+                ~Of each cue name
 ```
 
 The only exception is for newlines. Unlike Markdown, Cue counts every single line
@@ -150,7 +159,7 @@ This is line #3 because it comes two lines after line #1.
 You can also add comments using //.
 
 ```
-It was the best of times, it was the worst of times // consider revising
+It was the best of times, it was the worst of times    // consider revising
 ```
 
 ### Ending
