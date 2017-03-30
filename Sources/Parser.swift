@@ -212,6 +212,7 @@ extension Cue {
 extension Cue {
 	
 	func parseInlines(for stream: Node) {
+		let nodeRange = stream.range
 		let i = stream.range.lowerBound
 		
 		var queue = Queue<Node>()
@@ -220,7 +221,7 @@ extension Cue {
 		
 		var j = i
 		var foundBreakingStatement = false
-		while j < endOfLineCharNumber {
+		while j < nodeRange.upperBound {
 			let c = data[j]
 			
 			let k = data.index(after: j)
@@ -255,7 +256,7 @@ extension Cue {
 				
 				if data[k] == C.slash {
 					let l = data.index(after: k)
-					let com = Comment(left: j..<l, body: l..<endOfLineCharNumber)
+					let com = Comment(left: j..<l, body: l..<nodeRange.upperBound)
 					queue.enqueue(com)
 					foundBreakingStatement = true
 				}
@@ -285,7 +286,7 @@ extension Cue {
 		}
 		
 		if j < endOfLineCharNumber {
-			let lit = Literal(range: j..<endOfLineCharNumber)
+			let lit = Literal(range: j..<nodeRange.upperBound)
 			stream.addChild(lit)
 		}
 	}
@@ -376,7 +377,7 @@ extension Cue {
 		guard k < endOfLineCharNumber else { return nil }
 		
 		var l = scanForHyphen(startingAt: k)
-		let m = data.index(after: l)
+		var m = data.index(after: l)
 		l = scanBackwardForFirstNonspace(startingAt: l)
 		let idRange: Range<Index> = k..<l
 		
@@ -385,9 +386,10 @@ extension Cue {
 		
 		var title: Title? = nil
 		if m < endOfLineCharNumber {
-			let n = scanForFirstNonspace(startingAt: m)
-			let hyphenRange: Range<Index> = l..<n
-			let titleRange: Range<Index> = n..<m
+			m = scanForFirstNonspace(startingAt: m)
+			let n = scanBackwardForFirstNonspace(startingAt: endOfLineCharNumber)
+			let hyphenRange: Range<Index> = l..<m
+			let titleRange: Range<Index> = m..<n
 			
 			title = Title(left: hyphenRange, body: titleRange)
 		}
