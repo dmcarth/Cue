@@ -3,7 +3,7 @@ import XCTest
 
 class CueTests: XCTestCase {
     func testExample() {
-		let str = "Chapter 1 - Test\nA *test* for [every] cue //feature\n> Facsimiles\n---\nCue: Direction.\n^Dual Cue: ~Lyrics\n.Forced"
+		let str = "Chapter 1 - Test\nA *test* for [every] cue //feature\n> Facsimiles\n---\n\n\nCue: Direction.\n^Dual Cue: ~Lyrics\n.Forced"
 		
 		let html = Cue(str).html()
 		

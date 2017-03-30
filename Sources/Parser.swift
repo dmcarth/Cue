@@ -144,7 +144,7 @@ extension Cue {
 			return cueBlock
 		}
 		
-		let ewc = scanBackwardForFirstNonspace(startingAt: endOfLineCharNumber)
+		let ewc = scanBackwardForFirstNonspace(startingAt: endOfLineCharNumber, clamp: wc)
 		
 		let description = Description(start: charNumber, body: wc..<ewc, end: endOfLineCharNumber)
 		return description
@@ -202,7 +202,7 @@ extension Cue {
 		}
 		
 		let wc = scanForFirstNonspace(startingAt: charNumber)
-		let ewc = scanBackwardForFirstNonspace(startingAt: endOfLineCharNumber)
+		let ewc = scanBackwardForFirstNonspace(startingAt: endOfLineCharNumber, clamp: wc)
 		
 		// Invalid syntax, time to fail gracefully
 		block = Description(start: charNumber, body: wc..<ewc, end: endOfLineCharNumber)
@@ -339,10 +339,10 @@ extension Cue {
 		return j
 	}
 	
-	func scanBackwardForFirstNonspace(startingAt i: Index) -> Index {
+	func scanBackwardForFirstNonspace(startingAt i: Index, clamp: Index=0) -> Index {
 		var j = i
 		
-		while j > charNumber {
+		while j > charNumber, j > clamp {
 			let backtrack = data.index(before: j)
 			
 			if scanForWhitespace(at: backtrack) {

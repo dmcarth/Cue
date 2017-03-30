@@ -136,7 +136,7 @@ Five years later, Buttercup was betrothed to a prince...
 ```
 
 ### Whitespace
-Whitespace in Cue is generally ignored, allowing you to align lyrics and cues however you please.
+Whitespace in Cue is always ignored, allowing you to align lyrics and cues however you please.
 
 ```
        Jack:    ~This is
@@ -147,19 +147,20 @@ Christopher:    ~Aligned by the begining
                 ~Of each cue name
 ```
 
-The only exception is for newlines. Unlike Markdown, Cue counts every single line
+Line spacing is also simply a matter of taste. 
 
 ```
-This is line #1
+This is line #1.
 
-This is line #3 because it comes two lines after line #1.
+This is line #2.
+This is line #3.
 ```
 
 ### Comments
-You can also add comments using //.
+Comments can be extremely useful for sharing notes with you and your collaborators that won't appear in the final project. You can add a comment to the end of a line using //.
 
 ```
-It was the best of times, it was the worst of times    // consider revising
+It was the best of times, it was the worst of times.    // consider revising
 ```
 
 ### Ending

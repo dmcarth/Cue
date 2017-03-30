@@ -63,6 +63,10 @@ extension MarkupRenderer {
 				}
 				
 			case let desc as Description:
+				// If the block has nothing in it (only whitespace) don't render.
+				if desc.isEmpty {
+					break
+				}
 				renderDescriptionTags(for: desc, event: event, in: context)
 				
 			case let lit as Literal:

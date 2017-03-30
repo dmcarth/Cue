@@ -12,7 +12,7 @@ var output: String {
 }
 ```
 
-`MarkupContext` is designed to create beautiful, well formed markup. To render onto this context, you pass a string into `context.append(_:)`. That string can be obtained by calling `stringFromNode(_:)`. 
+`MarkupContext` is designed to create beautiful, well formed markup. To render onto this context, you pass a string into `context.append(_:)`. That string can be obtained by calling `stringFromNode(_:)`, which does some automatic HTML/XML sanitization. 
 
 ```swift
 let text = stringFromNode(node)
@@ -81,6 +81,10 @@ struct NSAttributedStringRenderer: Renderer {
 
 `Renderer` provides two methods for initiating a render: `render(in:)` for rendering a complete document and `render(range:,in:)` for a partial render. Because `Renderer` supports iterative rendering, it is *essential* that your context type encapsulate *all* necessary statefulness.
 
-The number of required methods is less than in `MarkupRender`, placing more responsibility on the renderer to handle layout and drawing. That includes calling `renderInlines(_:in:)`.
+The number of required methods is less than in `MarkupRender`, placing more responsibility on the renderer to handle layout and drawing. That includes calling `renderInlines(_:in:)` and determining whether a line of description is empty or not.
 
-Like `MarkupRenderer`, `Renderer` comes with a method for obtaining unmarked text from a given node for rendering: `stringFromNode(_:)`.
+By convention, Cue ignores all whitespace. However, in order to facilitate syntax highlighting Cue still keeps empty description nodes in its tree. To check if a `Description` node is empty, and therefore if it needs to be rendered, check if `node.isEmpty` returns true.
+
+Like `MarkupRenderer`, `Renderer` comes with a method for obtaining unmarked text from a given node for rendering: `stringFromNode(_:)`. Unlike `MarkupRenderer`, this method doesn't do any sanitizing.
+
+For a full list of required methods, see Renderer.swift.
