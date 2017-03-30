@@ -126,15 +126,6 @@ The begining of a letter (or sign, *et al.*) is marked with a right angle bracke
 > The Dursleys
 ```
 
-### Thematic Break
-A line of three or more hyphens becomes a break.
-
-```
-It was the last she ever saw of him.
----
-Five years later, Buttercup was betrothed to a prince...
-```
-
 ### Whitespace
 Whitespace in Cue is always ignored, allowing you to align lyrics and cues however you please.
 
@@ -156,8 +147,17 @@ This is line #2.
 This is line #3.
 ```
 
+### Thematic Break
+A line of three or more hyphens becomes a break.
+
+```
+It was the last she ever saw of him.
+---
+Five years later, Buttercup was betrothed to a prince...
+```
+
 ### Comments
-Comments can be extremely useful for sharing notes with you and your collaborators that won't appear in the final project. You can add a comment to the end of a line using //.
+Comments can be extremely useful for sharing notes with yourself and your collaborators, without appearing in the final project. You can add a comment to the end of a line using //.
 
 ```
 It was the best of times, it was the worst of times.    // consider revising

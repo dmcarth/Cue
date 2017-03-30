@@ -19,9 +19,9 @@ let text = stringFromNode(node)
 context.append(text)
 ```
 
-You should never add newlines with `context.append(_:)`. Instead, call `context.setNeedsNewLine()`. This will ensure that the next append operation will automatically be placed on a new line in the render output with proper indenting. 
+You should never add newlines with `context.append(_:)`. Instead, call `context.setNeedsNewLine()`. This will ensure that the next append operation will automatically be placed on a new line with the proper indent. 
 
-Managing indentation is as easy as calling `context.pushIndent()` and `context.popIndent`. Each newline will automatically get the proper indentation set by those two methods. For an example, here is how `HTMLMarkupRenderer` renders  indented block tags.
+Managing indentation is as easy as calling `context.pushIndent()` and `context.popIndent`. For an example, here is how `HTMLMarkupRenderer` renders  indented block tags.
 
 ```swift
 func renderTag(_ tag: String, class name: String?, event: WalkerEvent, context: MarkupContext) {
@@ -60,7 +60,7 @@ The result looks like this:
 </div>
 ```
 
-Most of the required methods for `MarkupRender` follow the same format: they pass a node and a `WalkerEvent` to indicate whether the renderer is entering or exiting the given node. The only exceptions are `renderReference(_:in:)` and `renderHorizontalBreak(_:in:)`, which are only called when entering.
+Most of the required methods for `MarkupRenderer` follow the same format: they pass a node and a `WalkerEvent` to indicate whether the renderer is entering or exiting the given node. The only exceptions are `renderReference(_:in:)` and `renderHorizontalBreak(_:in:)`, which are only called when entering.
 
 For a full list of the requirements see MarkupRenderer.swift. 
 
@@ -81,7 +81,7 @@ struct NSAttributedStringRenderer: Renderer {
 
 `Renderer` provides two methods for initiating a render: `render(in:)` for rendering a complete document and `render(range:,in:)` for a partial render. Because `Renderer` supports iterative rendering, it is *essential* that your context type encapsulate *all* necessary statefulness.
 
-The number of required methods is less than in `MarkupRender`, placing more responsibility on the renderer to handle layout and drawing. That includes calling `renderInlines(_:in:)` and determining whether a line of description is empty or not.
+The number of required methods is less than in `MarkupRenderer`, placing more responsibility on the renderer to handle layout and drawing. That includes calling `renderInlines(_:in:)` and determining whether a line of description is empty or not.
 
 By convention, Cue ignores all whitespace. However, in order to facilitate syntax highlighting Cue still keeps empty description nodes in its tree. To check if a `Description` node is empty, and therefore if it needs to be rendered, check if `node.isEmpty` returns true.
 
