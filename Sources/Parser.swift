@@ -356,7 +356,9 @@ extension Cue {
 		var type: Header.HeaderType
 		var j = i
 		
-		if scanForActHeading(at: i) {
+		if let h = scanForForcedHeader(at: i) {
+			return h
+		} else if scanForActHeading(at: i) {
 			type = .act
 			j = data.index(j, offsetBy: 3)
 		} else if scanForSceneHeading(at: i) {
@@ -395,6 +397,42 @@ extension Cue {
 		}
 		
 		let header = Header(type: type, start: charNumber, keyword: key, identifier: id, title: title, end: endOfLineCharNumber)
+		return header
+	}
+	
+	func scanForForcedHeader(at i: Index) -> Header? {
+		guard data[i] == C.period else { return nil }
+		
+		let j = data.index(after: i)
+		var k = j
+		while k < endOfLineCharNumber {
+			if scanForWhitespace(at: k) {
+				break
+			}
+			
+			k = data.index(after: k)
+		}
+		let key = Keyword(range: j..<k)
+		var id: Identifier? = nil
+		var title: Title? = nil
+		
+		let idStart = scanForFirstNonspace(startingAt: k)
+		var hyphenStart = idStart
+		var hyphenEnd = idStart
+		if idStart < endOfLineCharNumber {
+			hyphenStart = scanForHyphen(startingAt: idStart)
+			hyphenEnd = data.index(after: hyphenStart)
+			hyphenStart = scanBackwardForFirstNonspace(startingAt: hyphenStart)
+			id = Identifier(range: idStart..<hyphenStart)
+		}
+		
+		if hyphenEnd < endOfLineCharNumber {
+			hyphenEnd = scanForFirstNonspace(startingAt: hyphenEnd)
+			let titleEnd = scanBackwardForFirstNonspace(startingAt: endOfLineCharNumber)
+			title = Title(left: hyphenStart..<hyphenEnd, body: hyphenEnd..<titleEnd)
+		}
+		
+		let header = Header(type: .forced, start: charNumber, keyword: key, identifier: id, title: title, end: endOfLineCharNumber)
 		return header
 	}
 	

@@ -43,8 +43,10 @@ extension MarkupRenderer {
 					renderText(stringFromNode(head.keyword), in: context)
 					renderText(" ", in: context)
 					
-					let id = context.nextID(for: head.type) ?? stringFromNode(head.identifier)
-					renderText(id, in: context)
+					if let id = head.identifier {
+						let idText = context.nextID(for: head.type) ?? stringFromNode(id)
+						renderText(idText, in: context)
+					}
 					
 					if let title = head.title {
 						renderText(" ", in: context)

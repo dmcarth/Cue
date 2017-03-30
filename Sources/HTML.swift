@@ -104,6 +104,7 @@ extension HTMLMarkupRenderer {
 		case .chapter:	level = 2
 		case .scene:	level = 3
 		case .page:		level = 4
+		case .forced:	level = 3
 		}
 		
 		renderTag("h\(level)", class: nil, event: event, context: context)

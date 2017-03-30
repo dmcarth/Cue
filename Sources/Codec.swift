@@ -26,6 +26,7 @@ extension Codec {
 	static var openBracket: CodeUnit	{ return fromUTF8(0x5b) }
 	static var closeBracket: CodeUnit	{ return fromUTF8(0x5d) }
 	static var asterisk: CodeUnit		{ return fromUTF8(0x2a) }
+	static var period: CodeUnit			{ return fromUTF8(0x2e) }
 	static var A: CodeUnit				{ return fromUTF8(0x41) }
 	static var C: CodeUnit				{ return fromUTF8(0x43) }
 	static var E: CodeUnit				{ return fromUTF8(0x45) }

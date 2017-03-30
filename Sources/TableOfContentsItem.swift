@@ -19,12 +19,12 @@ public struct TableOfContentsItem {
 	
 }
 
-
 public enum TableOfContentsType {
 	case act
 	case chapter
 	case scene
 	case page
+	case forced
 	case reference
 	
 	init(keyword: Header.HeaderType) {
@@ -37,6 +37,8 @@ public enum TableOfContentsType {
 			self = .scene
 		case .page:
 			self = .page
+		case .forced:
+			self = .forced
 		}
 	}
 }

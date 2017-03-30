@@ -48,6 +48,7 @@ public final class Header: Node, LeftDelimited, RightDelimited {
 		case chapter
 		case scene
 		case page
+		case forced
 	}
 	
 	public var type: HeaderType
@@ -56,25 +57,25 @@ public final class Header: Node, LeftDelimited, RightDelimited {
 	
 	public var keyword: Keyword
 	
-	public var identifier: Identifier
+	public var identifier: Identifier?
 	
 	public var title: Title?
 	
 	public var rightDelimiter: Delimiter
 	
-	init(type: HeaderType, start: Int, keyword: Keyword, identifier: Identifier, title: Title?=nil, end: Int) {
+	init(type: HeaderType, start: Int, keyword: Keyword, identifier: Identifier?=nil, title: Title?=nil, end: Int) {
 		self.leftDelimiter = Delimiter(range: start..<keyword.offset)
 		self.type = type
 		self.keyword = keyword
 		self.identifier = identifier
 		self.title = title
 		
-		let titleUpper = (title != nil) ? title!.range.upperBound : identifier.range.upperBound
+		let titleUpper = title?.range.upperBound ?? identifier?.range.upperBound ?? keyword.range.upperBound
 		self.rightDelimiter = Delimiter(range: titleUpper..<end)
 		super.init(range: keyword.range.lowerBound..<end)
 		
 		addChild(keyword)
-		addChild(identifier)
+		if let identifier = identifier { addChild(identifier) }
 		if let title = title { addChild(title) }
 	}
 	
