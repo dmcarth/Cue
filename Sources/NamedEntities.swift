@@ -8,12 +8,10 @@
 
 struct NamedEntities {
 	
-	typealias Index = Int
-	
-	var map: [String: Array<Index>]
+	var map: [String: Array<Int>]
 	
 	init(_ parser: Cue) {
-		var map = [String: Array<Index>]()
+		var map = [String: Array<Int>]()
 		
 		parser.root.enumerate { (node) in
 			if node is Name {

@@ -8,8 +8,6 @@
 
 public final class Cue {
 	
-	public typealias Index = Int
-	
 	typealias C = UTF16
 	
 	let data: [UInt16]
@@ -18,9 +16,9 @@ public final class Cue {
 	
 	var lineNumber = 0
 	
-	var charNumber: Index
+	var charNumber: Int
 	
-	var endOfLineCharNumber: Index
+	var endOfLineCharNumber: Int
 	
 	public init(_ str: String) {
 		self.data = [UInt16](str.utf16)
@@ -44,7 +42,7 @@ extension Cue {
 		return TableOfContents(self).contents
 	}
 	
-	public var namedEntitiesDictionary: [String: Array<Index>] {
+	public var namedEntitiesDictionary: [String: Array<Int>] {
 		return NamedEntities(self).map
 	}
 	
@@ -220,7 +218,7 @@ extension Cue {
 		
 		var queue = Queue<Node>()
 		
-		var stack = DelimiterStack<Index>()
+		var stack = DelimiterStack()
 		
 		var j = i
 		var foundBreakingStatement = false
@@ -299,19 +297,19 @@ extension Cue {
 // MARK: - Scanners
 extension Cue {
 	
-	func scanForLineEnding(at i: Index) -> Bool {
+	func scanForLineEnding(at i: Int) -> Bool {
 		let c = data[i]
 		
 		return c == C.linefeed || c == C.carriage
 	}
 	
-	func scanForWhitespace(at i: Index) -> Bool {
+	func scanForWhitespace(at i: Int) -> Bool {
 		let c = data[i]
 		
 		return c == C.space || c == C.tab || scanForLineEnding(at: i)
 	}
 	
-	func scanForFirstNonspace(startingAt i: Index) -> Index {
+	func scanForFirstNonspace(startingAt i: Int) -> Int {
 		var j = i
 		
 		while j < endOfLineCharNumber {
@@ -325,7 +323,7 @@ extension Cue {
 		return j
 	}
 	
-	func scanForHyphen(startingAt i: Index) -> Index {
+	func scanForHyphen(startingAt i: Int) -> Int {
 		var j = i
 		
 		while j < endOfLineCharNumber {
@@ -339,7 +337,7 @@ extension Cue {
 		return j
 	}
 	
-	func scanBackwardForFirstNonspace(startingAt i: Index, clamp: Index=0) -> Index {
+	func scanBackwardForFirstNonspace(startingAt i: Int, clamp: Int=0) -> Int {
 		var j = i
 		
 		while j > charNumber, j > clamp {
@@ -355,7 +353,7 @@ extension Cue {
 		return j
 	}
 	
-	func scanForBreak(at i: Index) -> HorizontalBreak? {
+	func scanForBreak(at i: Int) -> HorizontalBreak? {
 		guard data.index(i, offsetBy: 3) < endOfLineCharNumber else {
 			return nil
 		}
@@ -378,7 +376,7 @@ extension Cue {
 		return HorizontalBreak(range: charNumber..<endOfLineCharNumber)
 	}
 	
-	func scanForHeader(at i: Index) -> Header? {
+	func scanForHeader(at i: Int) -> Header? {
 		var type: Header.HeaderType
 		var j = i
 		
@@ -399,7 +397,7 @@ extension Cue {
 		} else {
 			return nil
 		}
-		let keyRange: Range<Index> = i..<j
+		let keyRange: Range<Int> = i..<j
 		
 		let k = scanForFirstNonspace(startingAt: j)
 		guard k < endOfLineCharNumber else { return nil }
@@ -407,7 +405,7 @@ extension Cue {
 		var l = scanForHyphen(startingAt: k)
 		var m = data.index(after: l)
 		l = scanBackwardForFirstNonspace(startingAt: l)
-		let idRange: Range<Index> = k..<l
+		let idRange: Range<Int> = k..<l
 		
 		let key = Keyword(range: keyRange)
 		let id = Identifier(range: idRange)
@@ -416,8 +414,8 @@ extension Cue {
 		if m < endOfLineCharNumber {
 			m = scanForFirstNonspace(startingAt: m)
 			let n = scanBackwardForFirstNonspace(startingAt: endOfLineCharNumber)
-			let hyphenRange: Range<Index> = l..<m
-			let titleRange: Range<Index> = m..<n
+			let hyphenRange: Range<Int> = l..<m
+			let titleRange: Range<Int> = m..<n
 			
 			title = Title(left: hyphenRange, body: titleRange)
 		}
@@ -426,7 +424,7 @@ extension Cue {
 		return header
 	}
 	
-	func scanForForcedHeader(at i: Index) -> Header? {
+	func scanForForcedHeader(at i: Int) -> Header? {
 		guard data[i] == C.period else { return nil }
 		
 		let j = data.index(after: i)
@@ -462,7 +460,7 @@ extension Cue {
 		return header
 	}
 	
-	func scanForActHeading(at i: Index) -> Bool {
+	func scanForActHeading(at i: Int) -> Bool {
 		guard data.index(i, offsetBy: 3) < endOfLineCharNumber else {
 			return false
 		}
@@ -481,7 +479,7 @@ extension Cue {
 		return false
 	}
 	
-	func scanForChapterHeading(at i: Index) -> Bool {
+	func scanForChapterHeading(at i: Int) -> Bool {
 		guard data.index(i, offsetBy: 7) < endOfLineCharNumber else {
 			return false
 		}
@@ -512,7 +510,7 @@ extension Cue {
 		return false
 	}
 	
-	func scanForSceneHeading(at i: Index) -> Bool {
+	func scanForSceneHeading(at i: Int) -> Bool {
 		guard data.index(i, offsetBy: 5) < endOfLineCharNumber else {
 			return false
 		}
@@ -537,7 +535,7 @@ extension Cue {
 		return false
 	}
 	
-	func scanForPage(at i: Index) -> Bool {
+	func scanForPage(at i: Int) -> Bool {
 		guard data.index(i, offsetBy: 4) < endOfLineCharNumber else {
 			return false
 		}
@@ -559,7 +557,7 @@ extension Cue {
 		return false
 	}
 	
-	func scanForFacsimile(at i: Index) -> FacsimileBlock? {
+	func scanForFacsimile(at i: Int) -> FacsimileBlock? {
 		guard i < endOfLineCharNumber  else {
 			return nil
 		}
@@ -574,7 +572,7 @@ extension Cue {
 		return nil
 	}
 	
-	func scanForLyric(at i: Index) -> LyricBlock? {
+	func scanForLyric(at i: Int) -> LyricBlock? {
 		guard i < endOfLineCharNumber else {
 			return nil
 		}
@@ -589,14 +587,14 @@ extension Cue {
 		return nil
 	}
 	
-	func scanForDualCue(at i: Index) -> CueBlock? {
+	func scanForDualCue(at i: Int) -> CueBlock? {
 		let j = data.index(after: i)
 		
 		guard j < endOfLineCharNumber else {
 			return nil
 		}
 		
-		var del: Range<Index>? = nil
+		var del: Range<Int>? = nil
 		if data[i] == C.caret {	// '^'
 			del = charNumber..<j
 		}
@@ -617,7 +615,7 @@ extension Cue {
 		return cue
 	}
 	
-	func scanForCue(at i: Index) -> [SearchResult]? {
+	func scanForCue(at i: Int) -> [SearchResult]? {
 		var j = i
 		var distance = 0
 		while j < endOfLineCharNumber {
@@ -641,7 +639,7 @@ extension Cue {
 		return nil
 	}
 	
-	func scanForTheEnd(at i: Index) -> EndBlock? {
+	func scanForTheEnd(at i: Int) -> EndBlock? {
 		guard data.index(i, offsetBy: 7) == data.endIndex else {
 			return nil
 		}

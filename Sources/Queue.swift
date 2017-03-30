@@ -30,8 +30,6 @@ struct Queue<T> {
 
 extension Queue: Collection {
 	
-	typealias Index = Int
-	
 	var startIndex: Int {
 		return 0
 	}

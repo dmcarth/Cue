@@ -6,11 +6,11 @@
 //  Copyright © 2016 Dylan McArthur. All rights reserved.
 //
 
-struct InlineMarker<Index: Comparable> {
+struct InlineMarker{
 	
 	var type: MarkerType
 	
-	var range: Range<Index>
+	var range: Range<Int>
 	
 }
 
@@ -21,13 +21,13 @@ enum MarkerType {
 	case comment
 }
 
-struct DelimiterStack<I: Comparable> {
+struct DelimiterStack {
 	
-	fileprivate var buffer = [InlineMarker<I>]()
+	fileprivate var buffer = [InlineMarker]()
 	
 	fileprivate var lastOpeningBracketIndex: Int? = nil
 	
-	mutating func popToOpeningBracket() -> InlineMarker<I>? {
+	mutating func popToOpeningBracket() -> InlineMarker? {
 		guard let index = lastOpeningBracketIndex else {
 			return nil
 		}
@@ -39,7 +39,7 @@ struct DelimiterStack<I: Comparable> {
 		return marker
 	}
 	
-	mutating func popToOpeningAsterisk() -> InlineMarker<I>? {
+	mutating func popToOpeningAsterisk() -> InlineMarker? {
 		guard let last = buffer.last else { return nil }
 		
 		guard last.type == .asterisk else { return nil }
@@ -49,7 +49,7 @@ struct DelimiterStack<I: Comparable> {
 		return buffer.removeLast()
 	}
 	
-	mutating func push(_ marker: InlineMarker<I>) {
+	mutating func push(_ marker: InlineMarker) {
 		if marker.type == .openBracket {
 			lastOpeningBracketIndex = buffer.endIndex
 		}
@@ -61,8 +61,6 @@ struct DelimiterStack<I: Comparable> {
 
 extension DelimiterStack: Collection {
 	
-	typealias Index = Int
-	
 	var startIndex: Int {
 		return 0
 	}
@@ -71,7 +69,7 @@ extension DelimiterStack: Collection {
 		return buffer.endIndex
 	}
 	
-	subscript(index: Int) -> InlineMarker<I> {
+	subscript(index: Int) -> InlineMarker {
 		return buffer[index]
 	}
 	
