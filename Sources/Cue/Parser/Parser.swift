@@ -337,7 +337,7 @@ extension Cue {
 		return j
 	}
 	
-	func scanBackwardForFirstNonspace(startingAt i: Int, clamp: Int=0) -> Int {
+	func scanBackwardForFirstNonspace(startingAt i: Int, clamp: Int) -> Int {
 		var j = i
 		
 		while j > charNumber, j > clamp {
@@ -404,7 +404,7 @@ extension Cue {
 		
 		var l = scanForHyphen(startingAt: k)
 		var m = l + 1
-		l = scanBackwardForFirstNonspace(startingAt: l)
+		l = scanBackwardForFirstNonspace(startingAt: l, clamp: k)
 		let idRange: Range<Int> = k..<l
 		
 		let key = Keyword(range: keyRange)
@@ -413,7 +413,7 @@ extension Cue {
 		var title: Title? = nil
 		if m < endOfLineCharNumber {
 			m = scanForFirstNonspace(startingAt: m)
-			let n = scanBackwardForFirstNonspace(startingAt: endOfLineCharNumber)
+			let n = scanBackwardForFirstNonspace(startingAt: endOfLineCharNumber, clamp: m)
 			let hyphenRange: Range<Int> = l..<m
 			let titleRange: Range<Int> = m..<n
 			
@@ -425,7 +425,7 @@ extension Cue {
 	}
 	
 	func scanForForcedHeader(at i: Int) -> Header? {
-		guard data[i] == C.period else { return nil }
+		guard i < endOfLineCharNumber, data[i] == C.period else { return nil }
 		
 		let j = i + 1
 		var k = j
@@ -446,13 +446,13 @@ extension Cue {
 		if idStart < endOfLineCharNumber {
 			hyphenStart = scanForHyphen(startingAt: idStart)
 			hyphenEnd = hyphenStart + 1
-			hyphenStart = scanBackwardForFirstNonspace(startingAt: hyphenStart)
+			hyphenStart = scanBackwardForFirstNonspace(startingAt: hyphenStart, clamp: idStart)
 			id = Identifier(range: idStart..<hyphenStart)
 		}
 		
 		if hyphenEnd < endOfLineCharNumber {
 			hyphenEnd = scanForFirstNonspace(startingAt: hyphenEnd)
-			let titleEnd = scanBackwardForFirstNonspace(startingAt: endOfLineCharNumber)
+			let titleEnd = scanBackwardForFirstNonspace(startingAt: endOfLineCharNumber, clamp: hyphenEnd)
 			title = Title(left: hyphenStart..<hyphenEnd, body: hyphenEnd..<titleEnd)
 		}
 		
@@ -564,7 +564,7 @@ extension Cue {
 		
 		if data[i] == C.rightAngle { // ">"
 			let j = scanForFirstNonspace(startingAt: i + 1)
-			let k = scanBackwardForFirstNonspace(startingAt: endOfLineCharNumber)
+			let k = scanBackwardForFirstNonspace(startingAt: endOfLineCharNumber, clamp: j)
 			
 			return FacsimileBlock(start: charNumber, body: j..<k, end: endOfLineCharNumber)
 		}
@@ -579,7 +579,7 @@ extension Cue {
 		
 		if data[i] == C.tilde {	// '~'
 			let j = i + 1
-			let k = scanBackwardForFirstNonspace(startingAt: endOfLineCharNumber)
+			let k = scanBackwardForFirstNonspace(startingAt: endOfLineCharNumber, clamp: j)
 			
 			return LyricBlock(start: charNumber, body: j..<k, end: endOfLineCharNumber)
 		}
@@ -602,7 +602,7 @@ extension Cue {
 		guard let cueResults = scanForCue(at: del?.upperBound ?? i) else { return nil }
 		
 		let name = Name(body: cueResults[0].range, right: cueResults[1].range)
-		let ewc = scanBackwardForFirstNonspace(startingAt: endOfLineCharNumber)
+		let ewc = scanBackwardForFirstNonspace(startingAt: endOfLineCharNumber, clamp: cueResults[1].range.upperBound)
 		let direction = DirectionBlock(body: cueResults[1].range.upperBound..<ewc, end: endOfLineCharNumber)
 		
 		var cue: CueBlock
