@@ -9,7 +9,15 @@ class CueTests: XCTestCase {
 		
 		print(html)
     }
-
+	
+	func testBenchmark() {
+		let url = Bundle(for: CueTests.self).url(forResource: "war+peace", withExtension: "txt")!
+		let str = try! String(contentsOf: url)
+		
+		measure {
+			_ = Cue(str)
+		}
+	}
 
     static var allTests : [(String, (CueTests) -> () throws -> Void)] {
         return [

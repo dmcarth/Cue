@@ -10,6 +10,8 @@ public final class Cue {
 	
 	typealias C = UTF16
 	
+	typealias Buffer = UnsafeBufferPointer<UInt16>
+	
 	let data: [UInt16]
 	
 	let root: Document
@@ -26,7 +28,9 @@ public final class Cue {
 		self.endOfLineCharNumber = data.endIndex
 		self.root = Document(range: charNumber..<endOfLineCharNumber)
 		
-		parseBlocks()
+		self.data.withUnsafeBufferPointer { buffer in
+			parseBlocks(in: buffer)
+		}
 	}
 	
 }
@@ -55,40 +59,40 @@ extension Cue {
 // MARK: - Block Parsing
 extension Cue {
 	
-	func parseBlocks() {
+	func parseBlocks(in buffer: Buffer) {
 		
 		// Enumerate lines
-		while charNumber < data.endIndex {
+		while charNumber < buffer.endIndex {
 			// Find line ending
 			endOfLineCharNumber = charNumber
-			while endOfLineCharNumber < data.endIndex {
+			while endOfLineCharNumber < buffer.endIndex {
 				let backtrack = endOfLineCharNumber
 				endOfLineCharNumber += 1
-				if scanForLineEnding(at: backtrack) {
+				if buffer.scanForLineEnding(at: backtrack) {
 					break
 				}
 			}
 			
 			lineNumber += 1
 			
-			processLine()
+			processLine(in: buffer)
 			
 			charNumber = endOfLineCharNumber
 		}
 		
 	}
 	
-	func processLine() {
+	func processLine(in buffer: Buffer) {
 		// First we parse the current line as a block node.
-		var block = blockForLine()
+		var block = blockForLine(in: buffer)
 		
 		// Then we try to find an appropriate container node. If none can be found, block will be replaced.
-		let container = appropriateContainer(for: &block)
+		let container = appropriateContainer(for: &block, in: buffer)
 		container.addChild(block)
 		
 		// Only now can we parse first-line lyrics, because appropriateContainer() may have changed the current block
 		if let cueBlock = block as? CueBlock {
-			if let lyricBlock = scanForLyric(at: cueBlock.direction.range.lowerBound) {
+			if let lyricBlock = scanForLyric(in: buffer, at: cueBlock.direction.range.lowerBound) {
 				let lyricContainer = LyricContainer(range: lyricBlock.range.lowerBound..<endOfLineCharNumber)
 				lyricContainer.addChild(lyricBlock)
 				
@@ -97,58 +101,58 @@ extension Cue {
 				cueBlock.direction = lyricContainer
 				
 				// Lyrics are deeply nested. We may as well parse their inlines now rather than add an edge case later.
-				parseInlines(for: lyricBlock)
+				parseInlines(for: lyricBlock, in: buffer)
 			}
 		}
 		
 		// Parse inlines as appropriate
 		switch block {
 		case is FacsimileBlock, is Description, is LyricBlock:
-			parseInlines(for: block)
+			parseInlines(for: block, in: buffer)
 		case let header as Header:
 			if let title = header.title {
-				parseInlines(for: title)
+				parseInlines(for: title, in: buffer)
 			}
 		case let cue as CueBlock:
 			let direction = cue.direction
 			if direction.children.isEmpty {
-				parseInlines(for: direction)
+				parseInlines(for: direction, in: buffer)
 			}
 		default:
 			break
 		}
 	}
 	
-	func blockForLine() -> Node {
-		let wc = scanForFirstNonspace(startingAt: charNumber)
+	func blockForLine(in buffer: Buffer) -> Node {
+		let wc = buffer.scanForFirstNonspace(at: charNumber, limit: endOfLineCharNumber)
 		
-		if let br = scanForBreak(at: wc) {
+		if let br = scanForBreak(in: buffer, at: wc) {
 			
 			return br
-		} else if let header = scanForHeader(at: wc) {
+		} else if let header = scanForHeader(in: buffer, at: wc) {
 			
 			return header
-		} else if let end = scanForTheEnd(at: wc) {
+		} else if let end = scanForTheEnd(in: buffer, at: wc) {
 			
 			return end
-		} else if let facsimile = scanForFacsimile(at: wc) {
+		} else if let facsimile = scanForFacsimile(in: buffer, at: wc) {
 			
 			return facsimile
-		} else if let lyricBlock = scanForLyric(at: wc) {
+		} else if let lyricBlock = scanForLyric(in: buffer, at: wc) {
 			
 			return lyricBlock
-		} else if let cueBlock = scanForDualCue(at: wc) {
+		} else if let cueBlock = scanForDualCue(in: buffer, at: wc) {
 			
 			return cueBlock
 		}
 		
-		let ewc = scanBackwardForFirstNonspace(startingAt: endOfLineCharNumber, clamp: wc)
+		let ewc = buffer.scanBackwardForFirstNonspace(at: endOfLineCharNumber, limit: wc)
 		
 		let description = Description(start: charNumber, body: wc..<ewc, end: endOfLineCharNumber)
 		return description
 	}
 	
-	func appropriateContainer(for block: inout Node) -> Node {
+	func appropriateContainer(for block: inout Node, in buffer: Buffer) -> Node {
 		switch block {
 		// These block types can only ever be level-1
 		case is Header, is Description, is EndBlock, is HorizontalBreak:
@@ -199,8 +203,8 @@ extension Cue {
 			break
 		}
 		
-		let wc = scanForFirstNonspace(startingAt: charNumber)
-		let ewc = scanBackwardForFirstNonspace(startingAt: endOfLineCharNumber, clamp: wc)
+		let wc = buffer.scanForFirstNonspace(at: charNumber, limit: endOfLineCharNumber)
+		let ewc = buffer.scanBackwardForFirstNonspace(at: endOfLineCharNumber, limit: wc)
 		
 		// Invalid syntax, time to fail gracefully
 		block = Description(start: charNumber, body: wc..<ewc, end: endOfLineCharNumber)
@@ -212,7 +216,7 @@ extension Cue {
 // MARK: - Inline Parsing
 extension Cue {
 	
-	func parseInlines(for stream: Node) {
+	func parseInlines(for stream: Node, in buffer: Buffer) {
 		let nodeRange = stream.range
 		let i = stream.range.lowerBound
 		
@@ -223,7 +227,7 @@ extension Cue {
 		var j = i
 		var foundBreakingStatement = false
 		while j < nodeRange.upperBound {
-			let c = data[j]
+			let c = buffer[j]
 			
 			let k = j + 1
 			switch c {
@@ -255,7 +259,7 @@ extension Cue {
 			case C.slash:
 				guard k < endOfLineCharNumber else { break }
 				
-				if data[k] == C.slash {
+				if buffer[k] == C.slash {
 					let l = k + 1
 					let com = Comment(left: j..<l, body: l..<nodeRange.upperBound)
 					queue.enqueue(com)
@@ -297,63 +301,7 @@ extension Cue {
 // MARK: - Scanners
 extension Cue {
 	
-	func scanForLineEnding(at i: Int) -> Bool {
-		let c = data[i]
-		
-		return c == C.linefeed || c == C.carriage
-	}
-	
-	func scanForWhitespace(at i: Int) -> Bool {
-		let c = data[i]
-		
-		return c == C.space || c == C.tab || scanForLineEnding(at: i)
-	}
-	
-	func scanForFirstNonspace(startingAt i: Int) -> Int {
-		var j = i
-		
-		while j < endOfLineCharNumber {
-			if scanForWhitespace(at: j) {
-				j += 1
-			} else {
-				break
-			}
-		}
-		
-		return j
-	}
-	
-	func scanForHyphen(startingAt i: Int) -> Int {
-		var j = i
-		
-		while j < endOfLineCharNumber {
-			if data[j] == C.hyphen {
-				break
-			} else {
-				j += 1
-			}
-		}
-		
-		return j
-	}
-	
-	func scanBackwardForFirstNonspace(startingAt i: Int, clamp: Int) -> Int {
-		var j = i
-		
-		while j > charNumber, j > clamp {
-			let backtrack = j - 1
-			
-			if scanForWhitespace(at: backtrack) {
-				j = backtrack
-			} else {
-				break
-			}
-		}
-		
-		return j
-	}
-	
-	func scanForBreak(at i: Int) -> HorizontalBreak? {
+	func scanForBreak(in buffer: Buffer, at i: Int) -> HorizontalBreak? {
 		guard i + 3 < endOfLineCharNumber else {
 			return nil
 		}
@@ -361,7 +309,7 @@ extension Cue {
 		var j = i
 		var distance = 0
 		while j < endOfLineCharNumber {
-			if data[j] != C.hyphen {
+			if buffer[j] != C.hyphen {
 				break
 			}
 			
@@ -369,29 +317,29 @@ extension Cue {
 			distance += 1
 		}
 		
-		guard distance >= 3, scanForFirstNonspace(startingAt: j) == endOfLineCharNumber else {
+		guard distance >= 3, buffer.scanForFirstNonspace(at: j, limit: endOfLineCharNumber) == endOfLineCharNumber else {
 			return nil
 		}
 		
 		return HorizontalBreak(range: charNumber..<endOfLineCharNumber)
 	}
 	
-	func scanForHeader(at i: Int) -> Header? {
+	func scanForHeader(in buffer: Buffer, at i: Int) -> Header? {
 		var type: Header.HeaderType
 		var j = i
 		
-		if let h = scanForForcedHeader(at: i) {
+		if let h = scanForForcedHeader(in: buffer, at: i) {
 			return h
-		} else if scanForActHeading(at: i) {
+		} else if scanForActHeading(in: buffer, at: i) {
 			type = .act
 			j += 3
-		} else if scanForSceneHeading(at: i) {
+		} else if scanForSceneHeading(in: buffer, at: i) {
 			type = .scene
 			j += 5
-		} else if scanForChapterHeading(at: i) {
+		} else if scanForChapterHeading(in: buffer, at: i) {
 			type = .chapter
 			j += 7
-		} else if scanForPage(at: i) {
+		} else if scanForPage(in: buffer, at: i) {
 			type = .page
 			j += 4
 		} else {
@@ -399,12 +347,12 @@ extension Cue {
 		}
 		let keyRange: Range<Int> = i..<j
 		
-		let k = scanForFirstNonspace(startingAt: j)
+		let k = buffer.scanForFirstNonspace(at: j, limit: endOfLineCharNumber)
 		guard k < endOfLineCharNumber else { return nil }
 		
-		var l = scanForHyphen(startingAt: k)
+		var l = buffer.scanForHyphen(at: k, limit: endOfLineCharNumber)
 		var m = l + 1
-		l = scanBackwardForFirstNonspace(startingAt: l, clamp: k)
+		l = buffer.scanBackwardForFirstNonspace(at: l, limit: charNumber)
 		let idRange: Range<Int> = k..<l
 		
 		let key = Keyword(range: keyRange)
@@ -412,8 +360,8 @@ extension Cue {
 		
 		var title: Title? = nil
 		if m < endOfLineCharNumber {
-			m = scanForFirstNonspace(startingAt: m)
-			let n = scanBackwardForFirstNonspace(startingAt: endOfLineCharNumber, clamp: m)
+			m = buffer.scanForFirstNonspace(at: m, limit: endOfLineCharNumber)
+			let n = buffer.scanBackwardForFirstNonspace(at: endOfLineCharNumber, limit: m)
 			let hyphenRange: Range<Int> = l..<m
 			let titleRange: Range<Int> = m..<n
 			
@@ -424,13 +372,13 @@ extension Cue {
 		return header
 	}
 	
-	func scanForForcedHeader(at i: Int) -> Header? {
-		guard i < endOfLineCharNumber, data[i] == C.period else { return nil }
+	func scanForForcedHeader(in buffer: Buffer, at i: Int) -> Header? {
+		guard i < endOfLineCharNumber, buffer[i] == C.period else { return nil }
 		
 		let j = i + 1
 		var k = j
 		while k < endOfLineCharNumber {
-			if scanForWhitespace(at: k) {
+			if buffer.scanForWhitespace(at: k) {
 				break
 			}
 			
@@ -440,19 +388,19 @@ extension Cue {
 		var id: Identifier? = nil
 		var title: Title? = nil
 		
-		let idStart = scanForFirstNonspace(startingAt: k)
+		let idStart = buffer.scanForFirstNonspace(at: k, limit: endOfLineCharNumber)
 		var hyphenStart = idStart
 		var hyphenEnd = idStart
 		if idStart < endOfLineCharNumber {
-			hyphenStart = scanForHyphen(startingAt: idStart)
+			hyphenStart = buffer.scanForHyphen(at: idStart, limit: endOfLineCharNumber)
 			hyphenEnd = hyphenStart + 1
-			hyphenStart = scanBackwardForFirstNonspace(startingAt: hyphenStart, clamp: idStart)
+			hyphenStart = buffer.scanBackwardForFirstNonspace(at: hyphenStart, limit: idStart)
 			id = Identifier(range: idStart..<hyphenStart)
 		}
 		
 		if hyphenEnd < endOfLineCharNumber {
-			hyphenEnd = scanForFirstNonspace(startingAt: hyphenEnd)
-			let titleEnd = scanBackwardForFirstNonspace(startingAt: endOfLineCharNumber, clamp: hyphenEnd)
+			hyphenEnd = buffer.scanForFirstNonspace(at: hyphenEnd, limit: endOfLineCharNumber)
+			let titleEnd = buffer.scanBackwardForFirstNonspace(at: endOfLineCharNumber, limit: hyphenEnd)
 			title = Title(left: hyphenStart..<hyphenEnd, body: hyphenEnd..<titleEnd)
 		}
 		
@@ -460,17 +408,17 @@ extension Cue {
 		return header
 	}
 	
-	func scanForActHeading(at i: Int) -> Bool {
+	func scanForActHeading(in buffer: Buffer, at i: Int) -> Bool {
 		guard i + 3 < endOfLineCharNumber else {
 			return false
 		}
 		
 		var j = i
-		if data[j] == C.A {
+		if buffer[j] == C.A {
 			j += 1
-			if data[j] == C.c {
+			if buffer[j] == C.c {
 				j += 1
-				if data[j] == C.t {
+				if buffer[j] == C.t {
 					return true
 				}
 			}
@@ -479,25 +427,25 @@ extension Cue {
 		return false
 	}
 	
-	func scanForChapterHeading(at i: Int) -> Bool {
+	func scanForChapterHeading(in buffer: Buffer, at i: Int) -> Bool {
 		guard i + 7 < endOfLineCharNumber else {
 			return false
 		}
 		
 		var j = i
-		if data[j] == C.C {
+		if buffer[j] == C.C {
 			j += 1
-			if data[j] == C.h {
+			if buffer[j] == C.h {
 				j += 1
-				if data[j] == C.a {
+				if buffer[j] == C.a {
 					j += 1
-					if data[j] == C.p {
+					if buffer[j] == C.p {
 						j += 1
-						if data[j] == C.t {
+						if buffer[j] == C.t {
 							j += 1
-							if data[j] == C.e {
+							if buffer[j] == C.e {
 								j += 1
-								if data[j] == C.r {
+								if buffer[j] == C.r {
 									return true
 								}
 							}
@@ -510,21 +458,21 @@ extension Cue {
 		return false
 	}
 	
-	func scanForSceneHeading(at i: Int) -> Bool {
+	func scanForSceneHeading(in buffer: Buffer, at i: Int) -> Bool {
 		guard i + 5 < endOfLineCharNumber else {
 			return false
 		}
 		
 		var j = i
-		if data[j] == C.S {
+		if buffer[j] == C.S {
 			j += 1
-			if data[j] == C.c {
+			if buffer[j] == C.c {
 				j += 1
-				if data[j] == C.e {
+				if buffer[j] == C.e {
 					j += 1
-					if data[j] == C.n {
+					if buffer[j] == C.n {
 						j += 1
-						if data[j] == C.e {
+						if buffer[j] == C.e {
 							return true
 						}
 					}
@@ -535,19 +483,19 @@ extension Cue {
 		return false
 	}
 	
-	func scanForPage(at i: Int) -> Bool {
+	func scanForPage(in buffer: Buffer, at i: Int) -> Bool {
 		guard i + 4 < endOfLineCharNumber else {
 			return false
 		}
 		
 		var j = i
-		if data[j] == C.P {
+		if buffer[j] == C.P {
 			j += 1
-			if data[j] == C.a {
+			if buffer[j] == C.a {
 				j += 1
-				if data[j] == C.g {
+				if buffer[j] == C.g {
 					j += 1
-					if data[j] == C.e {
+					if buffer[j] == C.e {
 						return true
 					}
 				}
@@ -557,14 +505,14 @@ extension Cue {
 		return false
 	}
 	
-	func scanForFacsimile(at i: Int) -> FacsimileBlock? {
+	func scanForFacsimile(in buffer: Buffer, at i: Int) -> FacsimileBlock? {
 		guard i < endOfLineCharNumber  else {
 			return nil
 		}
 		
-		if data[i] == C.rightAngle { // ">"
-			let j = scanForFirstNonspace(startingAt: i + 1)
-			let k = scanBackwardForFirstNonspace(startingAt: endOfLineCharNumber, clamp: j)
+		if buffer[i] == C.rightAngle { // ">"
+			let j = buffer.scanForFirstNonspace(at: i + 1, limit: endOfLineCharNumber)
+			let k = buffer.scanBackwardForFirstNonspace(at: endOfLineCharNumber, limit: j)
 			
 			return FacsimileBlock(start: charNumber, body: j..<k, end: endOfLineCharNumber)
 		}
@@ -572,14 +520,14 @@ extension Cue {
 		return nil
 	}
 	
-	func scanForLyric(at i: Int) -> LyricBlock? {
+	func scanForLyric(in buffer: Buffer, at i: Int) -> LyricBlock? {
 		guard i < endOfLineCharNumber else {
 			return nil
 		}
 		
-		if data[i] == C.tilde {	// '~'
+		if buffer[i] == C.tilde {	// '~'
 			let j = i + 1
-			let k = scanBackwardForFirstNonspace(startingAt: endOfLineCharNumber, clamp: j)
+			let k = buffer.scanBackwardForFirstNonspace(at: endOfLineCharNumber, limit: j)
 			
 			return LyricBlock(start: charNumber, body: j..<k, end: endOfLineCharNumber)
 		}
@@ -587,7 +535,7 @@ extension Cue {
 		return nil
 	}
 	
-	func scanForDualCue(at i: Int) -> CueBlock? {
+	func scanForDualCue(in buffer: Buffer, at i: Int) -> CueBlock? {
 		let j = i + 1
 		
 		guard j < endOfLineCharNumber else {
@@ -595,14 +543,14 @@ extension Cue {
 		}
 		
 		var del: Range<Int>? = nil
-		if data[i] == C.caret {	// '^'
+		if buffer[i] == C.caret {	// '^'
 			del = charNumber..<j
 		}
 		
-		guard let cueResults = scanForCue(at: del?.upperBound ?? i) else { return nil }
+		guard let cueResults = scanForCue(in: buffer, at: del?.upperBound ?? i) else { return nil }
 		
 		let name = Name(body: cueResults[0].range, right: cueResults[1].range)
-		let ewc = scanBackwardForFirstNonspace(startingAt: endOfLineCharNumber, clamp: cueResults[1].range.upperBound)
+		let ewc = buffer.scanBackwardForFirstNonspace(at: endOfLineCharNumber, limit: cueResults[1].range.upperBound)
 		let direction = DirectionBlock(body: cueResults[1].range.upperBound..<ewc, end: endOfLineCharNumber)
 		
 		var cue: CueBlock
@@ -615,17 +563,17 @@ extension Cue {
 		return cue
 	}
 	
-	func scanForCue(at i: Int) -> [SearchResult]? {
+	func scanForCue(in buffer: Buffer, at i: Int) -> [SearchResult]? {
 		var j = i
 		var distance = 0
 		while j < endOfLineCharNumber {
-			let c = data[j]
+			let c = buffer[j]
 			
 			guard distance <= 24 else { break }
 			
 			if c == C.colon {
 				let nameResult = SearchResult(range: i..<j)
-				let k = scanForFirstNonspace(startingAt: j + 1)
+				let k = buffer.scanForFirstNonspace(at: j + 1, limit: endOfLineCharNumber)
 				let colonResult = SearchResult(range: j..<k)
 				return [nameResult, colonResult]
 			} else if c == C.openBracket {
@@ -639,25 +587,25 @@ extension Cue {
 		return nil
 	}
 	
-	func scanForTheEnd(at i: Int) -> EndBlock? {
-		guard i + 7 == data.endIndex else {
+	func scanForTheEnd(in buffer: Buffer, at i: Int) -> EndBlock? {
+		guard i + 7 == buffer.endIndex else {
 			return nil
 		}
 		
 		var j = i
-		if data[j] == C.T {
+		if buffer[j] == C.T {
 			j += 1
-			if data[j] == C.h {
+			if buffer[j] == C.h {
 				j += 1
-				if data[j] == C.e {
+				if buffer[j] == C.e {
 					j += 1
-					if data[j] == C.space {
+					if buffer[j] == C.space {
 						j += 1
-						if data[j] == C.E {
+						if buffer[j] == C.E {
 							j += 1
-							if data[j] == C.n {
+							if buffer[j] == C.n {
 								j += 1
-								if data[j] == C.d {
+								if buffer[j] == C.d {
 									return EndBlock(start: charNumber, body: i..<i+7, end: endOfLineCharNumber)
 								}
 							}
