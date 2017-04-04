@@ -51,7 +51,7 @@ extension UTF16: Codec {
 		return UInt16(byte)
 	}
 	
-	static func scalars<S : Sequence>(from units: S) -> [UnicodeScalar] where S.Iterator.Element == UInt16 {
+	static func scalars<S: Sequence>(from units: S) -> [UnicodeScalar] where S.Iterator.Element == UInt16 {
 		var codec = UTF16()
 		var iter = units.makeIterator()
 		var scalars = [UnicodeScalar]()
