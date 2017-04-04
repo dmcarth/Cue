@@ -6,31 +6,44 @@
 //  Copyright © 2016 Dylan McArthur. All rights reserved.
 //
 
+import Foundation
+
 public final class Cue {
 	
 	typealias C = UTF16
 	
 	typealias Buffer = UnsafeBufferPointer<UInt16>
 	
-	let data: [UInt16]
+	let data: Buffer
 	
 	let root: Document
-	
-	var lineNumber = 0
 	
 	var charNumber: Int
 	
 	var endOfLineCharNumber: Int
 	
-	public init(_ str: String) {
-		self.data = [UInt16](str.utf16)
-		self.charNumber = data.startIndex
-		self.endOfLineCharNumber = data.endIndex
+	init(_ buffer: UnsafeBufferPointer<UInt16>) {
+		self.data = buffer
+		self.charNumber = buffer.startIndex
+		self.endOfLineCharNumber = buffer.endIndex
 		self.root = Document(range: charNumber..<endOfLineCharNumber)
 		
-		self.data.withUnsafeBufferPointer { buffer in
-			parseBlocks(in: buffer)
-		}
+		parseBlocks(in: buffer)
+	}
+	
+	public convenience init(_ str: String) {
+		let nsstr = str as NSString
+		let ptr = UnsafeMutablePointer<UInt16>.allocate(capacity: nsstr.length)
+		nsstr.getCharacters(ptr)
+		let buffer = UnsafeBufferPointer(start: ptr, count: nsstr.length)
+		
+		self.init(buffer)
+	}
+	
+	deinit {
+		let ptr = UnsafeMutablePointer(mutating: data.baseAddress)
+		
+		ptr?.deallocate(capacity: data.count)
 	}
 	
 }
@@ -72,8 +85,6 @@ extension Cue {
 					break
 				}
 			}
-			
-			lineNumber += 1
 			
 			processLine(in: buffer)
 			
