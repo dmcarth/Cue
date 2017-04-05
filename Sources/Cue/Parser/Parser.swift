@@ -201,15 +201,12 @@ extension Cue {
 			
 			guard let cueBlock = cueContainer.children.last as? CueBlock else { break }
 			
-			let direction = cueBlock.direction
+			guard let direction = cueBlock.direction as? LyricContainer else { break }
 			
-			guard let content = direction.children.last as? LyricContainer else { break }
-			
-			content.extendLengthToInclude(node: block)
-			direction.extendLengthToInclude(node: content)
+			direction.extendLengthToInclude(node: block)
 			cueBlock.extendLengthToInclude(node: direction)
 			cueContainer.extendLengthToInclude(node: cueBlock)
-			return content
+			return direction
 		default:
 			break
 		}
