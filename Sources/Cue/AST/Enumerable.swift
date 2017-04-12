@@ -30,11 +30,8 @@ extension Node {
 		handler(.enter, self, &shouldBreak)
 		
 		if !shouldBreak {
-			var child = children.first
-			while child != nil {
-				child?.walk(handler)
-				
-				child = child?.next
+			for child in children {
+				child.walk(handler)
 			}
 		}
 		

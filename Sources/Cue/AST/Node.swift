@@ -12,24 +12,18 @@ public class Node {
 	
 	public weak var parent: Node?
 	
-	public weak var next: Node?
-	
 	public var children = [Node]()
 	
-	public let offset: Int
+	public let sourcePosition: Int
 	
-	public internal(set) var length: Int
+	public internal(set) var sourceEnd: Int
 	
 	public init(range: Range<Int>) {
-		self.offset = range.lowerBound
-		self.length = range.upperBound - range.lowerBound
+		self.sourcePosition = range.lowerBound
+		self.sourceEnd = range.upperBound
 	}
 	
 	func addChild(_ child: Node) {
-		if let last = children.last {
-			last.next = child
-		}
-		
 		child.parent = self
 		children.append(child)
 	}
@@ -37,10 +31,7 @@ public class Node {
 	func removeLastChild() {
 		guard !children.isEmpty else { return }
 		
-		children.removeLast()
-		if let last = children.last {
-			last.next = nil
-		}
+		_ = children.removeLast()
 	}
 	
 }
@@ -53,29 +44,29 @@ extension Node {
 	}
 	
 	public var range: Range<Int> {
-		return offset..<offset+length
+		return sourcePosition..<sourceEnd
 	}
 	
 	public var rangeIncludingMarkers: Range<Int> {
-		var lowerBound = offset
+		var lowerBound = sourcePosition
 		if let left = (self as? LeftDelimited)?.leftDelimiter {
-			lowerBound = left.offset
+			lowerBound = left.sourcePosition
 		}
 		
-		var upperBound = offset + length
+		var upperBound = sourceEnd
 		if let right = (self as? RightDelimited)?.rightDelimiter {
-			upperBound = right.offset + right.length
+			upperBound = right.sourceEnd
 		}
 		
 		return lowerBound..<upperBound
 	}
 	
 	func extendLengthToInclude(node: Node) {
-		length = node.range.upperBound - offset
+		sourceEnd = node.range.upperBound
 	}
 	
 	public var nsRange: NSRange {
-		return NSMakeRange(offset, length)
+		return NSMakeRange(sourcePosition, sourceEnd - sourcePosition)
 	}
 	
 	public var nsRangeIncludingMarkers: NSRange {

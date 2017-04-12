@@ -10,12 +10,6 @@ ast.walk { (event, node, shouldBreak) in
     // Performs a depth-first traversal. Supports tree transformation.
 }
 
-var current = ast.children.first
-while let next = current {
-    // Traverses child nodes in sequence
-    current = next.next
-}
-
 let opts = SearchOptions(deepSearch: true, searchPredicate: { (node) in
     return node is Description
 })

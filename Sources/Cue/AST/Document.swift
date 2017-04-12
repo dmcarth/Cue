@@ -68,7 +68,7 @@ public final class Header: Node, LeftDelimited, RightDelimited {
 	public var rightDelimiter: Delimiter
 	
 	init(type: HeaderType, start: Int, keyword: Keyword, identifier: Identifier?=nil, title: Title?=nil, end: Int) {
-		self.leftDelimiter = Delimiter(range: start..<keyword.offset)
+		self.leftDelimiter = Delimiter(range: start..<keyword.sourcePosition)
 		self.type = type
 		self.keyword = keyword
 		self.identifier = identifier

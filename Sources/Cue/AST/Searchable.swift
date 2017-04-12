@@ -32,18 +32,13 @@ extension Node {
 	public func childNodes(from lowerBound: Int, to upperBound: Int) -> [Node] {
 		var nodes = [Node]()
 		
-		let opts = SearchOptions(deepSearch: false)
-		
-		if var node = search(for: lowerBound, options: opts) {
-			nodes.append(node)
+		for child in children {
+			if child.range.upperBound >= upperBound {
+				break
+			}
 			
-			var searchIndex = node.range.upperBound
-			let safeUpperBound = min(range.upperBound, upperBound)
-			
-			while let next = node.next, searchIndex < safeUpperBound {
-				nodes.append(next)
-				searchIndex = node.range.upperBound
-				node = next
+			if child.range.lowerBound >= lowerBound {
+				nodes.append(child)
 			}
 		}
 		
