@@ -22,15 +22,6 @@ public final class Cue {
 	
 	var endOfLineCharNumber: Int
 	
-	init(_ buffer: UnsafeBufferPointer<UInt16>) {
-		self.data = buffer
-		self.charNumber = buffer.startIndex
-		self.endOfLineCharNumber = buffer.endIndex
-		self.root = Document(range: charNumber..<endOfLineCharNumber)
-		
-		parseBlocks(in: buffer)
-	}
-	
 	public convenience init(_ str: String) {
 		let nsstr = str as NSString
 		let ptr = UnsafeMutablePointer<UInt16>.allocate(capacity: nsstr.length)
@@ -38,6 +29,15 @@ public final class Cue {
 		let buffer = UnsafeBufferPointer(start: ptr, count: nsstr.length)
 		
 		self.init(buffer)
+	}
+	
+	private init(_ buffer: UnsafeBufferPointer<UInt16>) {
+		self.data = buffer
+		self.charNumber = buffer.startIndex
+		self.endOfLineCharNumber = buffer.endIndex
+		self.root = Document(range: charNumber..<endOfLineCharNumber)
+		
+		parseBlocks(in: buffer)
 	}
 	
 	deinit {
