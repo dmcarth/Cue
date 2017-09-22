@@ -19,8 +19,4 @@ public struct Cue {
 		p.printOutline()
 	}
 	
-	public func pretty() -> String {
-		return p.prettyOutline()
-	}
-
 }

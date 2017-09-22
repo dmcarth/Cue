@@ -12,7 +12,7 @@ import XCTest
 class CocoaCueTests: XCTestCase {
 	
 	func testOutline() {
-		let str = "Scene 1 - Test\nHarry: (O.S.) I **hate** ice-cream.\nSamantha: You monster! // too much"
+		let str = "Scene 1 - Test\nHarry: (O.S.) I **hate** ice-cream.\nSamantha: You monster! // too much\n> Hallo\n> Und hi!"
 		
 		let cue = Cue(str)
 		

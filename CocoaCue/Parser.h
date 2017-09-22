@@ -14,6 +14,4 @@
 
 - (void)printOutline;
 
-- (NSString *)prettyOutline;
-
 @end

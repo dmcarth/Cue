@@ -36,7 +36,7 @@
 
 - (void)printOutline
 {
-	s_node_print_description(doc->root);
+	s_node_print_description(cue_document_get_root(doc), 1);
 }
 
 @end

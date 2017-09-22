@@ -1,0 +1,4 @@
+module cue [system] {
+	header "cue.h"
+	export *
+}

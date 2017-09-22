@@ -73,19 +73,6 @@ int delim_stack_scan_for_last_matchable_tok(delim_stack *st, size_t *idx, d_tok 
 	return 0;
 }
 
-void print_d_tok(d_tok *tok) {
-	printf("(");
-	if (tok->event == EVENT_ENTER) {
-		printf("ENTER");
-	} else if (tok->event == EVENT_EXIT) {
-		printf("EXIT");
-	}
-	const char *type = s_node_type_description(tok->type);
-	printf(",%s", type);
-	
-	printf(")");
-}
-
 void scan_for_tokens(scanner *s, int handle_parens) {
 	delim_stack_reset(s->tokens);
 	delim_stack *st = s->tokens;
@@ -126,7 +113,7 @@ void scan_for_tokens(scanner *s, int handle_parens) {
 	}
 }
 
-void construct_ast(scanner *s, s_node *node, size_t ewc) {
+void construct_ast(scanner *s, pool *p, s_node *node, size_t ewc) {
 	delim_stack *st = s->tokens;
 	
 	s_node *active_parent = node;
@@ -139,11 +126,14 @@ void construct_ast(scanner *s, s_node *node, size_t ewc) {
 			continue;
 		
 		if (tok->start > last_idx) {
-			s_node_add_child(active_parent, S_NODE_LITERAL, last_idx, tok->start);
+			s_node *literal = pool_create_node(p, S_NODE_LITERAL, last_idx, tok->start);
+			s_node_add_child(active_parent, literal);
 		}
 		
 		if (tok->event == EVENT_ENTER) {
-			active_parent = s_node_add_child(active_parent, tok->type, tok->start, tok->end);
+			s_node *tnode = pool_create_node(p, tok->type, tok->start, tok->end);
+			s_node_add_child(active_parent, tnode);
+			active_parent = tnode;
 			last_idx = tok->end;
 		} else if (tok->event == EVENT_EXIT) {
 			active_parent->range.end = tok->end;
@@ -154,31 +144,17 @@ void construct_ast(scanner *s, s_node *node, size_t ewc) {
 	
 	// If any space is left over from the stack, fill with a literal node
 	if (last_idx < node->range.end) {
-		s_node_add_child(active_parent, S_NODE_LITERAL, last_idx, ewc);
+		s_node *literal = pool_create_node(p, S_NODE_LITERAL, last_idx, ewc);
+		s_node_add_child(active_parent, literal);
 	}
 }
 
-void print_stack(delim_stack *st) {
-	printf("[");
-	
-	for (size_t i=0; i<st->len; ++i) {
-		if (i)
-			printf(", ");
-		
-		d_tok *tok = delim_stack_peek_at(st, i);
-		
-		print_d_tok(tok);
-	}
-	
-	printf("]\n");
-}
-
-void parse_inlines_for_node(scanner *s, s_node *node, int handle_parens) {
+void parse_inlines_for_node(scanner *s, pool *p, s_node *node, int handle_parens) {
 	s->loc = node->range.start;
 	s->wc = node->range.start;
 	s->ewc = node->range.end;
 	
 	scan_for_tokens(s, handle_parens);
 	
-	construct_ast(s, node, s->ewc);
+	construct_ast(s, p, node, s->ewc);
 }

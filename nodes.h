@@ -2,7 +2,7 @@
 #ifndef nodes_h
 #define nodes_h
 
-#include <stddef.h>
+#include <stdint.h>
 #include "stack.h"
 
 typedef enum {
@@ -38,7 +38,7 @@ typedef enum {
 } s_node_type;
 
 typedef struct {
-	size_t start, end;
+	int32_t start, end;
 } s_range;
 
 typedef enum {
@@ -50,7 +50,7 @@ typedef enum {
 } header_type;
 
 struct s_node {
-	s_node_type type;
+	uint32_t type;
 	
 	s_range range;
 	
@@ -62,7 +62,7 @@ struct s_node {
 	
 	union {
 		struct {
-			header_type type;
+			uint32_t type;
 			struct s_node *keyword;
 			struct s_node *id;
 			struct s_node *title;
@@ -77,15 +77,7 @@ struct s_node {
 
 typedef struct s_node s_node;
 
-const char *s_node_type_description(s_node_type type);
-
-s_node * s_node_new(s_node_type type, size_t loc, size_t len);
-
-void s_node_free(s_node * node);
-
-s_node *s_node_add_child(s_node *node, s_node_type type, size_t begin, size_t end);
-
-void s_node_add(s_node *node, s_node *child);
+void s_node_add_child(s_node *node, s_node *child);
 
 void s_node_extend_length_to_include_child(s_node *node, s_node *child);
 
@@ -95,12 +87,6 @@ int s_node_is_direction(s_node * node);
 
 void s_node_unlink(s_node *node);
 
-s_node *s_node_title_init(size_t start, size_t end);
-
-s_node *s_node_line_init(size_t start, size_t end);
-
-s_node *s_node_description_init(size_t start, size_t wc, size_t ewc, size_t end);
-
-void s_node_print_description(s_node *node);
+void s_node_print_description(s_node *node, int recurse);
 
 #endif /* nodes_h */

@@ -19,7 +19,7 @@ void scanner_free(scanner *s) {
 	free(s);
 }
 
-extern inline int scanner_is_at_eol(scanner *s) {
+int scanner_is_at_eol(scanner *s) {
 	// For scanning purposes, ewc == eol
 	return s->loc == s->ewc;
 }
@@ -195,7 +195,7 @@ int scan_for_page(scanner *s) {
 
 /* The following are node factories. If scanning succeeds, they construct a node for the AST. */
 
-s_node *scan_for_thematic_break(scanner *s) {
+s_node *scan_for_thematic_break(scanner *s, pool *p) {
 	if (s->ewc - s->loc < 3)
 		return NULL;
 	
@@ -218,22 +218,22 @@ s_node *scan_for_thematic_break(scanner *s) {
 		return NULL;
 	}
 	
-	return s_node_new(S_NODE_THEMATIC_BREAK, s->bol, s->eol);
+	return pool_create_node(p, S_NODE_THEMATIC_BREAK, s->bol, s->eol);
 }
 
-s_node *scan_title(scanner *s) {
+s_node *scan_title(scanner *s, pool *p) {
 	s_node *title = NULL;
 	
 	if (!scanner_is_at_eol(s)) {
 		size_t tstart = scanner_advance_to_first_nonspace(s);
 		
-		title = s_node_title_init(tstart, s->ewc);
+		title = pool_create_node(p, S_NODE_TITLE, tstart, s->ewc);
 	}
 	
 	return title;
 }
 
-s_node *scan_for_forced_header(scanner *s) {
+s_node *scan_for_forced_header(scanner *s, pool *p) {
 	if (s->ewc - s->loc < 1 || s->buff[s->loc] != '.')
 		return NULL;
 	
@@ -242,10 +242,14 @@ s_node *scan_for_forced_header(scanner *s) {
 	size_t kend = scanner_backtrack_to_first_nonspace(s);
 	s->loc = hstart + 1;
 	
-	s_node *head = s_node_new(S_NODE_HEADER, s->bol, s->eol);
-	s_node *key = s_node_add_child(head, S_NODE_KEYWORD, kstart, kend);
-	s_node *title = scan_title(s);
-	s_node_add(head, title);
+	s_node *head = pool_create_node(p, S_NODE_HEADER, s->bol, s->eol);
+	
+	s_node *key = pool_create_node(p, S_NODE_KEYWORD, kstart, kend);
+	s_node_add_child(head, key);
+	
+	s_node *title = scan_title(s, p);
+	s_node_add_child(head, title);
+	
 	head->data.header.type = HEADER_FORCED;
 	head->data.header.keyword = key;
 	head->data.header.title = title;
@@ -253,7 +257,7 @@ s_node *scan_for_forced_header(scanner *s) {
 	return head;
 }
 
-s_node *scan_for_header(scanner *s) {
+s_node *scan_for_header(scanner *s, pool *p) {
 	header_type type;
 	size_t kstart = s->loc;
 	size_t kend = s->loc;
@@ -283,14 +287,20 @@ s_node *scan_for_header(scanner *s) {
 	
 	s->loc = hstart + 1;
 	
-	s_node *head = s_node_new(S_NODE_HEADER, s->bol, s->eol);
-	s_node *key = s_node_add_child(head, S_NODE_KEYWORD, kstart, kend);
+	s_node *head = pool_create_node(p, S_NODE_HEADER, s->bol, s->eol);
+	
+	s_node *key = pool_create_node(p, S_NODE_KEYWORD, kstart, kend);
+	s_node_add_child(head, key);
+	
 	s_node *id = NULL;
 	if (istart < iend) {
-		id = s_node_add_child(head, S_NODE_IDENTIFIER, istart, iend);
+		id = pool_create_node(p, S_NODE_IDENTIFIER, istart, iend);
+		s_node_add_child(head, id);
 	}
-	s_node *title = scan_title(s);
-	s_node_add(head, title);
+	
+	s_node *title = scan_title(s, p);
+	s_node_add_child(head, title);
+	
 	head->data.header.type = type;
 	head->data.header.keyword = key;
 	head->data.header.id = id;
@@ -299,7 +309,7 @@ s_node *scan_for_header(scanner *s) {
 	return head;
 }
 
-s_node *scan_for_end(scanner *s) {
+s_node *scan_for_end(scanner *s, pool *p) {
 	if (s->ewc - s->loc != 7)
 		return NULL;
 	
@@ -310,25 +320,25 @@ s_node *scan_for_end(scanner *s) {
 		s->buff[loc++] == ' ' &&
 		s->buff[loc++] == 'E' &&
 		s->buff[loc++] == 'n' &&
-		s->buff[loc] == 'd') {
+		s->buff[loc++] == 'd') {
 		s->loc = loc;
 		
-		return s_node_new(S_NODE_END, s->bol, s->eol);
+		return pool_create_node(p, S_NODE_END, s->bol, s->eol);
 	}
 	
 	return NULL;
 }
 
-s_node *scan_for_facsimile(scanner *s) {
+s_node *scan_for_facsimile(scanner *s, pool *p) {
 	if (scanner_is_at_eol(s))
 		return NULL;
 	
-	if (s->buff[s->loc] == '>' && scanner_loc_is_escaped(s)) {
+	if (s->buff[s->loc] == '>' && !scanner_loc_is_escaped(s)) {
 		size_t bstart = scanner_advance_to_first_nonspace(s);
 		
-		s_node *facs = s_node_new(S_NODE_FACSIMILE, s->bol, s->eol);
-		s_node *line = s_node_line_init(bstart, s->ewc);
-		s_node_add(facs, line);
+		s_node *facs = pool_create_node(p, S_NODE_FACSIMILE, s->bol, s->eol);
+		s_node *line = pool_create_node(p, S_NODE_LINE, bstart, s->ewc);
+		s_node_add_child(facs, line);
 		
 		return facs;
 	}
@@ -336,7 +346,7 @@ s_node *scan_for_facsimile(scanner *s) {
 	return NULL;
 }
 
-s_node *scan_for_lyric_line(scanner *s) {
+s_node *scan_for_lyric_line(scanner *s, pool *p) {
 	if (scanner_is_at_eol(s))
 		return NULL;
 	
@@ -344,13 +354,15 @@ s_node *scan_for_lyric_line(scanner *s) {
 		++(s->loc);
 		size_t bstart = scanner_advance_to_first_nonspace(s);
 		
-		return s_node_line_init(bstart, s->ewc);
+		s_node *line = pool_create_node(p, S_NODE_LINE, bstart, s->ewc);
+		
+		return line;
 	}
 	
 	return NULL;
 }
 
-s_node *scan_for_cue(scanner *s) {
+s_node *scan_for_cue(scanner *s, pool *p) {
 	if (scanner_is_at_eol(s))
 		return NULL;
 	
@@ -373,9 +385,14 @@ s_node *scan_for_cue(scanner *s) {
 	size_t dstart = scanner_advance_to_first_nonspace(s);
 	size_t dend = s->ewc;
 	
-	s_node *cue = s_node_new(S_NODE_CUE, s->bol, s->eol);
-	s_node *name = s_node_add_child(cue, S_NODE_NAME, nstart, nend);
-	s_node *dir = s_node_add_child(cue, S_NODE_PLAIN_DIRECTION, dstart, dend);
+	s_node *cue = pool_create_node(p, S_NODE_CUE, s->bol, s->eol);
+	
+	s_node *name = pool_create_node(p, S_NODE_NAME, nstart, nend);
+	s_node_add_child(cue, name);
+	
+	s_node *dir = pool_create_node(p, S_NODE_PLAIN_DIRECTION, dstart, dend);
+	s_node_add_child(cue, dir);
+	
 	cue->data.cue.isDual = isDual;
 	cue->data.cue.name = name;
 	cue->data.cue.direction = dir;

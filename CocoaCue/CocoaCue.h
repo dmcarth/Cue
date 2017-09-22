@@ -6,7 +6,7 @@
 //  Copyright © 2017 Dylan McArthur. All rights reserved.
 //
 
-#import <Cocoa/Cocoa.h>
+#import <Foundation/Foundation.h>
 
 //! Project version number for CocoaCue.
 FOUNDATION_EXPORT double CocoaCueVersionNumber;
