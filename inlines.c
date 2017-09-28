@@ -115,10 +115,10 @@ void scan_for_tokens(Scanner *s, int handle_parens) {
 	}
 }
 
-void construct_ast(Scanner *s, pool *p, s_node *node, uint32_t ewc) {
+void construct_ast(Scanner *s, pool *p, SNode *node, uint32_t ewc) {
 	delim_stack *st = s->tokens;
 	
-	s_node *active_parent = node;
+	SNode *active_parent = node;
 	uint32_t last_idx = node->range.start;
 	
 	for (size_t i = 0; i < st->len; ++i) {
@@ -128,12 +128,12 @@ void construct_ast(Scanner *s, pool *p, s_node *node, uint32_t ewc) {
 			continue;
 		
 		if (tok->start > last_idx) {
-			s_node *literal = pool_create_node(p, S_NODE_LITERAL, last_idx, tok->start);
+			SNode *literal = pool_create_node(p, S_NODE_LITERAL, last_idx, tok->start);
 			s_node_add_child(active_parent, literal);
 		}
 		
 		if (tok->event == EVENT_ENTER) {
-			s_node *tnode = pool_create_node(p, tok->type, tok->start, tok->end);
+			SNode *tnode = pool_create_node(p, tok->type, tok->start, tok->end);
 			s_node_add_child(active_parent, tnode);
 			active_parent = tnode;
 			last_idx = tok->end;
@@ -146,12 +146,12 @@ void construct_ast(Scanner *s, pool *p, s_node *node, uint32_t ewc) {
 	
 	// If any space is left over from the stack, fill with a literal node
 	if (last_idx < node->range.end) {
-		s_node *literal = pool_create_node(p, S_NODE_LITERAL, last_idx, ewc);
+		SNode *literal = pool_create_node(p, S_NODE_LITERAL, last_idx, ewc);
 		s_node_add_child(active_parent, literal);
 	}
 }
 
-void parse_inlines_for_node(Scanner *s, pool *p, s_node *node, int handle_parens) {
+void parse_inlines_for_node(Scanner *s, pool *p, SNode *node, int handle_parens) {
 	s->loc = node->range.start;
 	s->wc = node->range.start;
 	s->ewc = node->range.end;

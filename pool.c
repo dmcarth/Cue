@@ -7,7 +7,7 @@
 // We store pre-allocated nodes in buckets of varying sizes. Each bucket also holds a reference to the next bucket in the list.
 struct bucket {
 	struct bucket *next;
-	s_node *first;
+	SNode *first;
 	size_t head;
 	size_t len;
 };
@@ -25,7 +25,7 @@ bucket *bucket_new(size_t len) {
 	bucket *b = c_malloc(sizeof(bucket));
 	
 	b->next = NULL;
-	b->first = c_malloc(len * sizeof(s_node));
+	b->first = c_malloc(len * sizeof(SNode));
 	b->head = 0;
 	b->len = len;
 	
@@ -61,7 +61,7 @@ void pool_free(pool *p) {
 	free(p);
 }
 
-s_node *pool_create_node(pool *p, SNodeType type, uint32_t loc, uint32_t len) {
+SNode *pool_create_node(pool *p, SNodeType type, uint32_t loc, uint32_t len) {
 	bucket *b = p->last;
 	
 	// If current bucket is full, create a new one.
@@ -75,7 +75,7 @@ s_node *pool_create_node(pool *p, SNodeType type, uint32_t loc, uint32_t len) {
 	}
 	
 	// Obtain pointer to next available s_node and increment b->head.
-	s_node *node = b->first + b->head++;
+	SNode *node = b->first + b->head++;
 	
 	// Setup node.
 	SRange range = { loc, len };
@@ -90,7 +90,7 @@ s_node *pool_create_node(pool *p, SNodeType type, uint32_t loc, uint32_t len) {
 	
 	// If requested node is a stream container, automatically add a stream.
 	if (type == S_NODE_TITLE || type == S_NODE_LINE) {
-		s_node *stream = pool_create_node(p, S_NODE_STREAM, loc, len);
+		SNode *stream = pool_create_node(p, S_NODE_STREAM, loc, len);
 		s_node_add_child(node, stream);
 	}
 	
@@ -98,7 +98,7 @@ s_node *pool_create_node(pool *p, SNodeType type, uint32_t loc, uint32_t len) {
 }
 
 // Releases a given s_node pointer back into the pool. Assumes that s_node is at the top of the stack. If node isn't at the top of the stack, it will persist in memory until the pool is freed.
-void pool_release_node(pool *p, s_node *node) {
+void pool_release_node(pool *p, SNode *node) {
 	bucket *b = p->last;
 	
 	if (b->first + b->head - 1 == node) {

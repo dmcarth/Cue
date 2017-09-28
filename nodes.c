@@ -61,23 +61,23 @@ const char *s_node_type_description(SNodeType type) {
 	return "";
 }
 
-int s_node_is_type(s_node *node, SNodeType type) {
+int s_node_is_type(SNode *node, SNodeType type) {
 	return (node && node->type == type);
 }
 
-int s_node_is_direction(s_node * node) {
+int s_node_is_direction(SNode * node) {
 	return node->type == S_NODE_PLAIN_DIRECTION || node->type == S_NODE_LYRIC_DIRECTION;
 }
 
-int s_node_is_stream_container(s_node *node) {
+int s_node_is_stream_container(SNode *node) {
 	return node->type == S_NODE_TITLE || node->type == S_NODE_LINE || node->type == S_NODE_DESCRIPTION;
 }
 
-void s_node_extend_length_to_include_child(s_node *node, s_node *child) {
+void s_node_extend_length_to_include_child(SNode *node, SNode *child) {
 	node->range.end = child->range.end;
 }
 
-void s_node_add_child(s_node *node, s_node *child) {
+void s_node_add_child(SNode *node, SNode *child) {
 	child->parent = node;
 
 	if (node->last_child) {
@@ -90,7 +90,7 @@ void s_node_add_child(s_node *node, s_node *child) {
 	node->last_child = child;
 }
 
-void s_node_unlink(s_node *node) {
+void s_node_unlink(SNode *node) {
 	if (node->parent) {
 		if (node->parent->first_child == node)
 			node->parent->first_child = node->next;
@@ -107,20 +107,20 @@ void s_node_unlink(s_node *node) {
 	}
 }
 
-static void s_node_print_single_description(s_node *node) {
+static void s_node_print_single_description(SNode *node) {
 	const char * tdesc = s_node_type_description(node->type);
 	
 	printf("%s %p {%u, %u}", tdesc, node, node->range.start, node->range.end);
 }
 
-void s_node_print_description(s_node *node, int recurse) {
+void s_node_print_description(SNode *node, int recurse) {
 	if (recurse) {
 		Walker *w = walker_new(node);
 		WalkerEvent event;
 		
 		int indent = 0;
 		while ((event = walker_next(w)) != EVENT_DONE) {
-			s_node *current = walker_get_current_node(w);
+			SNode *current = walker_get_current_node(w);
 			
 			if (event == EVENT_ENTER) {
 				for (size_t i=0; i<indent; ++i)

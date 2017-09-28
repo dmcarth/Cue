@@ -13,10 +13,10 @@ typedef enum {
 
 typedef struct Walker Walker;
 
-Walker * walker_new(s_node *root);
+Walker * walker_new(SNode *root);
 
 WalkerEvent walker_next(Walker *w);
 
-s_node *walker_get_current_node(Walker *w);
+SNode *walker_get_current_node(Walker *w);
 
 #endif /* walker_h */

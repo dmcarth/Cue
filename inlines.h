@@ -26,6 +26,6 @@ delim_stack *delim_stack_new(void);
 
 void delim_stack_free(delim_stack *st);
 
-void parse_inlines_for_node(Scanner *s, pool *p, s_node *node, int handle_parens);
+void parse_inlines_for_node(Scanner *s, pool *p, SNode *node, int handle_parens);
 
 #endif /* inlines_h */

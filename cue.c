@@ -7,7 +7,7 @@
 
 struct cue_document {
 	pool *p;
-	s_node *root;
+	SNode *root;
 };
 
 cue_document *cue_document_new(uint32_t len) {
@@ -25,20 +25,20 @@ void cue_document_free(cue_document *doc) {
 	free(doc);
 }
 
-s_node *cue_document_get_root(cue_document *doc) {
+SNode *cue_document_get_root(cue_document *doc) {
 	return doc->root;
 }
 
-s_node *s_node_description_init(pool *p, uint32_t start, uint32_t wc, uint32_t ewc, uint32_t end) {
-	s_node *desc = pool_create_node(p, S_NODE_DESCRIPTION, start, end);
-	s_node *stream = pool_create_node(p, S_NODE_STREAM, wc, ewc);
+SNode *s_node_description_init(pool *p, uint32_t start, uint32_t wc, uint32_t ewc, uint32_t end) {
+	SNode *desc = pool_create_node(p, S_NODE_DESCRIPTION, start, end);
+	SNode *stream = pool_create_node(p, S_NODE_STREAM, wc, ewc);
 	s_node_add_child(desc, stream);
 
 	return desc;
 }
 
-s_node *block_for_line(Scanner *s, pool *p) {
-	s_node *block;
+SNode *block_for_line(Scanner *s, pool *p) {
+	SNode *block;
 	
 	if ((block = scan_for_thematic_break(s, p)) ||
 			(block = scan_for_forced_header(s, p)) ||
@@ -55,8 +55,8 @@ s_node *block_for_line(Scanner *s, pool *p) {
 	return block;
 }
 
-s_node *appropriate_container_for_block(Scanner *s, s_node *block, cue_document *doc) {
-	s_node *root = doc->root;
+SNode *appropriate_container_for_block(Scanner *s, SNode *block, cue_document *doc) {
+	SNode *root = doc->root;
 	pool *p = doc->p;
 	
 	switch (block->type) {
@@ -67,13 +67,13 @@ s_node *appropriate_container_for_block(Scanner *s, s_node *block, cue_document 
 			return root;
 		case S_NODE_CUE:
 			if (!block->data.cue.isDual) {
-				s_node *scues = pool_create_node(p, S_NODE_SIMULTANEOUS_CUES, block->range.start, block->range.end);
+				SNode *scues = pool_create_node(p, S_NODE_SIMULTANEOUS_CUES, block->range.start, block->range.end);
 				s_node_add_child(root, scues);
 				
 				return scues;
 			}
 			
-			s_node *last = root->last_child;
+			SNode *last = root->last_child;
 			if (s_node_is_type(last, S_NODE_SIMULTANEOUS_CUES)) {
 				s_node_extend_length_to_include_child(last, block);
 				return last;
@@ -81,12 +81,12 @@ s_node *appropriate_container_for_block(Scanner *s, s_node *block, cue_document 
 			
 			break;
 		case S_NODE_FACSIMILE: {
-			s_node *last = root->last_child;
+			SNode *last = root->last_child;
 			
 			// If last child of root is a facsimile, then change current block to a line and prepare it to be added to to the last child.
 			if (s_node_is_type(last, S_NODE_FACSIMILE)) {
-				s_node *line = block->first_child;
-				s_node *stream = line->first_child;
+				SNode *line = block->first_child;
+				SNode *stream = line->first_child;
 				
 				block->type = S_NODE_LINE;
 				
@@ -105,15 +105,15 @@ s_node *appropriate_container_for_block(Scanner *s, s_node *block, cue_document 
 			return root;
 		}
 		case S_NODE_LINE: {
-			s_node *scues = root->last_child;
+			SNode *scues = root->last_child;
 			if (!s_node_is_type(scues, S_NODE_SIMULTANEOUS_CUES))
 				break;
 			
-			s_node *cue = scues->last_child;
+			SNode *cue = scues->last_child;
 			if (!s_node_is_type(cue, S_NODE_CUE))
 				break;
 			
-			s_node *dir = cue->data.cue.direction;
+			SNode *dir = cue->data.cue.direction;
 			if (!s_node_is_type(dir, S_NODE_LYRIC_DIRECTION))
 				break;
 			
@@ -137,7 +137,7 @@ s_node *appropriate_container_for_block(Scanner *s, s_node *block, cue_document 
 	return root;
 }
 
-void finalize_line(cue_document *doc, Scanner *s, s_node *block) {
+void finalize_line(cue_document *doc, Scanner *s, SNode *block) {
 	pool *p = doc->p;
 	
 	switch (block->type) {
@@ -149,27 +149,27 @@ void finalize_line(cue_document *doc, Scanner *s, s_node *block) {
 			parse_inlines_for_node(s, p, block->first_child->first_child, 0);
 			break;
 		case S_NODE_HEADER: {
-			s_node *title = block->data.header.title;
+			SNode *title = block->data.header.title;
 			if (title) {
 				parse_inlines_for_node(s, p, title->first_child, 0);
 			}
 			break;
 		}
 		case S_NODE_CUE: {
-			s_node *dir = block->data.cue.direction;
+			SNode *dir = block->data.cue.direction;
 			
-			s_node *newdir;
+			SNode *newdir;
 			s->loc = dir->range.start;
 			if ((newdir = scan_for_lyric_line(s, p))) {
 				dir = newdir;
 				dir->type = S_NODE_LYRIC_DIRECTION;
 				
-				s_node *line = pool_create_node(p, S_NODE_LINE, dir->range.start, dir->range.end);
+				SNode *line = pool_create_node(p, S_NODE_LINE, dir->range.start, dir->range.end);
 				s_node_add_child(dir, line);
 				
 				parse_inlines_for_node(s, p, line->first_child, 1);
 			} else {
-				s_node *stream = pool_create_node(p, S_NODE_STREAM, dir->range.start, dir->range.end);
+				SNode *stream = pool_create_node(p, S_NODE_STREAM, dir->range.start, dir->range.end);
 				s_node_add_child(dir, stream);
 				
 				parse_inlines_for_node(s, p, stream, 1);
@@ -182,9 +182,9 @@ void finalize_line(cue_document *doc, Scanner *s, s_node *block) {
 }
 
 void process_line(cue_document *doc, Scanner *s) {
-	s_node *block = block_for_line(s, doc->p);
+	SNode *block = block_for_line(s, doc->p);
 	
-	s_node *container = appropriate_container_for_block(s, block, doc);
+	SNode *container = appropriate_container_for_block(s, block, doc);
 	s_node_add_child(container, block);
 	
 	finalize_line(doc, s, block);
