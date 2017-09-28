@@ -38,9 +38,8 @@ s_node *s_node_description_init(pool *p, uint32_t start, uint32_t wc, uint32_t e
 }
 
 s_node *block_for_line(scanner *s, pool *p) {
-	scanner_trim_whitespace(s);
-	
 	s_node *block;
+	
 	if ((block = scan_for_thematic_break(s, p)) ||
 			(block = scan_for_forced_header(s, p)) ||
 			(block = scan_for_header(s, p)) ||

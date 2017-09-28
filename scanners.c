@@ -29,9 +29,9 @@ static int scanner_loc_is_escaped(scanner *s) {
 	return s->loc && (s->buff[s->loc-1] == '\\');
 }
 
-/*	Cue ignores whitespace so we can ignore the CRLF case (the parser will interpret LF as an empty line and discard it). */
+/*	Cue ignores whitespace so we can safely ignore the "\r\n" case (the parser will interpret '\n' as an empty line and discard it). */
 static inline int is_newline(char c) {
-	return c == 10 || c == 11 || c == 12 || c == 13;
+	return c == '\n' || c == 11 || c == 12 || c == '\r';
 }
 
 static inline int is_whitespace(char c) {
@@ -48,8 +48,7 @@ uint32_t scanner_advance_to_next_line(scanner *s) {
 			break;
 	}
 	
-	s->wc = s->bol;
-	s->ewc = s->eol;
+	scanner_trim_whitespace(s);
 	
 	return s->bol;
 }
