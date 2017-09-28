@@ -4,8 +4,6 @@
 
 #include <stdint.h>
 
-typedef struct mem_alloc mem_alloc;
-
 typedef enum {
 	S_NODE_DOCUMENT,
 	
@@ -77,10 +75,6 @@ struct s_node {
 };
 
 typedef struct s_node s_node;
-
-s_node *s_node_init(s_node_type type, uint32_t loc, uint32_t len);
-
-s_node *s_node_init_with_mem_alloc(mem_alloc *mem, s_node_type type, uint32_t loc, uint32_t len);
 
 void s_node_add_child(s_node *node, s_node *child);
 
