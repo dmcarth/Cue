@@ -46,7 +46,7 @@ typedef enum {
 	HEADER_PAGE,
 	HEADER_FRAME,
 	HEADER_FORCED
-} header_type;
+} HeaderType;
 
 struct s_node {
 	uint32_t type;

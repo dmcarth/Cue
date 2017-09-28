@@ -254,7 +254,7 @@ s_node *scan_for_forced_header(Scanner *s, pool *p) {
 }
 
 s_node *scan_for_header(Scanner *s, pool *p) {
-	header_type type;
+	HeaderType type;
 	uint32_t kstart = s->loc;
 	uint32_t kend = s->loc;
 	
