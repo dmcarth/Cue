@@ -7,17 +7,17 @@
 typedef struct
 {
 	WalkerEvent ev;
-	SNode * node;
+	CueNode * node;
 } WalkerState;
 
 struct Walker
 {
-	SNode * root;
+	CueNode * root;
 	WalkerState curr;
 	WalkerState next;
 };
 
-Walker * walker_new(SNode * root)
+Walker * walker_new(CueNode * root)
 {
 	WalkerState curr = { EVENT_NONE, NULL };
 	WalkerState next = { EVENT_ENTER, root };
@@ -37,7 +37,7 @@ WalkerEvent walker_next(Walker * w)
 	// Make next state the current state.
 	w->curr = w->next;
 	WalkerEvent event = w->curr.ev;
-	SNode * node = w->curr.node;
+	CueNode * node = w->curr.node;
 	
 	// If done, return early.
 	if (event == EVENT_DONE)
@@ -69,7 +69,7 @@ WalkerEvent walker_next(Walker * w)
 	return event;
 }
 
-SNode *walker_get_current_node(Walker *w)
+CueNode *walker_get_current_node(Walker *w)
 {
 	return w->curr.node;
 }

@@ -8,7 +8,7 @@
 struct Bucket
 {
 	struct Bucket *next;
-	SNode *first;
+	CueNode *first;
 	size_t head;
 	size_t len;
 };
@@ -28,7 +28,7 @@ Bucket *bucket_new(size_t len)
 	Bucket *b = c_malloc(sizeof(Bucket));
 	
 	b->next = NULL;
-	b->first = c_malloc(len * sizeof(SNode));
+	b->first = c_malloc(len * sizeof(CueNode));
 	b->head = 0;
 	b->len = len;
 	
@@ -66,7 +66,7 @@ void pool_free(Pool *p)
 	free(p);
 }
 
-SNode *pool_create_node(Pool *p, SNodeType type, uint32_t loc, uint32_t len)
+CueNode *pool_create_node(Pool *p, CueNodeType type, uint32_t loc, uint32_t len)
 {
 	Bucket *b = p->last;
 	
@@ -80,8 +80,8 @@ SNode *pool_create_node(Pool *p, SNodeType type, uint32_t loc, uint32_t len)
 		p->cap += b->len;
 	}
 	
-	// Obtain pointer to next available s_node and increment b->head.
-	SNode *node = b->first + b->head++;
+	// Obtain pointer to next available cue_node and increment b->head.
+	CueNode *node = b->first + b->head++;
 	
 	// Setup node.
 	SRange range = { loc, len };
@@ -96,15 +96,15 @@ SNode *pool_create_node(Pool *p, SNodeType type, uint32_t loc, uint32_t len)
 	
 	// If requested node is a stream container, automatically add a stream.
 	if (type == S_NODE_TITLE || type == S_NODE_LINE) {
-		SNode *stream = pool_create_node(p, S_NODE_STREAM, loc, len);
-		s_node_add_child(node, stream);
+		CueNode *stream = pool_create_node(p, S_NODE_STREAM, loc, len);
+		cue_node_add_child(node, stream);
 	}
 	
 	return node;
 }
 
-// Releases a given s_node pointer back into the pool. Assumes that s_node is at the top of the stack. If node isn't at the top of the stack, it will persist in memory until the pool is freed.
-void pool_release_node(Pool *p, SNode *node)
+// Releases a given cue_node pointer back into the pool. Assumes that cue_node is at the top of the stack. If node isn't at the top of the stack, it will persist in memory until the pool is freed.
+void pool_release_node(Pool *p, CueNode *node)
 {
 	Bucket *b = p->last;
 	
@@ -114,7 +114,7 @@ void pool_release_node(Pool *p, SNode *node)
 	} else {
 		printf("Pool failed to release ");
 		
-		s_node_print_description(node, 0);
+		cue_node_print_description(node, 0);
 		
 		printf(" because it wasn't at the top of the stack.\n");
 	}

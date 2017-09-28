@@ -11,7 +11,7 @@ typedef struct CueDocument CueDocument;
 
 void cue_document_free(CueDocument *doc);
 
-SNode *cue_document_get_root(CueDocument *doc);
+CueNode *cue_document_get_root(CueDocument *doc);
 
 CueDocument *cue_document_from_utf8(const char *buff, size_t len);
 

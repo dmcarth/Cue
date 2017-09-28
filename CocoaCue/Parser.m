@@ -42,7 +42,7 @@
 
 - (void)printOutline
 {
-	s_node_print_description(cue_document_get_root(doc), 1);
+	cue_node_print_description(cue_document_get_root(doc), 1);
 }
 
 @end

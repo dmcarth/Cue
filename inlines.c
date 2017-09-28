@@ -3,7 +3,7 @@
 #include "mem.h"
 #include <stdio.h>
 
-DelimiterToken delimiter_token_init(SNodeType type, int can_open,
+DelimiterToken delimiter_token_init(CueNodeType type, int can_open,
 									uint32_t start, uint32_t end)
 {
 	DelimiterToken tok = {
@@ -127,11 +127,11 @@ void scan_for_tokens(Scanner *s, int handle_parens)
 	}
 }
 
-void construct_ast(Scanner *s, Pool *p, SNode *node, uint32_t ewc)
+void construct_ast(Scanner *s, Pool *p, CueNode *node, uint32_t ewc)
 {
 	DelimiterStack *st = s->tokens;
 	
-	SNode *active_parent = node;
+	CueNode *active_parent = node;
 	uint32_t last_idx = node->range.start;
 	
 	for (size_t i = 0; i < st->len; ++i) {
@@ -141,13 +141,13 @@ void construct_ast(Scanner *s, Pool *p, SNode *node, uint32_t ewc)
 			continue;
 		
 		if (tok->start > last_idx) {
-			SNode *literal = pool_create_node(p, S_NODE_LITERAL, last_idx, tok->start);
-			s_node_add_child(active_parent, literal);
+			CueNode *literal = pool_create_node(p, S_NODE_LITERAL, last_idx, tok->start);
+			cue_node_add_child(active_parent, literal);
 		}
 		
 		if (tok->event == EVENT_ENTER) {
-			SNode *tnode = pool_create_node(p, tok->type, tok->start, tok->end);
-			s_node_add_child(active_parent, tnode);
+			CueNode *tnode = pool_create_node(p, tok->type, tok->start, tok->end);
+			cue_node_add_child(active_parent, tnode);
 			active_parent = tnode;
 			last_idx = tok->end;
 		} else if (tok->event == EVENT_EXIT) {
@@ -159,12 +159,12 @@ void construct_ast(Scanner *s, Pool *p, SNode *node, uint32_t ewc)
 	
 	// If any space is left over from the stack, fill with a literal node
 	if (last_idx < node->range.end) {
-		SNode *literal = pool_create_node(p, S_NODE_LITERAL, last_idx, ewc);
-		s_node_add_child(active_parent, literal);
+		CueNode *literal = pool_create_node(p, S_NODE_LITERAL, last_idx, ewc);
+		cue_node_add_child(active_parent, literal);
 	}
 }
 
-void parse_inlines_for_node(Scanner *s, Pool *p, SNode *node,
+void parse_inlines_for_node(Scanner *s, Pool *p, CueNode *node,
 							int handle_parens)
 {
 	s->loc = node->range.start;
