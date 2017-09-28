@@ -396,7 +396,7 @@ SNode *scan_for_cue(Scanner *s, pool *p) {
 	return cue;
 }
 
-int scan_delimiter_token(Scanner *s, DelimiterToken *out, int handle_parens) {
+int scan_delimiter_token(Scanner *s, int handle_parens, DelimiterToken *out) {
 	for (; s->loc < s->ewc; ++s->loc) {
 		if (scanner_loc_is_escaped(s))
 			continue;

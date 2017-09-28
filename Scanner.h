@@ -42,6 +42,6 @@ SNode *scan_for_lyric_line(Scanner *s, pool *p);
 
 SNode *scan_for_cue(Scanner *s, pool *p);
 
-int scan_delimiter_token(Scanner *s, DelimiterToken *out, int handle_parens);
+int scan_delimiter_token(Scanner *s, int handle_parens, DelimiterToken *out);
 
 #endif /* scanner_h */

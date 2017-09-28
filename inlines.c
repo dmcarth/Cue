@@ -80,7 +80,7 @@ void scan_for_tokens(Scanner *s, int handle_parens) {
 	DelimiterStack *st = s->tokens;
 	
 	DelimiterToken tok;
-	while (scan_delimiter_token(s, &tok, handle_parens)) {
+	while (scan_delimiter_token(s, handle_parens, &tok)) {
 		// If comment, add appropriate tokens to stack and break the loop. Comments take up the rest of a line.
 		if (tok.type == S_NODE_COMMENT) {
 			DelimiterToken ctok = delimiter_token_init(S_NODE_COMMENT, 0, s->ewc, s->ewc);
