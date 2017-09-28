@@ -19,8 +19,10 @@ int d_tok_can_close(d_tok tok) {
 	return tok.type == S_NODE_EMPHASIS || tok.type == S_NODE_STRONG || !tok.can_open;
 }
 
-delim_stack *delim_stack_new(size_t cap) {
+delim_stack *delim_stack_new() {
 	delim_stack *st = c_malloc(sizeof(delim_stack));
+	
+	size_t cap = 8;
 	
 	st->first = c_malloc(cap * sizeof(d_tok));
 	st->lb = 0;
@@ -73,7 +75,7 @@ int delim_stack_scan_for_last_matchable_tok(delim_stack *st, size_t *idx, d_tok 
 	return 0;
 }
 
-void scan_for_tokens(scanner *s, int handle_parens) {
+void scan_for_tokens(Scanner *s, int handle_parens) {
 	delim_stack_reset(s->tokens);
 	delim_stack *st = s->tokens;
 	
@@ -113,7 +115,7 @@ void scan_for_tokens(scanner *s, int handle_parens) {
 	}
 }
 
-void construct_ast(scanner *s, pool *p, s_node *node, uint32_t ewc) {
+void construct_ast(Scanner *s, pool *p, s_node *node, uint32_t ewc) {
 	delim_stack *st = s->tokens;
 	
 	s_node *active_parent = node;
@@ -149,7 +151,7 @@ void construct_ast(scanner *s, pool *p, s_node *node, uint32_t ewc) {
 	}
 }
 
-void parse_inlines_for_node(scanner *s, pool *p, s_node *node, int handle_parens) {
+void parse_inlines_for_node(Scanner *s, pool *p, s_node *node, int handle_parens) {
 	s->loc = node->range.start;
 	s->wc = node->range.start;
 	s->ewc = node->range.end;

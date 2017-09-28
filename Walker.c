@@ -1,25 +1,25 @@
 
-#include "walker.h"
+#include "Walker.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include "mem.h"
 
 typedef struct {
-	walker_event ev;
+	WalkerEvent ev;
 	s_node * node;
-} walker_state;
+} WalkerState;
 
-struct walker {
+struct Walker {
 	s_node * root;
-	walker_state curr;
-	walker_state next;
+	WalkerState curr;
+	WalkerState next;
 };
 
-walker * walker_new(s_node * root) {
-	walker_state curr = { EVENT_NONE, NULL };
-	walker_state next = { EVENT_ENTER, root };
+Walker * walker_new(s_node * root) {
+	WalkerState curr = { EVENT_NONE, NULL };
+	WalkerState next = { EVENT_ENTER, root };
 	
-	walker * w = c_malloc(sizeof(walker));
+	Walker * w = c_malloc(sizeof(Walker));
 	
 	w->root = root;
 	w->curr = curr;
@@ -29,10 +29,10 @@ walker * walker_new(s_node * root) {
 }
 
 // Uses similar walking algorithm to cmark's iterator in https://github.com/commonmark/cmark/blob/master/src/iterator.c
-walker_event walker_next(walker * w) {
+WalkerEvent walker_next(Walker * w) {
 	// Make next state the current state.
 	w->curr = w->next;
-	walker_event event = w->curr.ev;
+	WalkerEvent event = w->curr.ev;
 	s_node * node = w->curr.node;
 	
 	// If done, return early.
@@ -65,6 +65,6 @@ walker_event walker_next(walker * w) {
 	return event;
 }
 
-s_node *walker_get_current_node(walker *w) {
+s_node *walker_get_current_node(Walker *w) {
 	return w->curr.node;
 }

@@ -1,6 +1,6 @@
 
 #include "pool.h"
-#include "walker.h"
+#include "Walker.h"
 #include "mem.h"
 #include <stdio.h>
 

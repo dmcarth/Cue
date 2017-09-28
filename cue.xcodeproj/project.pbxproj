@@ -9,9 +9,9 @@
 /* Begin PBXBuildFile section */
 		101968A71F5A2C1E00C14C35 /* cue.c in Sources */ = {isa = PBXBuildFile; fileRef = 1029B8ED1F5A2AEA0091471B /* cue.c */; };
 		101968A91F5A2C1E00C14C35 /* nodes.c in Sources */ = {isa = PBXBuildFile; fileRef = 1029B8EB1F5A2AEA0091471B /* nodes.c */; };
-		101968AD1F5A2C1E00C14C35 /* walker.c in Sources */ = {isa = PBXBuildFile; fileRef = 1029B8E91F5A2AE90091471B /* walker.c */; };
+		101968AD1F5A2C1E00C14C35 /* Walker.c in Sources */ = {isa = PBXBuildFile; fileRef = 1029B8E91F5A2AE90091471B /* Walker.c */; };
 		101968B11F5A2D7A00C14C35 /* mem.c in Sources */ = {isa = PBXBuildFile; fileRef = 101968AF1F5A2D7A00C14C35 /* mem.c */; };
-		101968B51F5B6F3600C14C35 /* scanners.c in Sources */ = {isa = PBXBuildFile; fileRef = 101968B31F5B6F3600C14C35 /* scanners.c */; };
+		101968B51F5B6F3600C14C35 /* Scanner.c in Sources */ = {isa = PBXBuildFile; fileRef = 101968B31F5B6F3600C14C35 /* Scanner.c */; };
 		1041DF9E1F668389005D45BB /* hamlet.txt in Resources */ = {isa = PBXBuildFile; fileRef = 1041DF9D1F668305005D45BB /* hamlet.txt */; };
 		1076B5541F66A9020087075B /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 1076B54F1F66A8E60087075B /* main.c */; };
 		1076B5551F66A9140087075B /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 1076B54F1F66A8E60087075B /* main.c */; };
@@ -69,13 +69,13 @@
 /* Begin PBXFileReference section */
 		101968AF1F5A2D7A00C14C35 /* mem.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = mem.c; sourceTree = "<group>"; };
 		101968B01F5A2D7A00C14C35 /* mem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mem.h; sourceTree = "<group>"; };
-		101968B31F5B6F3600C14C35 /* scanners.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = scanners.c; sourceTree = "<group>"; };
-		101968B41F5B6F3600C14C35 /* scanners.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = scanners.h; sourceTree = "<group>"; };
+		101968B31F5B6F3600C14C35 /* Scanner.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Scanner.c; sourceTree = "<group>"; };
+		101968B41F5B6F3600C14C35 /* Scanner.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Scanner.h; sourceTree = "<group>"; };
 		1029B8E21F5A2ACE0091471B /* libcue.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcue.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		1029B8E91F5A2AE90091471B /* walker.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = walker.c; sourceTree = "<group>"; };
+		1029B8E91F5A2AE90091471B /* Walker.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Walker.c; sourceTree = "<group>"; };
 		1029B8EB1F5A2AEA0091471B /* nodes.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = nodes.c; sourceTree = "<group>"; };
 		1029B8ED1F5A2AEA0091471B /* cue.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cue.c; sourceTree = "<group>"; };
-		1029B8EE1F5A2AEA0091471B /* walker.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = walker.h; sourceTree = "<group>"; };
+		1029B8EE1F5A2AEA0091471B /* Walker.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Walker.h; sourceTree = "<group>"; };
 		1029B8F01F5A2AEA0091471B /* cue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cue.h; sourceTree = "<group>"; };
 		1029B8F11F5A2AEA0091471B /* nodes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = nodes.h; sourceTree = "<group>"; };
 		1041DF9D1F668305005D45BB /* hamlet.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = hamlet.txt; sourceTree = SOURCE_ROOT; };
@@ -161,10 +161,10 @@
 				1029B8F11F5A2AEA0091471B /* nodes.h */,
 				1097DD711F69586F00164ECF /* pool.c */,
 				1097DD721F69586F00164ECF /* pool.h */,
-				101968B31F5B6F3600C14C35 /* scanners.c */,
-				101968B41F5B6F3600C14C35 /* scanners.h */,
-				1029B8E91F5A2AE90091471B /* walker.c */,
-				1029B8EE1F5A2AEA0091471B /* walker.h */,
+				101968B31F5B6F3600C14C35 /* Scanner.c */,
+				101968B41F5B6F3600C14C35 /* Scanner.h */,
+				1029B8E91F5A2AE90091471B /* Walker.c */,
+				1029B8EE1F5A2AEA0091471B /* Walker.h */,
 				10EBE2981F5EF45900C7417A /* CocoaCue */,
 				10EBE2A31F5EF45900C7417A /* CocoaCueTests */,
 				10C208AC1F70EF3C0015C464 /* iOSCue */,
@@ -441,12 +441,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				101968A91F5A2C1E00C14C35 /* nodes.c in Sources */,
-				101968B51F5B6F3600C14C35 /* scanners.c in Sources */,
+				101968B51F5B6F3600C14C35 /* Scanner.c in Sources */,
 				10EBE2C11F5FCA2E00C7417A /* inlines.c in Sources */,
 				10B193F31F696B8B0032F412 /* pool.c in Sources */,
 				1076B5541F66A9020087075B /* main.c in Sources */,
 				101968B11F5A2D7A00C14C35 /* mem.c in Sources */,
-				101968AD1F5A2C1E00C14C35 /* walker.c in Sources */,
+				101968AD1F5A2C1E00C14C35 /* Walker.c in Sources */,
 				101968A71F5A2C1E00C14C35 /* cue.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

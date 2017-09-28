@@ -1,7 +1,7 @@
 
 #include "cue.h"
 #include "mem.h"
-#include "scanners.h"
+#include "Scanner.h"
 #include "inlines.h"
 #include <stdio.h>
 
@@ -37,7 +37,7 @@ s_node *s_node_description_init(pool *p, uint32_t start, uint32_t wc, uint32_t e
 	return desc;
 }
 
-s_node *block_for_line(scanner *s, pool *p) {
+s_node *block_for_line(Scanner *s, pool *p) {
 	s_node *block;
 	
 	if ((block = scan_for_thematic_break(s, p)) ||
@@ -55,7 +55,7 @@ s_node *block_for_line(scanner *s, pool *p) {
 	return block;
 }
 
-s_node *appropriate_container_for_block(scanner *s, s_node *block, cue_document *doc) {
+s_node *appropriate_container_for_block(Scanner *s, s_node *block, cue_document *doc) {
 	s_node *root = doc->root;
 	pool *p = doc->p;
 	
@@ -137,7 +137,7 @@ s_node *appropriate_container_for_block(scanner *s, s_node *block, cue_document 
 	return root;
 }
 
-void finalize_line(cue_document *doc, scanner *s, s_node *block) {
+void finalize_line(cue_document *doc, Scanner *s, s_node *block) {
 	pool *p = doc->p;
 	
 	switch (block->type) {
@@ -181,7 +181,7 @@ void finalize_line(cue_document *doc, scanner *s, s_node *block) {
 	}
 }
 
-void process_line(cue_document *doc, scanner *s) {
+void process_line(cue_document *doc, Scanner *s) {
 	s_node *block = block_for_line(s, doc->p);
 	
 	s_node *container = appropriate_container_for_block(s, block, doc);
@@ -195,7 +195,7 @@ void process_line(cue_document *doc, scanner *s) {
 cue_document *cue_document_from_utf8(const char *buff, size_t len) {
 	cue_document *doc = cue_document_new((uint32_t)len);
 	
-	scanner *s = scanner_new(buff, (uint32_t)len);
+	Scanner *s = scanner_new(buff, (uint32_t)len);
 	
 	// Enumerate lines
 	while (scanner_advance_to_next_line(s) < len) {

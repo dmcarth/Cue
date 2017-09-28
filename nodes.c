@@ -1,7 +1,7 @@
 
 #include "nodes.h"
 #include "mem.h"
-#include "walker.h"
+#include "Walker.h"
 #include <stdio.h>
 
 const char *s_node_type_description(s_node_type type) {
@@ -115,8 +115,8 @@ static void s_node_print_single_description(s_node *node) {
 
 void s_node_print_description(s_node *node, int recurse) {
 	if (recurse) {
-		walker *w = walker_new(node);
-		walker_event event;
+		Walker *w = walker_new(node);
+		WalkerEvent event;
 		
 		int indent = 0;
 		while ((event = walker_next(w)) != EVENT_DONE) {
