@@ -7,7 +7,7 @@
 
 struct CueDocument
 {
-	pool *p;
+	Pool *p;
 	SNode *root;
 };
 
@@ -33,7 +33,7 @@ SNode *cue_document_get_root(CueDocument *doc)
 	return doc->root;
 }
 
-SNode *s_node_description_init(pool *p, uint32_t start, uint32_t wc,
+SNode *s_node_description_init(Pool *p, uint32_t start, uint32_t wc,
 							   uint32_t ewc, uint32_t end)
 {
 	SNode *desc = pool_create_node(p, S_NODE_DESCRIPTION, start, end);
@@ -43,7 +43,7 @@ SNode *s_node_description_init(pool *p, uint32_t start, uint32_t wc,
 	return desc;
 }
 
-SNode *block_for_line(Scanner *s, pool *p)
+SNode *block_for_line(Scanner *s, Pool *p)
 {
 	SNode *block;
 	
@@ -66,7 +66,7 @@ SNode *appropriate_container_for_block(Scanner *s, SNode *block,
 									   CueDocument *doc)
 {
 	SNode *root = doc->root;
-	pool *p = doc->p;
+	Pool *p = doc->p;
 	
 	switch (block->type) {
 		case S_NODE_HEADER:
@@ -148,7 +148,7 @@ SNode *appropriate_container_for_block(Scanner *s, SNode *block,
 
 void finalize_line(CueDocument *doc, Scanner *s, SNode *block)
 {
-	pool *p = doc->p;
+	Pool *p = doc->p;
 	
 	switch (block->type) {
 		case S_NODE_DESCRIPTION:

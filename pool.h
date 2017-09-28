@@ -4,14 +4,14 @@
 
 #include "nodes.h"
 
-typedef struct pool pool;
+typedef struct Pool Pool;
 
-pool *pool_new(void);
+Pool *pool_new(void);
 
-void pool_free(pool *p);
+void pool_free(Pool *p);
 
-SNode *pool_create_node(pool *p, SNodeType type, uint32_t loc, uint32_t len);
+SNode *pool_create_node(Pool *p, SNodeType type, uint32_t loc, uint32_t len);
 
-void pool_release_node(pool *p, SNode *node);
+void pool_release_node(Pool *p, SNode *node);
 
 #endif /* pool_h */

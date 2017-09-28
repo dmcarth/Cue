@@ -127,7 +127,7 @@ void scan_for_tokens(Scanner *s, int handle_parens)
 	}
 }
 
-void construct_ast(Scanner *s, pool *p, SNode *node, uint32_t ewc)
+void construct_ast(Scanner *s, Pool *p, SNode *node, uint32_t ewc)
 {
 	DelimiterStack *st = s->tokens;
 	
@@ -164,7 +164,7 @@ void construct_ast(Scanner *s, pool *p, SNode *node, uint32_t ewc)
 	}
 }
 
-void parse_inlines_for_node(Scanner *s, pool *p, SNode *node,
+void parse_inlines_for_node(Scanner *s, Pool *p, SNode *node,
 							int handle_parens)
 {
 	s->loc = node->range.start;

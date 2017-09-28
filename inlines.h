@@ -29,7 +29,7 @@ DelimiterStack *delimiter_stack_new(void);
 
 void delimiter_stack_free(DelimiterStack *st);
 
-void parse_inlines_for_node(Scanner *s, pool *p, SNode *node,
+void parse_inlines_for_node(Scanner *s, Pool *p, SNode *node,
 							int handle_parens);
 
 #endif /* inlines_h */

@@ -5,27 +5,27 @@
 #include <stdio.h>
 
 // We store pre-allocated nodes in buckets of varying sizes. Each bucket also holds a reference to the next bucket in the list.
-struct bucket
+struct Bucket
 {
-	struct bucket *next;
+	struct Bucket *next;
 	SNode *first;
 	size_t head;
 	size_t len;
 };
 
-typedef struct bucket bucket;
+typedef struct Bucket Bucket;
 
 // This pool maintains a linked list of buckets. cap represents the total capacity of all buckets combined.
-struct pool
+struct Pool
 {
-	bucket *first;
-	bucket *last;
+	Bucket *first;
+	Bucket *last;
 	size_t cap;
 };
 
-bucket *bucket_new(size_t len)
+Bucket *bucket_new(size_t len)
 {
-	bucket *b = c_malloc(sizeof(bucket));
+	Bucket *b = c_malloc(sizeof(Bucket));
 	
 	b->next = NULL;
 	b->first = c_malloc(len * sizeof(SNode));
@@ -35,9 +35,9 @@ bucket *bucket_new(size_t len)
 	return b;
 }
 
-pool *pool_new()
+Pool *pool_new()
 {
-	pool *p = c_malloc(sizeof(pool));
+	Pool *p = c_malloc(sizeof(Pool));
 	
 	size_t cap = 16;
 	
@@ -48,10 +48,10 @@ pool *pool_new()
 	return p;
 }
 
-void pool_free(pool *p)
+void pool_free(Pool *p)
 {
-	bucket *b = p->first;
-	bucket *next;
+	Bucket *b = p->first;
+	Bucket *next;
 	
 	while (b) {
 		free(b->first);
@@ -66,9 +66,9 @@ void pool_free(pool *p)
 	free(p);
 }
 
-SNode *pool_create_node(pool *p, SNodeType type, uint32_t loc, uint32_t len)
+SNode *pool_create_node(Pool *p, SNodeType type, uint32_t loc, uint32_t len)
 {
-	bucket *b = p->last;
+	Bucket *b = p->last;
 	
 	// If current bucket is full, create a new one.
 	if (b->head >= b->len) {
@@ -104,9 +104,9 @@ SNode *pool_create_node(pool *p, SNodeType type, uint32_t loc, uint32_t len)
 }
 
 // Releases a given s_node pointer back into the pool. Assumes that s_node is at the top of the stack. If node isn't at the top of the stack, it will persist in memory until the pool is freed.
-void pool_release_node(pool *p, SNode *node)
+void pool_release_node(Pool *p, SNode *node)
 {
-	bucket *b = p->last;
+	Bucket *b = p->last;
 	
 	if (b->first + b->head - 1 == node) {
 		--b->head;

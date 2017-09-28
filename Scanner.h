@@ -29,19 +29,19 @@ uint32_t scanner_advance_to_next_line(Scanner *s);
 
 void scanner_trim_whitespace(Scanner *s);
 
-SNode *scan_for_thematic_break(Scanner *s, pool *p);
+SNode *scan_for_thematic_break(Scanner *s, Pool *p);
 
-SNode *scan_for_forced_header(Scanner *s, pool *p);
+SNode *scan_for_forced_header(Scanner *s, Pool *p);
 
-SNode *scan_for_header(Scanner *s, pool *p);
+SNode *scan_for_header(Scanner *s, Pool *p);
 
-SNode *scan_for_end(Scanner *s, pool *p);
+SNode *scan_for_end(Scanner *s, Pool *p);
 
-SNode *scan_for_facsimile(Scanner *s, pool *p);
+SNode *scan_for_facsimile(Scanner *s, Pool *p);
 
-SNode *scan_for_lyric_line(Scanner *s, pool *p);
+SNode *scan_for_lyric_line(Scanner *s, Pool *p);
 
-SNode *scan_for_cue(Scanner *s, pool *p);
+SNode *scan_for_cue(Scanner *s, Pool *p);
 
 int scan_delimiter_token(Scanner *s, int handle_parens, DelimiterToken *out);
 

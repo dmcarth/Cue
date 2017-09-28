@@ -207,7 +207,7 @@ int scan_for_frame(Scanner *s)
 
 /* The following are node factories. If scanning succeeds, they construct a node for the AST. */
 
-SNode *scan_for_thematic_break(Scanner *s, pool *p)
+SNode *scan_for_thematic_break(Scanner *s, Pool *p)
 {
 	if (s->ewc - s->loc < 3)
 		return NULL;
@@ -234,7 +234,7 @@ SNode *scan_for_thematic_break(Scanner *s, pool *p)
 	return pool_create_node(p, S_NODE_THEMATIC_BREAK, s->bol, s->eol);
 }
 
-SNode *scan_title(Scanner *s, pool *p)
+SNode *scan_title(Scanner *s, Pool *p)
 {
 	SNode *title = NULL;
 	
@@ -247,7 +247,7 @@ SNode *scan_title(Scanner *s, pool *p)
 	return title;
 }
 
-SNode *scan_for_forced_header(Scanner *s, pool *p)
+SNode *scan_for_forced_header(Scanner *s, Pool *p)
 {
 	if (s->ewc - s->loc < 1 || s->buff[s->loc] != '.')
 		return NULL;
@@ -272,7 +272,7 @@ SNode *scan_for_forced_header(Scanner *s, pool *p)
 	return head;
 }
 
-SNode *scan_for_header(Scanner *s, pool *p)
+SNode *scan_for_header(Scanner *s, Pool *p)
 {
 	HeaderType type;
 	uint32_t kstart = s->loc;
@@ -325,7 +325,7 @@ SNode *scan_for_header(Scanner *s, pool *p)
 	return head;
 }
 
-SNode *scan_for_end(Scanner *s, pool *p)
+SNode *scan_for_end(Scanner *s, Pool *p)
 {
 	if (s->ewc - s->loc != 7)
 		return NULL;
@@ -346,7 +346,7 @@ SNode *scan_for_end(Scanner *s, pool *p)
 	return NULL;
 }
 
-SNode *scan_for_facsimile(Scanner *s, pool *p)
+SNode *scan_for_facsimile(Scanner *s, Pool *p)
 {
 	if (scanner_is_at_eol(s))
 		return NULL;
@@ -364,7 +364,7 @@ SNode *scan_for_facsimile(Scanner *s, pool *p)
 	return NULL;
 }
 
-SNode *scan_for_lyric_line(Scanner *s, pool *p)
+SNode *scan_for_lyric_line(Scanner *s, Pool *p)
 {
 	if (scanner_is_at_eol(s))
 		return NULL;
@@ -381,7 +381,7 @@ SNode *scan_for_lyric_line(Scanner *s, pool *p)
 	return NULL;
 }
 
-SNode *scan_for_cue(Scanner *s, pool *p)
+SNode *scan_for_cue(Scanner *s, Pool *p)
 {
 	if (scanner_is_at_eol(s))
 		return NULL;
