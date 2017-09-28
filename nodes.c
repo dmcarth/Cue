@@ -110,7 +110,7 @@ void s_node_unlink(s_node *node) {
 static void s_node_print_single_description(s_node *node) {
 	const char * tdesc = s_node_type_description(node->type);
 	
-	printf("%s %p {%ui, %ui}", tdesc, node, node->range.start, node->range.end);
+	printf("%s %p {%u, %u}", tdesc, node, node->range.start, node->range.end);
 }
 
 void s_node_print_description(s_node *node, int recurse) {
