@@ -4,7 +4,8 @@
 
 #include <stdint.h>
 
-typedef enum {
+typedef enum
+{
 	S_NODE_DOCUMENT,
 	
 	// Block-level
@@ -36,11 +37,13 @@ typedef enum {
 	S_NODE_COMMENT,
 } SNodeType;
 
-typedef struct {
+typedef struct
+{
 	uint32_t start, end;
 } SRange;
 
-typedef enum {
+typedef enum
+{
 	HEADER_ACT,
 	HEADER_SCENE,
 	HEADER_PAGE,
@@ -48,7 +51,8 @@ typedef enum {
 	HEADER_FORCED
 } HeaderType;
 
-struct SNode {
+struct SNode
+{
 	uint32_t type;
 	
 	SRange range;

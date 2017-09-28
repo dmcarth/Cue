@@ -2,7 +2,8 @@
 #include "mem.h"
 #include <stdio.h>
 
-void *c_malloc(size_t size) {
+void *c_malloc(size_t size)
+{
 	void *ptr = malloc(size);
 	
 	if (!ptr) {
@@ -13,7 +14,8 @@ void *c_malloc(size_t size) {
 	return ptr;
 }
 
-void *c_calloc(size_t count, size_t size) {
+void *c_calloc(size_t count, size_t size)
+{
 	void *ptr = calloc(count, size);
 	
 	if (!ptr) {
@@ -24,7 +26,8 @@ void *c_calloc(size_t count, size_t size) {
 	return ptr;
 }
 
-void *c_realloc(void *ptr, size_t size) {
+void *c_realloc(void *ptr, size_t size)
+{
 	void *newPtr = realloc(ptr, size);
 	
 	if (!newPtr) {

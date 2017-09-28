@@ -10,7 +10,8 @@ typedef struct DelimiterToken DelimiterToken;
 
 typedef struct DelimiterStack DelimiterStack;
 
-typedef struct {
+typedef struct
+{
 	const char *buff;
 	uint32_t len;
 	uint32_t bol, eol, loc;

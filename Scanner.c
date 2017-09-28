@@ -3,7 +3,8 @@
 #include "inlines.h"
 #include "mem.h"
 
-Scanner *scanner_new(const char *buff, uint32_t len) {
+Scanner *scanner_new(const char *buff, uint32_t len)
+{
 	Scanner *s = c_calloc(1, sizeof(Scanner));
 	
 	s->buff = buff;
@@ -13,32 +14,38 @@ Scanner *scanner_new(const char *buff, uint32_t len) {
 	return s;
 }
 
-void scanner_free(Scanner *s) {
+void scanner_free(Scanner *s)
+{
 	delimiter_stack_free(s->tokens);
 	
 	free(s);
 }
 
-int scanner_is_at_eol(Scanner *s) {
+int scanner_is_at_eol(Scanner *s)
+{
 	// For scanning purposes, ewc == eol
 	return s->loc == s->ewc;
 }
 
 /* true if buff[loc - 1] == '\' */
-static int scanner_loc_is_escaped(Scanner *s) {
+static int scanner_loc_is_escaped(Scanner *s)
+{
 	return s->loc && (s->buff[s->loc-1] == '\\');
 }
 
 /*	Cue ignores whitespace so we can safely ignore the "\r\n" case (the parser will interpret '\n' as an empty line and discard it). */
-static inline int is_newline(char c) {
+static inline int is_newline(char c)
+{
 	return c == '\n' || c == 11 || c == 12 || c == '\r';
 }
 
-static inline int is_whitespace(char c) {
+static inline int is_whitespace(char c)
+{
 	return c == ' ' || c == '\t' || is_newline(c);
 }
 
-uint32_t scanner_advance_to_next_line(Scanner *s) {
+uint32_t scanner_advance_to_next_line(Scanner *s)
+{
 	s->bol = s->eol;
 	s->loc = s->bol;
 	
@@ -53,7 +60,8 @@ uint32_t scanner_advance_to_next_line(Scanner *s) {
 	return s->bol;
 }
 
-uint32_t scanner_advance_to_first_nonspace(Scanner *s) {
+uint32_t scanner_advance_to_first_nonspace(Scanner *s)
+{
 	while (s->loc < s->ewc) {
 		if (is_whitespace(s->buff[s->loc]))
 			++(s->loc);
@@ -64,7 +72,8 @@ uint32_t scanner_advance_to_first_nonspace(Scanner *s) {
 	return s->loc;
 }
 
-uint32_t scanner_advance_to_hyphen(Scanner *s) {
+uint32_t scanner_advance_to_hyphen(Scanner *s)
+{
 	while (s->loc < s->ewc) {
 		if (s->buff[s->loc] == '-' && !scanner_loc_is_escaped(s))
 			break;
@@ -75,7 +84,8 @@ uint32_t scanner_advance_to_hyphen(Scanner *s) {
 	return s->loc;
 }
 
-uint32_t scanner_backtrack_to_first_nonspace(Scanner *s) {
+uint32_t scanner_backtrack_to_first_nonspace(Scanner *s)
+{
 	while (s->loc > s->wc) {
 		uint32_t bt = s->loc - 1;
 		
@@ -88,7 +98,8 @@ uint32_t scanner_backtrack_to_first_nonspace(Scanner *s) {
 	return s->loc;
 }
 
-uint32_t scanner_advance_to_colon(Scanner *s, uint32_t bound) {
+uint32_t scanner_advance_to_colon(Scanner *s, uint32_t bound)
+{
 	uint32_t start = s->loc;
 	
 	while (s->loc < s->ewc) {
@@ -104,7 +115,8 @@ uint32_t scanner_advance_to_colon(Scanner *s, uint32_t bound) {
 	return s->loc;
 }
 
-void scanner_trim_whitespace(Scanner *s) {
+void scanner_trim_whitespace(Scanner *s)
+{
 	// trim left
 	scanner_advance_to_first_nonspace(s);
 	s->wc = s->loc;
@@ -120,7 +132,8 @@ void scanner_trim_whitespace(Scanner *s) {
 
 /* The following functions all advance the scanner if they match at the scanner's current location. If no match is found, they return 0 and do not advance the scanner. */
 
-int scan_for_act(Scanner *s) {
+int scan_for_act(Scanner *s)
+{
 	if (s->ewc - s->loc < 3)
 		return 0;
 	
@@ -136,7 +149,8 @@ int scan_for_act(Scanner *s) {
 	return 0;
 }
 
-int scan_for_scene(Scanner *s) {
+int scan_for_scene(Scanner *s)
+{
 	if (s->ewc - s->loc < 5)
 		return 0;
 	
@@ -154,7 +168,8 @@ int scan_for_scene(Scanner *s) {
 	return 0;
 }
 
-int scan_for_page(Scanner *s) {
+int scan_for_page(Scanner *s)
+{
 	if (s->ewc - s->loc < 4)
 		return 0;
 	
@@ -171,7 +186,8 @@ int scan_for_page(Scanner *s) {
 	return 0;
 }
 
-int scan_for_frame(Scanner *s) {
+int scan_for_frame(Scanner *s)
+{
 	if (s->ewc - s->loc < 5)
 		return 0;
 	
@@ -191,7 +207,8 @@ int scan_for_frame(Scanner *s) {
 
 /* The following are node factories. If scanning succeeds, they construct a node for the AST. */
 
-SNode *scan_for_thematic_break(Scanner *s, pool *p) {
+SNode *scan_for_thematic_break(Scanner *s, pool *p)
+{
 	if (s->ewc - s->loc < 3)
 		return NULL;
 	
@@ -217,7 +234,8 @@ SNode *scan_for_thematic_break(Scanner *s, pool *p) {
 	return pool_create_node(p, S_NODE_THEMATIC_BREAK, s->bol, s->eol);
 }
 
-SNode *scan_title(Scanner *s, pool *p) {
+SNode *scan_title(Scanner *s, pool *p)
+{
 	SNode *title = NULL;
 	
 	if (!scanner_is_at_eol(s)) {
@@ -229,7 +247,8 @@ SNode *scan_title(Scanner *s, pool *p) {
 	return title;
 }
 
-SNode *scan_for_forced_header(Scanner *s, pool *p) {
+SNode *scan_for_forced_header(Scanner *s, pool *p)
+{
 	if (s->ewc - s->loc < 1 || s->buff[s->loc] != '.')
 		return NULL;
 	
@@ -253,7 +272,8 @@ SNode *scan_for_forced_header(Scanner *s, pool *p) {
 	return head;
 }
 
-SNode *scan_for_header(Scanner *s, pool *p) {
+SNode *scan_for_header(Scanner *s, pool *p)
+{
 	HeaderType type;
 	uint32_t kstart = s->loc;
 	uint32_t kend = s->loc;
@@ -305,7 +325,8 @@ SNode *scan_for_header(Scanner *s, pool *p) {
 	return head;
 }
 
-SNode *scan_for_end(Scanner *s, pool *p) {
+SNode *scan_for_end(Scanner *s, pool *p)
+{
 	if (s->ewc - s->loc != 7)
 		return NULL;
 	
@@ -325,7 +346,8 @@ SNode *scan_for_end(Scanner *s, pool *p) {
 	return NULL;
 }
 
-SNode *scan_for_facsimile(Scanner *s, pool *p) {
+SNode *scan_for_facsimile(Scanner *s, pool *p)
+{
 	if (scanner_is_at_eol(s))
 		return NULL;
 	
@@ -342,7 +364,8 @@ SNode *scan_for_facsimile(Scanner *s, pool *p) {
 	return NULL;
 }
 
-SNode *scan_for_lyric_line(Scanner *s, pool *p) {
+SNode *scan_for_lyric_line(Scanner *s, pool *p)
+{
 	if (scanner_is_at_eol(s))
 		return NULL;
 	
@@ -358,7 +381,8 @@ SNode *scan_for_lyric_line(Scanner *s, pool *p) {
 	return NULL;
 }
 
-SNode *scan_for_cue(Scanner *s, pool *p) {
+SNode *scan_for_cue(Scanner *s, pool *p)
+{
 	if (scanner_is_at_eol(s))
 		return NULL;
 	
@@ -396,7 +420,8 @@ SNode *scan_for_cue(Scanner *s, pool *p) {
 	return cue;
 }
 
-int scan_delimiter_token(Scanner *s, int handle_parens, DelimiterToken *out) {
+int scan_delimiter_token(Scanner *s, int handle_parens, DelimiterToken *out)
+{
 	for (; s->loc < s->ewc; ++s->loc) {
 		if (scanner_loc_is_escaped(s))
 			continue;

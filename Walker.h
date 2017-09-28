@@ -4,7 +4,8 @@
 
 #include "nodes.h"
 
-typedef enum {
+typedef enum
+{
 	EVENT_NONE,
 	EVENT_ENTER,
 	EVENT_EXIT,

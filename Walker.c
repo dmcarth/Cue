@@ -4,18 +4,21 @@
 #include <stdlib.h>
 #include "mem.h"
 
-typedef struct {
+typedef struct
+{
 	WalkerEvent ev;
 	SNode * node;
 } WalkerState;
 
-struct Walker {
+struct Walker
+{
 	SNode * root;
 	WalkerState curr;
 	WalkerState next;
 };
 
-Walker * walker_new(SNode * root) {
+Walker * walker_new(SNode * root)
+{
 	WalkerState curr = { EVENT_NONE, NULL };
 	WalkerState next = { EVENT_ENTER, root };
 	
@@ -29,7 +32,8 @@ Walker * walker_new(SNode * root) {
 }
 
 // Uses similar walking algorithm to cmark's iterator in https://github.com/commonmark/cmark/blob/master/src/iterator.c
-WalkerEvent walker_next(Walker * w) {
+WalkerEvent walker_next(Walker * w)
+{
 	// Make next state the current state.
 	w->curr = w->next;
 	WalkerEvent event = w->curr.ev;
@@ -65,6 +69,7 @@ WalkerEvent walker_next(Walker * w) {
 	return event;
 }
 
-SNode *walker_get_current_node(Walker *w) {
+SNode *walker_get_current_node(Walker *w)
+{
 	return w->curr.node;
 }

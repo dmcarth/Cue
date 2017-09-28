@@ -3,7 +3,9 @@
 #include "mem.h"
 #include <stdio.h>
 
-DelimiterToken delimiter_token_init(SNodeType type, int can_open, uint32_t start, uint32_t end) {
+DelimiterToken delimiter_token_init(SNodeType type, int can_open,
+									uint32_t start, uint32_t end)
+{
 	DelimiterToken tok = {
 		type,
 		can_open,
@@ -15,11 +17,13 @@ DelimiterToken delimiter_token_init(SNodeType type, int can_open, uint32_t start
 	return tok;
 }
 
-int DelimiterToken_can_close(DelimiterToken tok) {
+int DelimiterToken_can_close(DelimiterToken tok)
+{
 	return tok.type == S_NODE_EMPHASIS || tok.type == S_NODE_STRONG || !tok.can_open;
 }
 
-DelimiterStack *delimiter_stack_new() {
+DelimiterStack *delimiter_stack_new()
+{
 	DelimiterStack *st = c_malloc(sizeof(DelimiterStack));
 	
 	size_t cap = 8;
@@ -32,33 +36,40 @@ DelimiterStack *delimiter_stack_new() {
 	return st;
 }
 
-void delimiter_stack_free(DelimiterStack *st) {
+void delimiter_stack_free(DelimiterStack *st)
+{
 	free(st->first);
 	
 	free(st);
 }
 
-void delimiter_stack_resize(DelimiterStack *st, size_t target) {
+void delimiter_stack_resize(DelimiterStack *st, size_t target)
+{
 	st->first = c_realloc(st->first, target * sizeof(DelimiterToken));
 	
 	st->cap = target;
 }
 
-void delimiter_stack_push(DelimiterStack *st, DelimiterToken tok) {
+void delimiter_stack_push(DelimiterStack *st, DelimiterToken tok)
+{
 	if (st->len >= st->cap)
 		delimiter_stack_resize(st, st->cap * 2);
 	
 	st->first[st->len++] = tok;
 }
 
-void delimiter_stack_reset(DelimiterStack *st) {
+void delimiter_stack_reset(DelimiterStack *st)
+{
 	st->len = 0;
 	st->lb = 0;
 }
 
 #define delimiter_stack_peek_at(st, idx) st->first + idx
 
-int delimiter_stack_scan_for_last_matchable_tok(DelimiterStack *st, size_t *idx, DelimiterToken tok) {
+int delimiter_stack_scan_for_last_matchable_tok(DelimiterStack *st,
+												size_t *idx,
+												DelimiterToken tok)
+{
 	size_t i = st->len;
 	
 	while (i > st->lb) {
@@ -75,7 +86,8 @@ int delimiter_stack_scan_for_last_matchable_tok(DelimiterStack *st, size_t *idx,
 	return 0;
 }
 
-void scan_for_tokens(Scanner *s, int handle_parens) {
+void scan_for_tokens(Scanner *s, int handle_parens)
+{
 	delimiter_stack_reset(s->tokens);
 	DelimiterStack *st = s->tokens;
 	
@@ -115,7 +127,8 @@ void scan_for_tokens(Scanner *s, int handle_parens) {
 	}
 }
 
-void construct_ast(Scanner *s, pool *p, SNode *node, uint32_t ewc) {
+void construct_ast(Scanner *s, pool *p, SNode *node, uint32_t ewc)
+{
 	DelimiterStack *st = s->tokens;
 	
 	SNode *active_parent = node;
@@ -151,7 +164,9 @@ void construct_ast(Scanner *s, pool *p, SNode *node, uint32_t ewc) {
 	}
 }
 
-void parse_inlines_for_node(Scanner *s, pool *p, SNode *node, int handle_parens) {
+void parse_inlines_for_node(Scanner *s, pool *p, SNode *node,
+							int handle_parens)
+{
 	s->loc = node->range.start;
 	s->wc = node->range.start;
 	s->ewc = node->range.end;

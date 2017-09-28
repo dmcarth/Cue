@@ -5,12 +5,14 @@
 #include "inlines.h"
 #include <stdio.h>
 
-struct CueDocument {
+struct CueDocument
+{
 	pool *p;
 	SNode *root;
 };
 
-CueDocument *cue_document_new(uint32_t len) {
+CueDocument *cue_document_new(uint32_t len)
+{
 	CueDocument *doc = c_malloc(sizeof(CueDocument));
 	
 	doc->p = pool_new();
@@ -19,17 +21,21 @@ CueDocument *cue_document_new(uint32_t len) {
 	return doc;
 }
 
-void cue_document_free(CueDocument *doc) {
+void cue_document_free(CueDocument *doc)
+{
 	pool_free(doc->p);
 	
 	free(doc);
 }
 
-SNode *cue_document_get_root(CueDocument *doc) {
+SNode *cue_document_get_root(CueDocument *doc)
+{
 	return doc->root;
 }
 
-SNode *s_node_description_init(pool *p, uint32_t start, uint32_t wc, uint32_t ewc, uint32_t end) {
+SNode *s_node_description_init(pool *p, uint32_t start, uint32_t wc,
+							   uint32_t ewc, uint32_t end)
+{
 	SNode *desc = pool_create_node(p, S_NODE_DESCRIPTION, start, end);
 	SNode *stream = pool_create_node(p, S_NODE_STREAM, wc, ewc);
 	s_node_add_child(desc, stream);
@@ -37,7 +43,8 @@ SNode *s_node_description_init(pool *p, uint32_t start, uint32_t wc, uint32_t ew
 	return desc;
 }
 
-SNode *block_for_line(Scanner *s, pool *p) {
+SNode *block_for_line(Scanner *s, pool *p)
+{
 	SNode *block;
 	
 	if ((block = scan_for_thematic_break(s, p)) ||
@@ -55,7 +62,9 @@ SNode *block_for_line(Scanner *s, pool *p) {
 	return block;
 }
 
-SNode *appropriate_container_for_block(Scanner *s, SNode *block, CueDocument *doc) {
+SNode *appropriate_container_for_block(Scanner *s, SNode *block,
+									   CueDocument *doc)
+{
 	SNode *root = doc->root;
 	pool *p = doc->p;
 	
@@ -137,7 +146,8 @@ SNode *appropriate_container_for_block(Scanner *s, SNode *block, CueDocument *do
 	return root;
 }
 
-void finalize_line(CueDocument *doc, Scanner *s, SNode *block) {
+void finalize_line(CueDocument *doc, Scanner *s, SNode *block)
+{
 	pool *p = doc->p;
 	
 	switch (block->type) {
@@ -181,7 +191,8 @@ void finalize_line(CueDocument *doc, Scanner *s, SNode *block) {
 	}
 }
 
-void process_line(CueDocument *doc, Scanner *s) {
+void process_line(CueDocument *doc, Scanner *s)
+{
 	SNode *block = block_for_line(s, doc->p);
 	
 	SNode *container = appropriate_container_for_block(s, block, doc);
@@ -192,7 +203,8 @@ void process_line(CueDocument *doc, Scanner *s) {
 	return;
 }
 
-CueDocument *cue_document_from_utf8(const char *buff, size_t len) {
+CueDocument *cue_document_from_utf8(const char *buff, size_t len)
+{
 	CueDocument *doc = cue_document_new((uint32_t)len);
 	
 	Scanner *s = scanner_new(buff, (uint32_t)len);
