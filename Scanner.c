@@ -8,13 +8,13 @@ Scanner *scanner_new(const char *buff, uint32_t len) {
 	
 	s->buff = buff;
 	s->len = len;
-	s->tokens = delim_stack_new();
+	s->tokens = delimiter_stack_new();
 	
 	return s;
 }
 
 void scanner_free(Scanner *s) {
-	delim_stack_free(s->tokens);
+	delimiter_stack_free(s->tokens);
 	
 	free(s);
 }

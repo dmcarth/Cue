@@ -19,8 +19,8 @@ int DelimiterToken_can_close(DelimiterToken tok) {
 	return tok.type == S_NODE_EMPHASIS || tok.type == S_NODE_STRONG || !tok.can_open;
 }
 
-delim_stack *delim_stack_new() {
-	delim_stack *st = c_malloc(sizeof(delim_stack));
+DelimiterStack *delimiter_stack_new() {
+	DelimiterStack *st = c_malloc(sizeof(DelimiterStack));
 	
 	size_t cap = 8;
 	
@@ -32,37 +32,37 @@ delim_stack *delim_stack_new() {
 	return st;
 }
 
-void delim_stack_free(delim_stack *st) {
+void delimiter_stack_free(DelimiterStack *st) {
 	free(st->first);
 	
 	free(st);
 }
 
-void delim_stack_resize(delim_stack *st, size_t target) {
+void delimiter_stack_resize(DelimiterStack *st, size_t target) {
 	st->first = c_realloc(st->first, target * sizeof(DelimiterToken));
 	
 	st->cap = target;
 }
 
-void delim_stack_push(delim_stack *st, DelimiterToken tok) {
+void delimiter_stack_push(DelimiterStack *st, DelimiterToken tok) {
 	if (st->len >= st->cap)
-		delim_stack_resize(st, st->cap * 2);
+		delimiter_stack_resize(st, st->cap * 2);
 	
 	st->first[st->len++] = tok;
 }
 
-void delim_stack_reset(delim_stack *st) {
+void delimiter_stack_reset(DelimiterStack *st) {
 	st->len = 0;
 	st->lb = 0;
 }
 
-#define delim_stack_peek_at(st, idx) st->first + idx
+#define delimiter_stack_peek_at(st, idx) st->first + idx
 
-int delim_stack_scan_for_last_matchable_tok(delim_stack *st, size_t *idx, DelimiterToken tok) {
+int delimiter_stack_scan_for_last_matchable_tok(DelimiterStack *st, size_t *idx, DelimiterToken tok) {
 	size_t i = st->len;
 	
 	while (i > st->lb) {
-		DelimiterToken *p = delim_stack_peek_at(st, --i);
+		DelimiterToken *p = delimiter_stack_peek_at(st, --i);
 		
 		if (p->type == tok.type && p->can_open && p->event == EVENT_NONE) {
 			*idx = i;
@@ -76,8 +76,8 @@ int delim_stack_scan_for_last_matchable_tok(delim_stack *st, size_t *idx, Delimi
 }
 
 void scan_for_tokens(Scanner *s, int handle_parens) {
-	delim_stack_reset(s->tokens);
-	delim_stack *st = s->tokens;
+	delimiter_stack_reset(s->tokens);
+	DelimiterStack *st = s->tokens;
 	
 	DelimiterToken tok;
 	while (scan_delimiter_token(s, &tok, handle_parens)) {
@@ -86,43 +86,43 @@ void scan_for_tokens(Scanner *s, int handle_parens) {
 			DelimiterToken ctok = delimiter_token_init(S_NODE_COMMENT, 0, s->ewc, s->ewc);
 			tok.event = EVENT_ENTER;
 			ctok.event = EVENT_EXIT;
-			delim_stack_push(st, tok);
-			delim_stack_push(st, ctok);
+			delimiter_stack_push(st, tok);
+			delimiter_stack_push(st, ctok);
 			break;
 		}
 		
 		// Scan stack backward for last matchable ptok with precedence > tok. If none found but tok can open, push to stack
 		size_t idx;
-		if (delim_stack_scan_for_last_matchable_tok(st, &idx, tok)) {
+		if (delimiter_stack_scan_for_last_matchable_tok(st, &idx, tok)) {
 			// Found match. Set tokens to enter and exit.
-			DelimiterToken *ptok = delim_stack_peek_at(st, idx);
+			DelimiterToken *ptok = delimiter_stack_peek_at(st, idx);
 			ptok->event = EVENT_ENTER;
 			tok.event = EVENT_EXIT;
-			delim_stack_push(st, tok);
+			delimiter_stack_push(st, tok);
 			
 			// If idx was the stack's lower bound, advance lower bound to next unmatched token
 			if (idx == st->lb) {
 				for (; st->lb<st->len; ++st->lb) {
-					DelimiterToken *atok = delim_stack_peek_at(st, st->lb);
+					DelimiterToken *atok = delimiter_stack_peek_at(st, st->lb);
 					
 					if (atok->event == EVENT_NONE)
 						break;
 				}
 			}
 		} else if (tok.can_open) {
-			delim_stack_push(st, tok);
+			delimiter_stack_push(st, tok);
 		}
 	}
 }
 
 void construct_ast(Scanner *s, pool *p, SNode *node, uint32_t ewc) {
-	delim_stack *st = s->tokens;
+	DelimiterStack *st = s->tokens;
 	
 	SNode *active_parent = node;
 	uint32_t last_idx = node->range.start;
 	
 	for (size_t i = 0; i < st->len; ++i) {
-		DelimiterToken *tok = delim_stack_peek_at(st, i);
+		DelimiterToken *tok = delimiter_stack_peek_at(st, i);
 		
 		if (tok->event == EVENT_NONE)
 			continue;

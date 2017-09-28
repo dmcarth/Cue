@@ -13,7 +13,7 @@ struct DelimiterToken {
 	WalkerEvent event;
 };
 
-struct delim_stack {
+struct DelimiterStack {
 	DelimiterToken *first;
 	size_t lb;
 	size_t len;
@@ -22,9 +22,9 @@ struct delim_stack {
 
 DelimiterToken delimiter_token_init(SNodeType type, int can_open, uint32_t start, uint32_t end);
 
-delim_stack *delim_stack_new(void);
+DelimiterStack *delimiter_stack_new(void);
 
-void delim_stack_free(delim_stack *st);
+void delimiter_stack_free(DelimiterStack *st);
 
 void parse_inlines_for_node(Scanner *s, pool *p, SNode *node, int handle_parens);
 

@@ -8,14 +8,14 @@
 
 typedef struct DelimiterToken DelimiterToken;
 
-typedef struct delim_stack delim_stack;
+typedef struct DelimiterStack DelimiterStack;
 
 typedef struct {
 	const char *buff;
 	uint32_t len;
 	uint32_t bol, eol, loc;
 	uint32_t wc, ewc;
-	delim_stack *tokens;
+	DelimiterStack *tokens;
 } Scanner;
 
 Scanner *scanner_new(const char *buff, uint32_t len);
