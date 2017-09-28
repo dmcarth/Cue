@@ -396,14 +396,14 @@ SNode *scan_for_cue(Scanner *s, pool *p) {
 	return cue;
 }
 
-int scan_d_tok(Scanner *s, d_tok *out, int handle_parens) {
+int scan_delimiter_token(Scanner *s, DelimiterToken *out, int handle_parens) {
 	for (; s->loc < s->ewc; ++s->loc) {
 		if (scanner_loc_is_escaped(s))
 			continue;
 		
 		switch (s->buff[s->loc]) {
 			case '*': {
-				*out = d_tok_init(S_NODE_EMPHASIS, 1, s->loc, ++s->loc);
+				*out = delimiter_token_init(S_NODE_EMPHASIS, 1, s->loc, ++s->loc);
 				if (!scanner_is_at_eol(s) && s->buff[s->loc] == '*') {
 					out->type = S_NODE_STRONG;
 					out->end = ++s->loc;
@@ -412,27 +412,27 @@ int scan_d_tok(Scanner *s, d_tok *out, int handle_parens) {
 			}
 			case '(':
 				if (handle_parens) {
-					*out = d_tok_init(S_NODE_PARENTHETICAL, 1, s->loc, ++s->loc);
+					*out = delimiter_token_init(S_NODE_PARENTHETICAL, 1, s->loc, ++s->loc);
 					return 1;
 				}
 				break;
 			case ')':
 				if (handle_parens) {
-					*out = d_tok_init(S_NODE_PARENTHETICAL, 0, s->loc, ++s->loc);
+					*out = delimiter_token_init(S_NODE_PARENTHETICAL, 0, s->loc, ++s->loc);
 					return 1;
 				}
 				break;
 			case '[':
-				*out = d_tok_init(S_NODE_REFERENCE, 1, s->loc, ++s->loc);
+				*out = delimiter_token_init(S_NODE_REFERENCE, 1, s->loc, ++s->loc);
 				return 1;
 			case ']':
-				*out = d_tok_init(S_NODE_REFERENCE, 0, s->loc, ++s->loc);
+				*out = delimiter_token_init(S_NODE_REFERENCE, 0, s->loc, ++s->loc);
 				return 1;
 			case '/': {
 				uint32_t bt = s->loc++;
 				if (!scanner_is_at_eol(s) && s->buff[s->loc] == '/') {
 					scanner_advance_to_first_nonspace(s);
-					*out = d_tok_init(S_NODE_COMMENT, 1, bt, s->loc);
+					*out = delimiter_token_init(S_NODE_COMMENT, 1, bt, s->loc);
 					s->loc = s->ewc;
 					return 1;
 				}

@@ -6,7 +6,7 @@
 #include "Scanner.h"
 #include "Walker.h"
 
-struct d_tok {
+struct DelimiterToken {
 	SNodeType type;
 	int can_open;
 	uint32_t start, end;
@@ -14,13 +14,13 @@ struct d_tok {
 };
 
 struct delim_stack {
-	d_tok *first;
+	DelimiterToken *first;
 	size_t lb;
 	size_t len;
 	size_t cap;
 };
 
-d_tok d_tok_init(SNodeType type, int can_open, uint32_t start, uint32_t end);
+DelimiterToken delimiter_token_init(SNodeType type, int can_open, uint32_t start, uint32_t end);
 
 delim_stack *delim_stack_new(void);
 

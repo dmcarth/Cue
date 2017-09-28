@@ -6,7 +6,7 @@
 #include "nodes.h"
 #include "pool.h"
 
-typedef struct d_tok d_tok;
+typedef struct DelimiterToken DelimiterToken;
 
 typedef struct delim_stack delim_stack;
 
@@ -42,6 +42,6 @@ SNode *scan_for_lyric_line(Scanner *s, pool *p);
 
 SNode *scan_for_cue(Scanner *s, pool *p);
 
-int scan_d_tok(Scanner *s, d_tok *out, int handle_parens);
+int scan_delimiter_token(Scanner *s, DelimiterToken *out, int handle_parens);
 
 #endif /* scanner_h */

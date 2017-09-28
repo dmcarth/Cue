@@ -3,8 +3,8 @@
 #include "mem.h"
 #include <stdio.h>
 
-d_tok d_tok_init(SNodeType type, int can_open, uint32_t start, uint32_t end) {
-	d_tok tok = {
+DelimiterToken delimiter_token_init(SNodeType type, int can_open, uint32_t start, uint32_t end) {
+	DelimiterToken tok = {
 		type,
 		can_open,
 		start,
@@ -15,7 +15,7 @@ d_tok d_tok_init(SNodeType type, int can_open, uint32_t start, uint32_t end) {
 	return tok;
 }
 
-int d_tok_can_close(d_tok tok) {
+int DelimiterToken_can_close(DelimiterToken tok) {
 	return tok.type == S_NODE_EMPHASIS || tok.type == S_NODE_STRONG || !tok.can_open;
 }
 
@@ -24,7 +24,7 @@ delim_stack *delim_stack_new() {
 	
 	size_t cap = 8;
 	
-	st->first = c_malloc(cap * sizeof(d_tok));
+	st->first = c_malloc(cap * sizeof(DelimiterToken));
 	st->lb = 0;
 	st->len = 0;
 	st->cap = cap;
@@ -39,12 +39,12 @@ void delim_stack_free(delim_stack *st) {
 }
 
 void delim_stack_resize(delim_stack *st, size_t target) {
-	st->first = c_realloc(st->first, target * sizeof(d_tok));
+	st->first = c_realloc(st->first, target * sizeof(DelimiterToken));
 	
 	st->cap = target;
 }
 
-void delim_stack_push(delim_stack *st, d_tok tok) {
+void delim_stack_push(delim_stack *st, DelimiterToken tok) {
 	if (st->len >= st->cap)
 		delim_stack_resize(st, st->cap * 2);
 	
@@ -58,11 +58,11 @@ void delim_stack_reset(delim_stack *st) {
 
 #define delim_stack_peek_at(st, idx) st->first + idx
 
-int delim_stack_scan_for_last_matchable_tok(delim_stack *st, size_t *idx, d_tok tok) {
+int delim_stack_scan_for_last_matchable_tok(delim_stack *st, size_t *idx, DelimiterToken tok) {
 	size_t i = st->len;
 	
 	while (i > st->lb) {
-		d_tok *p = delim_stack_peek_at(st, --i);
+		DelimiterToken *p = delim_stack_peek_at(st, --i);
 		
 		if (p->type == tok.type && p->can_open && p->event == EVENT_NONE) {
 			*idx = i;
@@ -79,11 +79,11 @@ void scan_for_tokens(Scanner *s, int handle_parens) {
 	delim_stack_reset(s->tokens);
 	delim_stack *st = s->tokens;
 	
-	d_tok tok;
-	while (scan_d_tok(s, &tok, handle_parens)) {
+	DelimiterToken tok;
+	while (scan_delimiter_token(s, &tok, handle_parens)) {
 		// If comment, add appropriate tokens to stack and break the loop. Comments take up the rest of a line.
 		if (tok.type == S_NODE_COMMENT) {
-			d_tok ctok = d_tok_init(S_NODE_COMMENT, 0, s->ewc, s->ewc);
+			DelimiterToken ctok = delimiter_token_init(S_NODE_COMMENT, 0, s->ewc, s->ewc);
 			tok.event = EVENT_ENTER;
 			ctok.event = EVENT_EXIT;
 			delim_stack_push(st, tok);
@@ -95,7 +95,7 @@ void scan_for_tokens(Scanner *s, int handle_parens) {
 		size_t idx;
 		if (delim_stack_scan_for_last_matchable_tok(st, &idx, tok)) {
 			// Found match. Set tokens to enter and exit.
-			d_tok *ptok = delim_stack_peek_at(st, idx);
+			DelimiterToken *ptok = delim_stack_peek_at(st, idx);
 			ptok->event = EVENT_ENTER;
 			tok.event = EVENT_EXIT;
 			delim_stack_push(st, tok);
@@ -103,7 +103,7 @@ void scan_for_tokens(Scanner *s, int handle_parens) {
 			// If idx was the stack's lower bound, advance lower bound to next unmatched token
 			if (idx == st->lb) {
 				for (; st->lb<st->len; ++st->lb) {
-					d_tok *atok = delim_stack_peek_at(st, st->lb);
+					DelimiterToken *atok = delim_stack_peek_at(st, st->lb);
 					
 					if (atok->event == EVENT_NONE)
 						break;
@@ -122,7 +122,7 @@ void construct_ast(Scanner *s, pool *p, SNode *node, uint32_t ewc) {
 	uint32_t last_idx = node->range.start;
 	
 	for (size_t i = 0; i < st->len; ++i) {
-		d_tok *tok = delim_stack_peek_at(st, i);
+		DelimiterToken *tok = delim_stack_peek_at(st, i);
 		
 		if (tok->event == EVENT_NONE)
 			continue;
