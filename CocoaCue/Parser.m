@@ -11,7 +11,7 @@
 
 @implementation Parser
 {
-	cue_document *doc;
+	CueDocument *doc;
 }
 
 - (instancetype)initWithString:(NSString *)str

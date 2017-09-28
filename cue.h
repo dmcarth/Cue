@@ -7,12 +7,12 @@
 #include <stdint.h>
 #include "pool.h"
 
-typedef struct cue_document cue_document;
+typedef struct CueDocument CueDocument;
 
-void cue_document_free(cue_document *doc);
+void cue_document_free(CueDocument *doc);
 
-SNode *cue_document_get_root(cue_document *doc);
+SNode *cue_document_get_root(CueDocument *doc);
 
-cue_document *cue_document_from_utf8(const char *buff, size_t len);
+CueDocument *cue_document_from_utf8(const char *buff, size_t len);
 
 #endif /* cue_h */
