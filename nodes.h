@@ -38,7 +38,7 @@ typedef enum {
 
 typedef struct {
 	uint32_t start, end;
-} s_range;
+} SRange;
 
 typedef enum {
 	HEADER_ACT,
@@ -51,7 +51,7 @@ typedef enum {
 struct s_node {
 	uint32_t type;
 	
-	s_range range;
+	SRange range;
 	
 	struct s_node * parent;
 	struct s_node * first_child;

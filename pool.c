@@ -78,7 +78,7 @@ s_node *pool_create_node(pool *p, SNodeType type, uint32_t loc, uint32_t len) {
 	s_node *node = b->first + b->head++;
 	
 	// Setup node.
-	s_range range = { loc, len };
+	SRange range = { loc, len };
 	
 	node->type = type;
 	node->range = range;
