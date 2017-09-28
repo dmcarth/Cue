@@ -4,7 +4,7 @@
 #include "Walker.h"
 #include <stdio.h>
 
-const char *s_node_type_description(s_node_type type) {
+const char *s_node_type_description(SNodeType type) {
 	switch (type) {
 		case S_NODE_DOCUMENT:
 			return "document";
@@ -61,7 +61,7 @@ const char *s_node_type_description(s_node_type type) {
 	return "";
 }
 
-int s_node_is_type(s_node *node, s_node_type type) {
+int s_node_is_type(s_node *node, SNodeType type) {
 	return (node && node->type == type);
 }
 

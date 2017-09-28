@@ -61,7 +61,7 @@ void pool_free(pool *p) {
 	free(p);
 }
 
-s_node *pool_create_node(pool *p, s_node_type type, uint32_t loc, uint32_t len) {
+s_node *pool_create_node(pool *p, SNodeType type, uint32_t loc, uint32_t len) {
 	bucket *b = p->last;
 	
 	// If current bucket is full, create a new one.

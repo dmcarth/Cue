@@ -34,7 +34,7 @@ typedef enum {
 	S_NODE_REFERENCE,
 	S_NODE_PARENTHETICAL,
 	S_NODE_COMMENT,
-} s_node_type;
+} SNodeType;
 
 typedef struct {
 	uint32_t start, end;
@@ -80,7 +80,7 @@ void s_node_add_child(s_node *node, s_node *child);
 
 void s_node_extend_length_to_include_child(s_node *node, s_node *child);
 
-int s_node_is_type(s_node *node, s_node_type type);
+int s_node_is_type(s_node *node, SNodeType type);
 
 int s_node_is_direction(s_node * node);
 
