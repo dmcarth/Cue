@@ -9,7 +9,7 @@
 struct d_tok {
 	s_node_type type;
 	int can_open;
-	size_t start, end;
+	uint32_t start, end;
 	walker_event event;
 };
 
@@ -20,7 +20,7 @@ struct delim_stack {
 	size_t cap;
 };
 
-d_tok d_tok_init(s_node_type type, int can_open, size_t start, size_t end);
+d_tok d_tok_init(s_node_type type, int can_open, uint32_t start, uint32_t end);
 
 delim_stack *delim_stack_new(size_t cap);
 

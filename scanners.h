@@ -11,27 +11,22 @@ typedef struct d_tok d_tok;
 typedef struct delim_stack delim_stack;
 
 typedef struct {
-	uint16_t *buff;
-	size_t len;
-	size_t bol, eol, loc;
-	size_t wc, ewc;
+	const char *buff;
+	uint32_t len;
+	uint32_t bol, eol, loc;
+	uint32_t wc, ewc;
 	delim_stack *tokens;
 } scanner;
 
-scanner *scanner_new(uint16_t *buff, size_t len);
+scanner *scanner_new(const char *buff, uint32_t len);
 
 void scanner_free(scanner *s);
 
 int scanner_is_at_eol(scanner *s);
 
-size_t scanner_advance_to_next_line(scanner *s);
+uint32_t scanner_advance_to_next_line(scanner *s);
 
 void scanner_trim_whitespace(scanner *s);
-
-size_t scanner_advance_to_first_nonspace(scanner *s);
-
-size_t scanner_backtrack_to_first_nonspace(scanner *s);
-
 
 s_node *scan_for_thematic_break(scanner *s, pool *p);
 

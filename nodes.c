@@ -53,6 +53,7 @@ const char *s_node_type_description(s_node_type type) {
 		case S_NODE_COMMENT:
 			return "comment";
 		default:
+			printf("Unrecognized node type: %i", type);
 			abort();
 			break;
 	}
@@ -71,27 +72,6 @@ int s_node_is_direction(s_node * node) {
 int s_node_is_stream_container(s_node *node) {
 	return node->type == S_NODE_TITLE || node->type == S_NODE_LINE || node->type == S_NODE_DESCRIPTION;
 }
-
-//s_node *s_node_title_init(size_t start, size_t end) {
-//	s_node *title = s_node_new(S_NODE_TITLE, start, end);
-//	s_node_add_child(title, S_NODE_STREAM, start, end);
-//	
-//	return title;
-//}
-//
-//s_node *s_node_line_init(size_t start, size_t end) {
-//	s_node *line = s_node_new(S_NODE_LINE, start, end);
-//	s_node_add_child(line, S_NODE_STREAM, start, end);
-//	
-//	return line;
-//}
-//
-//s_node *s_node_description_init(size_t start, size_t wc, size_t ewc, size_t end) {
-//	s_node *desc = s_node_new(S_NODE_DESCRIPTION, start, end);
-//	s_node_add_child(desc, S_NODE_STREAM, wc, ewc);
-//	
-//	return desc;
-//}
 
 void s_node_extend_length_to_include_child(s_node *node, s_node *child) {
 	node->range.end = child->range.end;
@@ -130,7 +110,7 @@ void s_node_unlink(s_node *node) {
 static void s_node_print_single_description(s_node *node) {
 	const char * tdesc = s_node_type_description(node->type);
 	
-	printf("%s %p {%zu, %zu}", tdesc, node, node->range.start, node->range.end);
+	printf("%s %p {%ui, %ui}", tdesc, node, node->range.start, node->range.end);
 }
 
 void s_node_print_description(s_node *node, int recurse) {

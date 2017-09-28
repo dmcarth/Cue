@@ -4,6 +4,7 @@
 #include "mem.h"
 #include <stdio.h>
 
+// We store pre-allocated nodes in buckets of varying sizes. Each bucket also holds a reference to the next bucket in the list.
 struct bucket {
 	struct bucket *next;
 	s_node *first;
@@ -13,6 +14,7 @@ struct bucket {
 
 typedef struct bucket bucket;
 
+// This pool maintains a linked list of buckets. cap represents the total capacity of all buckets combined.
 struct pool {
 	bucket *first;
 	bucket *last;
@@ -30,8 +32,10 @@ bucket *bucket_new(size_t len) {
 	return b;
 }
 
-pool *pool_new(size_t cap) {
+pool *pool_new() {
 	pool *p = c_malloc(sizeof(pool));
+	
+	size_t cap = 16;
 	
 	p->first = bucket_new(cap);
 	p->last = p->first;
@@ -57,13 +61,13 @@ void pool_free(pool *p) {
 	free(p);
 }
 
-s_node *pool_create_node(pool *p, s_node_type type, size_t loc, size_t len) {
+s_node *pool_create_node(pool *p, s_node_type type, uint32_t loc, uint32_t len) {
 	bucket *b = p->last;
 	
-	// If current bucket is full, create a new one
+	// If current bucket is full, create a new one.
 	if (b->head >= b->len) {
-		// We want our pool to grow exponentially to amortize the cost of bucket allocation, but this wastes a lot of space. Limiting bucket size to 256 gives a nice balance between memory and speed.
-		size_t newlen = (p->cap < 256) ? p->cap : 256;
+		// We want our pool to grow exponentially to amortize the cost of bucket allocation. Make each new bucket equal to the pool's current capacity to double its size.
+		size_t newlen = p->cap;
 		b = bucket_new(newlen);
 		p->last->next = b;
 		p->last = b;
@@ -93,19 +97,8 @@ s_node *pool_create_node(pool *p, s_node_type type, size_t loc, size_t len) {
 	return node;
 }
 
-// Returns a given s_node pointer back to the pool. Assumes that s_node is at the top of the pool stack.
+// Releases a given s_node pointer back into the pool. Assumes that s_node is at the top of the stack. If node isn't at the top of the stack, it will persist in memory until the pool is freed.
 void pool_release_node(pool *p, s_node *node) {
-	// Because the pool is an effective stack, we need to iterate recursively backwards over the node's children before releasing this node.
-	s_node *child = node->last_child;
-	s_node *prev;
-	while (child) {
-		prev = child->prev;
-		
-		pool_release_node(p, child);
-		
-		child = prev;
-	}
-	
 	bucket *b = p->last;
 	
 	if (b->first + b->head - 1 == node) {

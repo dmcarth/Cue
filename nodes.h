@@ -3,7 +3,8 @@
 #define nodes_h
 
 #include <stdint.h>
-#include "stack.h"
+
+typedef struct mem_alloc mem_alloc;
 
 typedef enum {
 	S_NODE_DOCUMENT,
@@ -38,14 +39,14 @@ typedef enum {
 } s_node_type;
 
 typedef struct {
-	int32_t start, end;
+	uint32_t start, end;
 } s_range;
 
 typedef enum {
 	HEADER_ACT,
-	HEADER_CHAPTER,
 	HEADER_SCENE,
 	HEADER_PAGE,
+	HEADER_FRAME,
 	HEADER_FORCED
 } header_type;
 
@@ -76,6 +77,10 @@ struct s_node {
 };
 
 typedef struct s_node s_node;
+
+s_node *s_node_init(s_node_type type, uint32_t loc, uint32_t len);
+
+s_node *s_node_init_with_mem_alloc(mem_alloc *mem, s_node_type type, uint32_t loc, uint32_t len);
 
 void s_node_add_child(s_node *node, s_node *child);
 

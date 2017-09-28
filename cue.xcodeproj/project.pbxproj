@@ -7,15 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		101968A51F5A2C1E00C14C35 /* cp_buff.c in Sources */ = {isa = PBXBuildFile; fileRef = 1029B8EA1F5A2AEA0091471B /* cp_buff.c */; };
 		101968A71F5A2C1E00C14C35 /* cue.c in Sources */ = {isa = PBXBuildFile; fileRef = 1029B8ED1F5A2AEA0091471B /* cue.c */; };
 		101968A91F5A2C1E00C14C35 /* nodes.c in Sources */ = {isa = PBXBuildFile; fileRef = 1029B8EB1F5A2AEA0091471B /* nodes.c */; };
-		101968AB1F5A2C1E00C14C35 /* utf16.c in Sources */ = {isa = PBXBuildFile; fileRef = 1029B8EC1F5A2AEA0091471B /* utf16.c */; };
 		101968AD1F5A2C1E00C14C35 /* walker.c in Sources */ = {isa = PBXBuildFile; fileRef = 1029B8E91F5A2AE90091471B /* walker.c */; };
 		101968B11F5A2D7A00C14C35 /* mem.c in Sources */ = {isa = PBXBuildFile; fileRef = 101968AF1F5A2D7A00C14C35 /* mem.c */; };
 		101968B51F5B6F3600C14C35 /* scanners.c in Sources */ = {isa = PBXBuildFile; fileRef = 101968B31F5B6F3600C14C35 /* scanners.c */; };
 		1041DF9E1F668389005D45BB /* hamlet.txt in Resources */ = {isa = PBXBuildFile; fileRef = 1041DF9D1F668305005D45BB /* hamlet.txt */; };
-		104783511F6BC3D400EAD077 /* stack.c in Sources */ = {isa = PBXBuildFile; fileRef = 10552E311F678EBE006F9B63 /* stack.c */; };
 		1076B5541F66A9020087075B /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 1076B54F1F66A8E60087075B /* main.c */; };
 		1076B5551F66A9140087075B /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 1076B54F1F66A8E60087075B /* main.c */; };
 		10B193F31F696B8B0032F412 /* pool.c in Sources */ = {isa = PBXBuildFile; fileRef = 1097DD711F69586F00164ECF /* pool.c */; };
@@ -76,18 +73,12 @@
 		101968B41F5B6F3600C14C35 /* scanners.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = scanners.h; sourceTree = "<group>"; };
 		1029B8E21F5A2ACE0091471B /* libcue.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcue.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		1029B8E91F5A2AE90091471B /* walker.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = walker.c; sourceTree = "<group>"; };
-		1029B8EA1F5A2AEA0091471B /* cp_buff.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cp_buff.c; sourceTree = "<group>"; };
 		1029B8EB1F5A2AEA0091471B /* nodes.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = nodes.c; sourceTree = "<group>"; };
-		1029B8EC1F5A2AEA0091471B /* utf16.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = utf16.c; sourceTree = "<group>"; };
 		1029B8ED1F5A2AEA0091471B /* cue.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = cue.c; sourceTree = "<group>"; };
 		1029B8EE1F5A2AEA0091471B /* walker.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = walker.h; sourceTree = "<group>"; };
-		1029B8EF1F5A2AEA0091471B /* utf16.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = utf16.h; sourceTree = "<group>"; };
 		1029B8F01F5A2AEA0091471B /* cue.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cue.h; sourceTree = "<group>"; };
 		1029B8F11F5A2AEA0091471B /* nodes.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = nodes.h; sourceTree = "<group>"; };
-		1029B8F21F5A2AEA0091471B /* cp_buff.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = cp_buff.h; sourceTree = "<group>"; };
 		1041DF9D1F668305005D45BB /* hamlet.txt */ = {isa = PBXFileReference; lastKnownFileType = text; path = hamlet.txt; sourceTree = SOURCE_ROOT; };
-		10552E301F678EBE006F9B63 /* stack.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = stack.h; sourceTree = "<group>"; };
-		10552E311F678EBE006F9B63 /* stack.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = stack.c; sourceTree = "<group>"; };
 		1076B54D1F66A8E60087075B /* cue-cl */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "cue-cl"; sourceTree = BUILT_PRODUCTS_DIR; };
 		1076B54F1F66A8E60087075B /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		1097DD711F69586F00164ECF /* pool.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = pool.c; sourceTree = "<group>"; };
@@ -159,8 +150,6 @@
 		1029B8D91F5A2ACE0091471B = {
 			isa = PBXGroup;
 			children = (
-				1029B8EA1F5A2AEA0091471B /* cp_buff.c */,
-				1029B8F21F5A2AEA0091471B /* cp_buff.h */,
 				1029B8ED1F5A2AEA0091471B /* cue.c */,
 				1029B8F01F5A2AEA0091471B /* cue.h */,
 				10EBE2BF1F5FCA2E00C7417A /* inlines.c */,
@@ -174,10 +163,6 @@
 				1097DD721F69586F00164ECF /* pool.h */,
 				101968B31F5B6F3600C14C35 /* scanners.c */,
 				101968B41F5B6F3600C14C35 /* scanners.h */,
-				10552E311F678EBE006F9B63 /* stack.c */,
-				10552E301F678EBE006F9B63 /* stack.h */,
-				1029B8EC1F5A2AEA0091471B /* utf16.c */,
-				1029B8EF1F5A2AEA0091471B /* utf16.h */,
 				1029B8E91F5A2AE90091471B /* walker.c */,
 				1029B8EE1F5A2AEA0091471B /* walker.h */,
 				10EBE2981F5EF45900C7417A /* CocoaCue */,
@@ -456,13 +441,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				101968A91F5A2C1E00C14C35 /* nodes.c in Sources */,
-				101968A51F5A2C1E00C14C35 /* cp_buff.c in Sources */,
-				101968AB1F5A2C1E00C14C35 /* utf16.c in Sources */,
 				101968B51F5B6F3600C14C35 /* scanners.c in Sources */,
 				10EBE2C11F5FCA2E00C7417A /* inlines.c in Sources */,
 				10B193F31F696B8B0032F412 /* pool.c in Sources */,
 				1076B5541F66A9020087075B /* main.c in Sources */,
-				104783511F6BC3D400EAD077 /* stack.c in Sources */,
 				101968B11F5A2D7A00C14C35 /* mem.c in Sources */,
 				101968AD1F5A2C1E00C14C35 /* walker.c in Sources */,
 				101968A71F5A2C1E00C14C35 /* cue.c in Sources */,
