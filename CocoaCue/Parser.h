@@ -12,6 +12,8 @@
 
 - (instancetype)initWithString:(NSString *)str;
 
+- (instancetype)initWithCString:(char *)buff len:(size_t)len;
+
 - (void)printOutline;
 
 @end

@@ -11,21 +11,12 @@ typedef enum {
 	EVENT_DONE
 } walker_event;
 
-typedef struct {
-	walker_event ev;
-	s_node * node;
-} walker_state;
+typedef struct walker walker;
 
-typedef struct {
-	s_node * root;
-	walker_state curr;
-	walker_state next;
-} walker;
+walker * walker_new(s_node *root);
 
-walker * walker_new(s_node * root);
+walker_event walker_next(walker *w);
 
-walker_event walker_next(walker * w);
-
-#define walker_get_current_node(w) w->curr.node
+s_node *walker_get_current_node(walker *w);
 
 #endif /* walker_h */

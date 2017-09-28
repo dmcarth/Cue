@@ -1,27 +1,26 @@
 
 #include "cue.h"
-#include "utf16.h"
 #include "mem.h"
 #include "scanners.h"
 #include "inlines.h"
 #include <stdio.h>
 
 struct cue_document {
-	pool *mem;
+	pool *p;
 	s_node *root;
 };
 
-cue_document *cue_document_new(size_t len) {
+cue_document *cue_document_new(uint32_t len) {
 	cue_document *doc = c_malloc(sizeof(cue_document));
 	
-	doc->mem = pool_new(16);
-	doc->root = pool_create_node(doc->mem, S_NODE_DOCUMENT, 0, len);;
+	doc->p = pool_new();
+	doc->root = pool_create_node(doc->p, S_NODE_DOCUMENT, 0, len);;
 	
 	return doc;
 }
 
 void cue_document_free(cue_document *doc) {
-	pool_free(doc->mem);
+	pool_free(doc->p);
 	
 	free(doc);
 }
@@ -30,7 +29,7 @@ s_node *cue_document_get_root(cue_document *doc) {
 	return doc->root;
 }
 
-s_node *s_node_description_init(pool *p, size_t start, size_t wc, size_t ewc, size_t end) {
+s_node *s_node_description_init(pool *p, uint32_t start, uint32_t wc, uint32_t ewc, uint32_t end) {
 	s_node *desc = pool_create_node(p, S_NODE_DESCRIPTION, start, end);
 	s_node *stream = pool_create_node(p, S_NODE_STREAM, wc, ewc);
 	s_node_add_child(desc, stream);
@@ -59,7 +58,7 @@ s_node *block_for_line(scanner *s, pool *p) {
 
 s_node *appropriate_container_for_block(scanner *s, s_node *block, cue_document *doc) {
 	s_node *root = doc->root;
-	pool *p = doc->mem;
+	pool *p = doc->p;
 	
 	switch (block->type) {
 		case S_NODE_HEADER:
@@ -132,7 +131,6 @@ s_node *appropriate_container_for_block(scanner *s, s_node *block, cue_document 
 	// invalid syntax, fail gracefully
 	
 	s_node_unlink(block);
-	
 	pool_release_node(p, block);
 	
 	block = s_node_description_init(p, s->bol, s->wc, s->ewc, s->eol);
@@ -140,12 +138,8 @@ s_node *appropriate_container_for_block(scanner *s, s_node *block, cue_document 
 	return root;
 }
 
-void process_line(cue_document *doc, scanner *s) {
-	pool *p = doc->mem;
-	s_node *block = block_for_line(s, p);
-	
-	s_node *container = appropriate_container_for_block(s, block, doc);
-	s_node_add_child(container, block);
+void finalize_line(cue_document *doc, scanner *s, s_node *block) {
+	pool *p = doc->p;
 	
 	switch (block->type) {
 		case S_NODE_DESCRIPTION:
@@ -186,14 +180,23 @@ void process_line(cue_document *doc, scanner *s) {
 		default:
 			break;
 	}
+}
+
+void process_line(cue_document *doc, scanner *s) {
+	s_node *block = block_for_line(s, doc->p);
+	
+	s_node *container = appropriate_container_for_block(s, block, doc);
+	s_node_add_child(container, block);
+	
+	finalize_line(doc, s, block);
 	
 	return;
 }
 
-cue_document *cue_document_from_utf16(uint16_t *buff, size_t len) {
-	cue_document *doc = cue_document_new(len);
+cue_document *cue_document_from_utf8(const char *buff, size_t len) {
+	cue_document *doc = cue_document_new((uint32_t)len);
 	
-	scanner *s = scanner_new(buff, len);
+	scanner *s = scanner_new(buff, (uint32_t)len);
 	
 	// Enumerate lines
 	while (scanner_advance_to_next_line(s) < len) {

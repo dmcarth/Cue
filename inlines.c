@@ -3,7 +3,7 @@
 #include "mem.h"
 #include <stdio.h>
 
-d_tok d_tok_init(s_node_type type, int can_open, size_t start, size_t end) {
+d_tok d_tok_init(s_node_type type, int can_open, uint32_t start, uint32_t end) {
 	d_tok tok = {
 		type,
 		can_open,
@@ -113,11 +113,11 @@ void scan_for_tokens(scanner *s, int handle_parens) {
 	}
 }
 
-void construct_ast(scanner *s, pool *p, s_node *node, size_t ewc) {
+void construct_ast(scanner *s, pool *p, s_node *node, uint32_t ewc) {
 	delim_stack *st = s->tokens;
 	
 	s_node *active_parent = node;
-	size_t last_idx = node->range.start;
+	uint32_t last_idx = node->range.start;
 	
 	for (size_t i = 0; i < st->len; ++i) {
 		d_tok *tok = delim_stack_peek_at(st, i);

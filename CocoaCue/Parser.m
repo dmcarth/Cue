@@ -18,13 +18,19 @@
 {
 	self = [super init];
 	if (self) {
-		uint16_t *buff = malloc(str.length * sizeof(uint16_t));
+		const char *buff = [str UTF8String];
+		size_t len = strlen(buff);
 		
-		[str getCharacters:buff];
-		
-		doc = cue_document_from_utf16(buff, str.length);
-		
-		free(buff);
+		doc = cue_document_from_utf8(buff, len);
+	}
+	return self;
+}
+
+- (instancetype)initWithCString:(char *)buff len:(size_t)len
+{
+	self = [super init];
+	if (self) {
+		doc = cue_document_from_utf8(buff, len);
 	}
 	return self;
 }

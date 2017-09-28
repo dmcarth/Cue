@@ -22,14 +22,6 @@ class CocoaCueTests: XCTestCase {
 	func testHamlet() {
 		let url = Bundle(for: CocoaCueTests.self).url(forResource: "hamlet", withExtension: "txt")!
 		let str = try! String(contentsOf: url)
-//		var str = ""
-//		for _ in 0..<18 {
-//			str += base
-//		}
-//		str += str
-//		str += str
-//		str += str
-//		str += str
 		
 		measure {
 			_ = Cue(str)
@@ -38,15 +30,13 @@ class CocoaCueTests: XCTestCase {
 	
     func testBenchmark() {
         let url = Bundle(for: CocoaCueTests.self).url(forResource: "war+peace", withExtension: "txt")!
-		var str = try! String(contentsOf: url)
-//		str += str
-//		str += str
-//		str += str
-//		str += str
-//		str += str
+		let str = try! String(contentsOf: url)
+		
+		let buff = UnsafeMutablePointer(mutating: (str as NSString).utf8String)
+		let len = strlen(buff)
 		
         self.measure {
-            _ = Cue(str)
+			_ = Parser(cString: buff, len: len)
         }
     }
     
