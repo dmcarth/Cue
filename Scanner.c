@@ -9,15 +9,12 @@ Scanner *scanner_new(const char *buff, uint32_t len)
 	
 	s->buff = buff;
 	s->len = len;
-	s->tokens = delimiter_stack_new();
 	
 	return s;
 }
 
 void scanner_free(Scanner *s)
 {
-	delimiter_stack_free(s->tokens);
-	
 	free(s);
 }
 
@@ -34,12 +31,12 @@ static int scanner_loc_is_escaped(Scanner *s)
 }
 
 /*	Cue ignores whitespace so we can safely ignore the "\r\n" case (the parser will interpret '\n' as an empty line and discard it). */
-static inline int is_newline(char c)
+static inline int is_newline(const char c)
 {
 	return c == '\n' || c == 11 || c == 12 || c == '\r';
 }
 
-static inline int is_whitespace(char c)
+static inline int is_whitespace(const char c)
 {
 	return c == ' ' || c == '\t' || is_newline(c);
 }

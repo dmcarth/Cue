@@ -2,17 +2,22 @@
 #ifndef cue_h
 #define cue_h
 
+#include <stdint.h>
 #include "nodes.h"
 #include "Walker.h"
-#include <stdint.h>
 #include "pool.h"
 
-typedef struct CueDocument CueDocument;
+typedef struct CueParser CueParser;
 
-void cue_document_free(CueDocument *doc);
+/** Creates a CueParser from a UTF-8 encoded string `buff` of size `len`. It
+ * is the client's responsibility to ensure `buff` is a valid UTF-8 string.
+ */
+CueParser *cue_parser_from_utf8(const char *buff, size_t len);
 
-CueNode *cue_document_get_root(CueDocument *doc);
+void cue_parser_free(CueParser *parser);
 
-CueDocument *cue_document_from_utf8(const char *buff, size_t len);
+CueNode *cue_parser_get_root(CueParser *parser);
+
+void *cue_parser_get_table_of_contents(CueParser *parser);
 
 #endif /* cue_h */

@@ -1,36 +1,41 @@
 
+#include <stdio.h>
 #include "cue.h"
 #include "mem.h"
 #include "Scanner.h"
 #include "inlines.h"
-#include <stdio.h>
+#include "parser.h"
 
-struct CueDocument
+CueParser *cue_parser_new(const char *buff, uint32_t len)
 {
-	Pool *p;
-	CueNode *root;
-};
-
-CueDocument *cue_document_new(uint32_t len)
-{
-	CueDocument *doc = c_malloc(sizeof(CueDocument));
+	CueParser *p = c_malloc(sizeof(CueParser));
 	
-	doc->p = pool_new();
-	doc->root = pool_create_node(doc->p, S_NODE_DOCUMENT, 0, len);;
+	p->node_allocator = pool_new();
+	p->root = pool_create_node(p->node_allocator, S_NODE_DOCUMENT, 0, len);
+	p->scanner = scanner_new(buff, len);
+	p->delimiter_stack = delimiter_stack_new();
+	p->bol = 0;
+	p->eol = 0;
+	p->first_nonspace = 0;
+	p->last_nonspace = 0;
 	
-	return doc;
+	return p;
 }
 
-void cue_document_free(CueDocument *doc)
+void cue_parser_free(CueParser *parser)
 {
-	pool_free(doc->p);
+	pool_free(parser->node_allocator);
 	
-	free(doc);
+	scanner_free(parser->scanner);
+	
+	delimiter_stack_free(parser->delimiter_stack);
+	
+	free(parser);
 }
 
-CueNode *cue_document_get_root(CueDocument *doc)
+CueNode *cue_parser_get_root(CueParser *parser)
 {
-	return doc->root;
+	return parser->root;
 }
 
 CueNode *cue_node_description_init(Pool *p, uint32_t start, uint32_t wc,
@@ -43,8 +48,10 @@ CueNode *cue_node_description_init(Pool *p, uint32_t start, uint32_t wc,
 	return desc;
 }
 
-CueNode *block_for_line(Scanner *s, Pool *p)
+CueNode *block_for_line(CueParser *parser)
 {
+	Scanner *s = parser->scanner;
+	Pool *p = parser->node_allocator;
 	CueNode *block;
 	
 	if ((block = scan_for_thematic_break(s, p)) ||
@@ -62,11 +69,10 @@ CueNode *block_for_line(Scanner *s, Pool *p)
 	return block;
 }
 
-CueNode *appropriate_container_for_block(Scanner *s, CueNode *block,
-									   CueDocument *doc)
+CueNode *appropriate_container_for_block(CueParser *parser, CueNode *block)
 {
-	CueNode *root = doc->root;
-	Pool *p = doc->p;
+	CueNode *root = parser->root;
+	Pool *p = parser->node_allocator;
 	
 	switch (block->type) {
 		case S_NODE_HEADER:
@@ -141,27 +147,30 @@ CueNode *appropriate_container_for_block(Scanner *s, CueNode *block,
 	cue_node_unlink(block);
 	pool_release_node(p, block);
 	
+	Scanner *s = parser->scanner;
+	
 	block = cue_node_description_init(p, s->bol, s->wc, s->ewc, s->eol);
 	
 	return root;
 }
 
-void finalize_line(CueDocument *doc, Scanner *s, CueNode *block)
+void finalize_line(CueParser *parser, CueNode *block)
 {
-	Pool *p = doc->p;
+	Scanner *s = parser->scanner;
+	Pool *p = parser->node_allocator;
 	
 	switch (block->type) {
 		case S_NODE_DESCRIPTION:
 		case S_NODE_LINE:
-			parse_inlines_for_node(s, p, block->first_child, 0);
+			parse_inlines_for_node(parser, block->first_child, 0);
 			break;
 		case S_NODE_FACSIMILE:
-			parse_inlines_for_node(s, p, block->first_child->first_child, 0);
+			parse_inlines_for_node(parser, block->first_child->first_child, 0);
 			break;
 		case S_NODE_HEADER: {
 			CueNode *title = block->data.header.title;
 			if (title) {
-				parse_inlines_for_node(s, p, title->first_child, 0);
+				parse_inlines_for_node(parser, title->first_child, 0);
 			}
 			break;
 		}
@@ -177,12 +186,12 @@ void finalize_line(CueDocument *doc, Scanner *s, CueNode *block)
 				CueNode *line = pool_create_node(p, S_NODE_LINE, dir->range.start, dir->range.end);
 				cue_node_add_child(dir, line);
 				
-				parse_inlines_for_node(s, p, line->first_child, 1);
+				parse_inlines_for_node(parser, line->first_child, 1);
 			} else {
 				CueNode *stream = pool_create_node(p, S_NODE_STREAM, dir->range.start, dir->range.end);
 				cue_node_add_child(dir, stream);
 				
-				parse_inlines_for_node(s, p, stream, 1);
+				parse_inlines_for_node(parser, stream, 1);
 			}
 			break;
 		}
@@ -191,32 +200,30 @@ void finalize_line(CueDocument *doc, Scanner *s, CueNode *block)
 	}
 }
 
-void process_line(CueDocument *doc, Scanner *s)
+void process_line(CueParser *parser)
 {
-	CueNode *block = block_for_line(s, doc->p);
+	CueNode *block = block_for_line(parser);
 	
-	CueNode *container = appropriate_container_for_block(s, block, doc);
+	CueNode *container = appropriate_container_for_block(parser, block);
 	cue_node_add_child(container, block);
 	
-	finalize_line(doc, s, block);
+	finalize_line(parser, block);
 	
 	return;
 }
 
-CueDocument *cue_document_from_utf8(const char *buff, size_t len)
+CueParser *cue_parser_from_utf8(const char *buff, size_t len)
 {
-	CueDocument *doc = cue_document_new((uint32_t)len);
+	CueParser *parser = cue_parser_new(buff, (uint32_t)len);
 	
-	Scanner *s = scanner_new(buff, (uint32_t)len);
+	Scanner *scanner = parser->scanner;
 	
 	// Enumerate lines
-	while (scanner_advance_to_next_line(s) < len) {
-		if (!scanner_is_at_eol(s)) {
-			process_line(doc, s);
+	while (scanner_advance_to_next_line(scanner) < len) {
+		if (!scanner_is_at_eol(scanner)) {
+			process_line(parser);
 		}
 	}
 	
-	scanner_free(s);
-	
-	return doc;
+	return parser;
 }

@@ -16,7 +16,6 @@ typedef struct
 	uint32_t len;
 	uint32_t bol, eol, loc;
 	uint32_t wc, ewc;
-	DelimiterStack *tokens;
 } Scanner;
 
 Scanner *scanner_new(const char *buff, uint32_t len);

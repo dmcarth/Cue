@@ -86,13 +86,15 @@ int delimiter_stack_scan_for_last_matchable_tok(DelimiterStack *st,
 	return 0;
 }
 
-void scan_for_tokens(Scanner *s, int handle_parens)
+void scan_for_tokens(struct CueParser *parser, int handle_parens)
 {
-	delimiter_stack_reset(s->tokens);
-	DelimiterStack *st = s->tokens;
+	DelimiterStack *st = parser->delimiter_stack;
+	delimiter_stack_reset(st);
+	
+	Scanner *s = parser->scanner;
 	
 	DelimiterToken tok;
-	while (scan_delimiter_token(s, handle_parens, &tok)) {
+	while (scan_delimiter_token(parser->scanner, handle_parens, &tok)) {
 		// If comment, add appropriate tokens to stack and break the loop. Comments take up the rest of a line.
 		if (tok.type == S_NODE_COMMENT) {
 			DelimiterToken ctok = delimiter_token_init(S_NODE_COMMENT, 0, s->ewc, s->ewc);
@@ -127,9 +129,9 @@ void scan_for_tokens(Scanner *s, int handle_parens)
 	}
 }
 
-void construct_ast(Scanner *s, Pool *p, CueNode *node, uint32_t ewc)
+void construct_ast(struct CueParser *parser, CueNode *node, uint32_t ewc)
 {
-	DelimiterStack *st = s->tokens;
+	DelimiterStack *st = parser->delimiter_stack;
 	
 	CueNode *active_parent = node;
 	uint32_t last_idx = node->range.start;
@@ -141,12 +143,12 @@ void construct_ast(Scanner *s, Pool *p, CueNode *node, uint32_t ewc)
 			continue;
 		
 		if (tok->start > last_idx) {
-			CueNode *literal = pool_create_node(p, S_NODE_LITERAL, last_idx, tok->start);
+			CueNode *literal = pool_create_node(parser->node_allocator, S_NODE_LITERAL, last_idx, tok->start);
 			cue_node_add_child(active_parent, literal);
 		}
 		
 		if (tok->event == EVENT_ENTER) {
-			CueNode *tnode = pool_create_node(p, tok->type, tok->start, tok->end);
+			CueNode *tnode = pool_create_node(parser->node_allocator, tok->type, tok->start, tok->end);
 			cue_node_add_child(active_parent, tnode);
 			active_parent = tnode;
 			last_idx = tok->end;
@@ -159,19 +161,20 @@ void construct_ast(Scanner *s, Pool *p, CueNode *node, uint32_t ewc)
 	
 	// If any space is left over from the stack, fill with a literal node
 	if (last_idx < node->range.end) {
-		CueNode *literal = pool_create_node(p, S_NODE_LITERAL, last_idx, ewc);
+		CueNode *literal = pool_create_node(parser->node_allocator, S_NODE_LITERAL, last_idx, ewc);
 		cue_node_add_child(active_parent, literal);
 	}
 }
 
-void parse_inlines_for_node(Scanner *s, Pool *p, CueNode *node,
+void parse_inlines_for_node(struct CueParser *parser, CueNode *node,
 							int handle_parens)
 {
+	Scanner *s = parser->scanner;
 	s->loc = node->range.start;
 	s->wc = node->range.start;
 	s->ewc = node->range.end;
 	
-	scan_for_tokens(s, handle_parens);
+	scan_for_tokens(parser, handle_parens);
 	
-	construct_ast(s, p, node, s->ewc);
+	construct_ast(parser, node, s->ewc);
 }

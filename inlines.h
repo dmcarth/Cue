@@ -3,6 +3,7 @@
 #define inlines_h
 
 #include <stdint.h>
+#include "parser.h"
 #include "Scanner.h"
 #include "Walker.h"
 
@@ -29,7 +30,7 @@ DelimiterStack *delimiter_stack_new(void);
 
 void delimiter_stack_free(DelimiterStack *st);
 
-void parse_inlines_for_node(Scanner *s, Pool *p, CueNode *node,
+void parse_inlines_for_node(struct CueParser *parser, CueNode *node,
 							int handle_parens);
 
 #endif /* inlines_h */

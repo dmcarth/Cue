@@ -15,6 +15,7 @@
 		1041DF9E1F668389005D45BB /* hamlet.txt in Resources */ = {isa = PBXBuildFile; fileRef = 1041DF9D1F668305005D45BB /* hamlet.txt */; };
 		1076B5541F66A9020087075B /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 1076B54F1F66A8E60087075B /* main.c */; };
 		1076B5551F66A9140087075B /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = 1076B54F1F66A8E60087075B /* main.c */; };
+		109DD2C51F7E0FEB00C0E38A /* parser.h in Headers */ = {isa = PBXBuildFile; fileRef = 109DD2C31F7E0FEB00C0E38A /* parser.h */; };
 		10B193F31F696B8B0032F412 /* pool.c in Sources */ = {isa = PBXBuildFile; fileRef = 1097DD711F69586F00164ECF /* pool.c */; };
 		10C208AE1F70EF3C0015C464 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C208AD1F70EF3C0015C464 /* AppDelegate.swift */; };
 		10C208B01F70EF3C0015C464 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 10C208AF1F70EF3C0015C464 /* ViewController.swift */; };
@@ -83,6 +84,7 @@
 		1076B54F1F66A8E60087075B /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		1097DD711F69586F00164ECF /* pool.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = pool.c; sourceTree = "<group>"; };
 		1097DD721F69586F00164ECF /* pool.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = pool.h; sourceTree = "<group>"; };
+		109DD2C31F7E0FEB00C0E38A /* parser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = parser.h; sourceTree = "<group>"; };
 		10C208AB1F70EF3C0015C464 /* iOSCue.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = iOSCue.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		10C208AD1F70EF3C0015C464 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		10C208AF1F70EF3C0015C464 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -159,6 +161,7 @@
 				101968B01F5A2D7A00C14C35 /* mem.h */,
 				1029B8EB1F5A2AEA0091471B /* nodes.c */,
 				1029B8F11F5A2AEA0091471B /* nodes.h */,
+				109DD2C31F7E0FEB00C0E38A /* parser.h */,
 				1097DD711F69586F00164ECF /* pool.c */,
 				1097DD721F69586F00164ECF /* pool.h */,
 				101968B31F5B6F3600C14C35 /* Scanner.c */,
@@ -245,6 +248,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				10EBE2C21F5FCA2E00C7417A /* inlines.h in Headers */,
+				109DD2C51F7E0FEB00C0E38A /* parser.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

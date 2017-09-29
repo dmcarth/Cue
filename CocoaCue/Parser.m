@@ -11,7 +11,7 @@
 
 @implementation Parser
 {
-	CueDocument *doc;
+	CueParser *parser;
 }
 
 - (instancetype)initWithString:(NSString *)str
@@ -21,7 +21,7 @@
 		const char *buff = [str UTF8String];
 		size_t len = strlen(buff);
 		
-		doc = cue_document_from_utf8(buff, len);
+		parser = cue_parser_from_utf8(buff, len);
 	}
 	return self;
 }
@@ -30,19 +30,19 @@
 {
 	self = [super init];
 	if (self) {
-		doc = cue_document_from_utf8(buff, len);
+		parser = cue_parser_from_utf8(buff, len);
 	}
 	return self;
 }
 
 - (void)dealloc
 {
-	cue_document_free(doc);
+	cue_parser_free(parser);
 }
 
 - (void)printOutline
 {
-	cue_node_print_description(cue_document_get_root(doc), 1);
+	cue_node_print_description(cue_parser_get_root(parser), 1);
 }
 
 @end
