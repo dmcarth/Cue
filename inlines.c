@@ -1,7 +1,6 @@
 
 #include "inlines.h"
 #include "mem.h"
-#include <stdio.h>
 
 DelimiterToken delimiter_token_init(CueNodeType type, int can_open,
 									uint32_t start, uint32_t end)

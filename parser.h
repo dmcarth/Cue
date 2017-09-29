@@ -3,6 +3,7 @@
 #define parser_h
 
 #include <stdint.h>
+
 #include "pool.h"
 #include "nodes.h"
 #include "Scanner.h"

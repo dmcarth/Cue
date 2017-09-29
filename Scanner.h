@@ -3,6 +3,7 @@
 #define scanner_h
 
 #include <stdint.h>
+
 #include "nodes.h"
 #include "pool.h"
 

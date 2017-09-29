@@ -1,8 +1,10 @@
 
 #include "nodes.h"
+
+#include <stdio.h>
+
 #include "mem.h"
 #include "Walker.h"
-#include <stdio.h>
 
 const char *cue_node_type_description(CueNodeType type)
 {

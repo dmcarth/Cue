@@ -1,7 +1,10 @@
 
-#include <stdio.h>
 #include "cue.h"
+
+#include <stdio.h>
+
 #include "mem.h"
+#include "pool.h"
 #include "Scanner.h"
 #include "inlines.h"
 #include "parser.h"
@@ -26,7 +29,7 @@ void cue_parser_free(CueParser *parser)
 {
 	pool_free(parser->node_allocator);
 	
-	scanner_free(parser->scanner);
+	free(parser->scanner);
 	
 	delimiter_stack_free(parser->delimiter_stack);
 	

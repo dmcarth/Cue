@@ -1,8 +1,9 @@
 
 #include "pool.h"
-#include "Walker.h"
-#include "mem.h"
+
 #include <stdio.h>
+
+#include "mem.h"
 
 // We store pre-allocated nodes in buckets of varying sizes. Each bucket also holds a reference to the next bucket in the list.
 struct Bucket

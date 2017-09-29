@@ -3,6 +3,7 @@
 #define inlines_h
 
 #include <stdint.h>
+
 #include "parser.h"
 #include "Scanner.h"
 #include "Walker.h"

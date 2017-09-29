@@ -3,9 +3,9 @@
 #define cue_h
 
 #include <stdint.h>
+
 #include "nodes.h"
 #include "Walker.h"
-#include "pool.h"
 
 typedef struct CueParser CueParser;
 
