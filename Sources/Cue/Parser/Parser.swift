@@ -78,6 +78,7 @@ extension Cue {
 		while charNumber < buffer.endIndex {
 			// Find line ending
 			endOfLineCharNumber = charNumber
+			
 			while endOfLineCharNumber < buffer.endIndex {
 				let backtrack = endOfLineCharNumber
 				endOfLineCharNumber += 1
@@ -232,9 +233,8 @@ extension Cue {
 		
 		var stack = DelimiterStack()
 		
-		var j = i
 		var foundBreakingStatement = false
-		while j < nodeRange.upperBound {
+		for j in nodeRange.lowerBound..<nodeRange.upperBound {
 			let c = buffer[j]
 			
 			let k = j + 1
@@ -279,11 +279,9 @@ extension Cue {
 			}
 			
 			if foundBreakingStatement { break }
-			
-			j = k
 		}
 		
-		j = i
+		var j = i
 		
 		while let next = queue.dequeue() {
 			let nextRange = next.rangeIncludingMarkers
