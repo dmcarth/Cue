@@ -2,7 +2,7 @@
 #include "inlines.h"
 #include "mem.h"
 
-DelimiterToken delimiter_token_init(CueNodeType type, int can_open,
+DelimiterToken delimiter_token_init(ASTNodeType type, int can_open,
 									uint32_t start, uint32_t end)
 {
 	DelimiterToken tok = {
@@ -128,11 +128,11 @@ void scan_for_tokens(struct CueParser *parser, int handle_parens)
 	}
 }
 
-void construct_ast(struct CueParser *parser, CueNode *node, uint32_t ewc)
+void construct_ast(struct CueParser *parser, ASTNode *node, uint32_t ewc)
 {
 	DelimiterStack *st = parser->delimiter_stack;
 	
-	CueNode *active_parent = node;
+	ASTNode *active_parent = node;
 	uint32_t last_idx = node->range.start;
 	
 	for (size_t i = 0; i < st->len; ++i) {
@@ -142,13 +142,13 @@ void construct_ast(struct CueParser *parser, CueNode *node, uint32_t ewc)
 			continue;
 		
 		if (tok->start > last_idx) {
-			CueNode *literal = pool_create_node(parser->node_allocator, S_NODE_LITERAL, last_idx, tok->start);
-			cue_node_add_child(active_parent, literal);
+			ASTNode *literal = pool_create_node(parser->node_allocator, S_NODE_LITERAL, last_idx, tok->start);
+			ast_node_add_child(active_parent, literal);
 		}
 		
 		if (tok->event == EVENT_ENTER) {
-			CueNode *tnode = pool_create_node(parser->node_allocator, tok->type, tok->start, tok->end);
-			cue_node_add_child(active_parent, tnode);
+			ASTNode *tnode = pool_create_node(parser->node_allocator, tok->type, tok->start, tok->end);
+			ast_node_add_child(active_parent, tnode);
 			active_parent = tnode;
 			last_idx = tok->end;
 		} else if (tok->event == EVENT_EXIT) {
@@ -160,12 +160,12 @@ void construct_ast(struct CueParser *parser, CueNode *node, uint32_t ewc)
 	
 	// If any space is left over from the stack, fill with a literal node
 	if (last_idx < node->range.end) {
-		CueNode *literal = pool_create_node(parser->node_allocator, S_NODE_LITERAL, last_idx, ewc);
-		cue_node_add_child(active_parent, literal);
+		ASTNode *literal = pool_create_node(parser->node_allocator, S_NODE_LITERAL, last_idx, ewc);
+		ast_node_add_child(active_parent, literal);
 	}
 }
 
-void parse_inlines_for_node(struct CueParser *parser, CueNode *node,
+void parse_inlines_for_node(struct CueParser *parser, ASTNode *node,
 							int handle_parens)
 {
 	Scanner *s = parser->scanner;

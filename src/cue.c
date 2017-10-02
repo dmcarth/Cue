@@ -36,26 +36,26 @@ void cue_parser_free(CueParser *parser)
 	free(parser);
 }
 
-CueNode *cue_parser_get_root(CueParser *parser)
+ASTNode *cue_parser_get_root(CueParser *parser)
 {
 	return parser->root;
 }
 
-CueNode *cue_node_description_init(Pool *p, uint32_t start, uint32_t wc,
+ASTNode *ast_node_description_init(Pool *p, uint32_t start, uint32_t wc,
 							   uint32_t ewc, uint32_t end)
 {
-	CueNode *desc = pool_create_node(p, S_NODE_DESCRIPTION, start, end);
-	CueNode *stream = pool_create_node(p, S_NODE_STREAM, wc, ewc);
-	cue_node_add_child(desc, stream);
+	ASTNode *desc = pool_create_node(p, S_NODE_DESCRIPTION, start, end);
+	ASTNode *stream = pool_create_node(p, S_NODE_STREAM, wc, ewc);
+	ast_node_add_child(desc, stream);
 
 	return desc;
 }
 
-CueNode *block_for_line(CueParser *parser)
+ASTNode *block_for_line(CueParser *parser)
 {
 	Scanner *s = parser->scanner;
 	Pool *p = parser->node_allocator;
-	CueNode *block;
+	ASTNode *block;
 	
 	if ((block = scan_for_thematic_break(s, p)) ||
 			(block = scan_for_forced_header(s, p)) ||
@@ -67,14 +67,14 @@ CueNode *block_for_line(CueParser *parser)
 		return block;
 	}
 	
-	block = cue_node_description_init(p, s->bol, s->wc, s->ewc, s->eol);
+	block = ast_node_description_init(p, s->bol, s->wc, s->ewc, s->eol);
 	
 	return block;
 }
 
-CueNode *appropriate_container_for_block(CueParser *parser, CueNode *block)
+ASTNode *appropriate_container_for_block(CueParser *parser, ASTNode *block)
 {
-	CueNode *root = parser->root;
+	ASTNode *root = parser->root;
 	Pool *p = parser->node_allocator;
 	
 	switch (block->type) {
@@ -85,37 +85,37 @@ CueNode *appropriate_container_for_block(CueParser *parser, CueNode *block)
 			return root;
 		case S_NODE_CUE:
 			if (!block->data.cue.isDual) {
-				CueNode *scues = pool_create_node(p, S_NODE_SIMULTANEOUS_CUES, block->range.start, block->range.end);
-				cue_node_add_child(root, scues);
+				ASTNode *scues = pool_create_node(p, S_NODE_SIMULTANEOUS_CUES, block->range.start, block->range.end);
+				ast_node_add_child(root, scues);
 				
 				return scues;
 			}
 			
-			CueNode *last = root->last_child;
-			if (cue_node_is_type(last, S_NODE_SIMULTANEOUS_CUES)) {
-				cue_node_extend_length_to_include_child(last, block);
+			ASTNode *last = root->last_child;
+			if (ast_node_is_type(last, S_NODE_SIMULTANEOUS_CUES)) {
+				ast_node_extend_length_to_include_child(last, block);
 				return last;
 			}
 			
 			break;
 		case S_NODE_FACSIMILE: {
-			CueNode *last = root->last_child;
+			ASTNode *last = root->last_child;
 			
 			// If last child of root is a facsimile, then change current block to a line and prepare it to be added to to the last child.
-			if (cue_node_is_type(last, S_NODE_FACSIMILE)) {
-				CueNode *line = block->first_child;
-				CueNode *stream = line->first_child;
+			if (ast_node_is_type(last, S_NODE_FACSIMILE)) {
+				ASTNode *line = block->first_child;
+				ASTNode *stream = line->first_child;
 				
 				block->type = S_NODE_LINE;
 				
 				line->type = S_NODE_STREAM;
 				line->range = stream->range;
 				
-				cue_node_unlink(stream);
+				ast_node_unlink(stream);
 				
 				pool_release_node(p, stream);
 				
-				cue_node_extend_length_to_include_child(last, block);
+				ast_node_extend_length_to_include_child(last, block);
 				return last;
 			}
 			
@@ -123,21 +123,21 @@ CueNode *appropriate_container_for_block(CueParser *parser, CueNode *block)
 			return root;
 		}
 		case S_NODE_LINE: {
-			CueNode *scues = root->last_child;
-			if (!cue_node_is_type(scues, S_NODE_SIMULTANEOUS_CUES))
+			ASTNode *scues = root->last_child;
+			if (!ast_node_is_type(scues, S_NODE_SIMULTANEOUS_CUES))
 				break;
 			
-			CueNode *cue = scues->last_child;
-			if (!cue_node_is_type(cue, S_NODE_CUE))
+			ASTNode *cue = scues->last_child;
+			if (!ast_node_is_type(cue, S_NODE_CUE))
 				break;
 			
-			CueNode *dir = cue->data.cue.direction;
-			if (!cue_node_is_type(dir, S_NODE_LYRIC_DIRECTION))
+			ASTNode *dir = cue->data.cue.direction;
+			if (!ast_node_is_type(dir, S_NODE_LYRIC_DIRECTION))
 				break;
 			
-			cue_node_extend_length_to_include_child(dir, block);
-			cue_node_extend_length_to_include_child(cue, dir);
-			cue_node_extend_length_to_include_child(scues, cue);
+			ast_node_extend_length_to_include_child(dir, block);
+			ast_node_extend_length_to_include_child(cue, dir);
+			ast_node_extend_length_to_include_child(scues, cue);
 			
 			return dir;
 		}
@@ -147,17 +147,17 @@ CueNode *appropriate_container_for_block(CueParser *parser, CueNode *block)
 	
 	// invalid syntax, fail gracefully
 	
-	cue_node_unlink(block);
+	ast_node_unlink(block);
 	pool_release_node(p, block);
 	
 	Scanner *s = parser->scanner;
 	
-	block = cue_node_description_init(p, s->bol, s->wc, s->ewc, s->eol);
+	block = ast_node_description_init(p, s->bol, s->wc, s->ewc, s->eol);
 	
 	return root;
 }
 
-void finalize_line(CueParser *parser, CueNode *block)
+void finalize_line(CueParser *parser, ASTNode *block)
 {
 	Scanner *s = parser->scanner;
 	Pool *p = parser->node_allocator;
@@ -171,28 +171,28 @@ void finalize_line(CueParser *parser, CueNode *block)
 			parse_inlines_for_node(parser, block->first_child->first_child, 0);
 			break;
 		case S_NODE_HEADER: {
-			CueNode *title = block->data.header.title;
+			ASTNode *title = block->data.header.title;
 			if (title) {
 				parse_inlines_for_node(parser, title->first_child, 0);
 			}
 			break;
 		}
 		case S_NODE_CUE: {
-			CueNode *dir = block->data.cue.direction;
+			ASTNode *dir = block->data.cue.direction;
 			
-			CueNode *newdir;
+			ASTNode *newdir;
 			s->loc = dir->range.start;
 			if ((newdir = scan_for_lyric_line(s, p))) {
 				dir = newdir;
 				dir->type = S_NODE_LYRIC_DIRECTION;
 				
-				CueNode *line = pool_create_node(p, S_NODE_LINE, dir->range.start, dir->range.end);
-				cue_node_add_child(dir, line);
+				ASTNode *line = pool_create_node(p, S_NODE_LINE, dir->range.start, dir->range.end);
+				ast_node_add_child(dir, line);
 				
 				parse_inlines_for_node(parser, line->first_child, 1);
 			} else {
-				CueNode *stream = pool_create_node(p, S_NODE_STREAM, dir->range.start, dir->range.end);
-				cue_node_add_child(dir, stream);
+				ASTNode *stream = pool_create_node(p, S_NODE_STREAM, dir->range.start, dir->range.end);
+				ast_node_add_child(dir, stream);
 				
 				parse_inlines_for_node(parser, stream, 1);
 			}
@@ -205,10 +205,10 @@ void finalize_line(CueParser *parser, CueNode *block)
 
 void process_line(CueParser *parser)
 {
-	CueNode *block = block_for_line(parser);
+	ASTNode *block = block_for_line(parser);
 	
-	CueNode *container = appropriate_container_for_block(parser, block);
-	cue_node_add_child(container, block);
+	ASTNode *container = appropriate_container_for_block(parser, block);
+	ast_node_add_child(container, block);
 	
 	finalize_line(parser, block);
 	

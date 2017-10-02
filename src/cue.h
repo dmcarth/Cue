@@ -17,7 +17,7 @@ CueParser *cue_parser_from_utf8(const char *buff, size_t len);
 
 void cue_parser_free(CueParser *parser);
 
-CueNode *cue_parser_get_root(CueParser *parser);
+ASTNode *cue_parser_get_root(CueParser *parser);
 
 void *cue_parser_get_table_of_contents(CueParser *parser);
 

@@ -6,7 +6,7 @@
 #include "mem.h"
 #include "Walker.h"
 
-const char *cue_node_type_description(CueNodeType type)
+const char *ast_node_type_description(ASTNodeType type)
 {
 	switch (type) {
 		case S_NODE_DOCUMENT:
@@ -64,27 +64,27 @@ const char *cue_node_type_description(CueNodeType type)
 	return "";
 }
 
-int cue_node_is_type(CueNode *node, CueNodeType type)
+int ast_node_is_type(ASTNode *node, ASTNodeType type)
 {
 	return (node && node->type == type);
 }
 
-int cue_node_is_direction(CueNode * node)
+int ast_node_is_direction(ASTNode * node)
 {
 	return node->type == S_NODE_PLAIN_DIRECTION || node->type == S_NODE_LYRIC_DIRECTION;
 }
 
-int cue_node_is_stream_container(CueNode *node)
+int ast_node_is_stream_container(ASTNode *node)
 {
 	return node->type == S_NODE_TITLE || node->type == S_NODE_LINE || node->type == S_NODE_DESCRIPTION;
 }
 
-void cue_node_extend_length_to_include_child(CueNode *node, CueNode *child)
+void ast_node_extend_length_to_include_child(ASTNode *node, ASTNode *child)
 {
 	node->range.end = child->range.end;
 }
 
-void cue_node_add_child(CueNode *node, CueNode *child)
+void ast_node_add_child(ASTNode *node, ASTNode *child)
 {
 	child->parent = node;
 
@@ -98,7 +98,7 @@ void cue_node_add_child(CueNode *node, CueNode *child)
 	node->last_child = child;
 }
 
-void cue_node_unlink(CueNode *node)
+void ast_node_unlink(ASTNode *node)
 {
 	if (node->parent) {
 		if (node->parent->first_child == node)
@@ -116,14 +116,14 @@ void cue_node_unlink(CueNode *node)
 	}
 }
 
-static void cue_node_print_single_description(CueNode *node)
+static void ast_node_print_single_description(ASTNode *node)
 {
-	const char * tdesc = cue_node_type_description(node->type);
+	const char * tdesc = ast_node_type_description(node->type);
 	
 	printf("%s %p {%u, %u}", tdesc, node, node->range.start, node->range.end);
 }
 
-void cue_node_print_description(CueNode *node, int recurse)
+void ast_node_print_description(ASTNode *node, int recurse)
 {
 	if (recurse) {
 		Walker *w = walker_new(node);
@@ -131,13 +131,13 @@ void cue_node_print_description(CueNode *node, int recurse)
 		
 		int indent = 0;
 		while ((event = walker_next(w)) != EVENT_DONE) {
-			CueNode *current = walker_get_current_node(w);
+			ASTNode *current = walker_get_current_node(w);
 			
 			if (event == EVENT_ENTER) {
 				for (size_t i=0; i<indent; ++i)
 					printf("| ");
 				
-				cue_node_print_single_description(current);
+				ast_node_print_single_description(current);
 				printf("\n");
 				
 				++indent;
@@ -148,6 +148,6 @@ void cue_node_print_description(CueNode *node, int recurse)
 		
 		free(w);
 	} else {
-		cue_node_print_single_description(node);
+		ast_node_print_single_description(node);
 	}
 }

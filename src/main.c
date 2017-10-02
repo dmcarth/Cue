@@ -147,8 +147,8 @@ void handle_request(CLIRequest *req)
 		CueParser *parser = cue_parser_from_utf8(str->buff, str->len);
 		
 		if (req->options & CUE_OPTION_AST) {
-			CueNode *root = cue_parser_get_root(parser);
-			cue_node_print_description(root, 1);
+			ASTNode *root = cue_parser_get_root(parser);
+			ast_node_print_description(root, 1);
 		}
 		
 		cue_parser_free(parser);

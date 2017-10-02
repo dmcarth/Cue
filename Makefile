@@ -18,5 +18,8 @@ program: library src/main.c
 	mkdir -p build
 	$(CC) $(CFLAGS) src/main.c build/libcue.a -o build/cue -L build -lcue
 
+bench: program
+	./build/cue bench/war+peace.txt --bench
+
 clean:
 	rm -rf build

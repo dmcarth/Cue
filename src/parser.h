@@ -12,7 +12,7 @@
 struct CueParser
 {
 	Pool *node_allocator;
-	CueNode *root;
+	ASTNode *root;
 	Scanner *scanner;
 	DelimiterStack *delimiter_stack;
 	

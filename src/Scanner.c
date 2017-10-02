@@ -210,7 +210,7 @@ int scan_for_frame(Scanner *s)
 
 /* The following are node factories. If scanning succeeds, they construct a node for the AST. */
 
-CueNode *scan_for_thematic_break(Scanner *s, Pool *p)
+ASTNode *scan_for_thematic_break(Scanner *s, Pool *p)
 {
 	if (s->ewc - s->loc < 3)
 		return NULL;
@@ -237,9 +237,9 @@ CueNode *scan_for_thematic_break(Scanner *s, Pool *p)
 	return pool_create_node(p, S_NODE_THEMATIC_BREAK, s->bol, s->eol);
 }
 
-CueNode *scan_title(Scanner *s, Pool *p)
+ASTNode *scan_title(Scanner *s, Pool *p)
 {
-	CueNode *title = NULL;
+	ASTNode *title = NULL;
 	
 	if (!scanner_is_at_eol(s)) {
 		uint32_t tstart = scanner_advance_to_first_nonspace(s);
@@ -250,7 +250,7 @@ CueNode *scan_title(Scanner *s, Pool *p)
 	return title;
 }
 
-CueNode *scan_for_forced_header(Scanner *s, Pool *p)
+ASTNode *scan_for_forced_header(Scanner *s, Pool *p)
 {
 	if (s->ewc - s->loc < 1 || s->buff[s->loc] != '.')
 		return NULL;
@@ -260,13 +260,13 @@ CueNode *scan_for_forced_header(Scanner *s, Pool *p)
 	uint32_t kend = scanner_backtrack_to_first_nonspace(s);
 	s->loc = hstart + 1;
 	
-	CueNode *head = pool_create_node(p, S_NODE_HEADER, s->bol, s->eol);
+	ASTNode *head = pool_create_node(p, S_NODE_HEADER, s->bol, s->eol);
 	
-	CueNode *key = pool_create_node(p, S_NODE_KEYWORD, kstart, kend);
-	cue_node_add_child(head, key);
+	ASTNode *key = pool_create_node(p, S_NODE_KEYWORD, kstart, kend);
+	ast_node_add_child(head, key);
 	
-	CueNode *title = scan_title(s, p);
-	cue_node_add_child(head, title);
+	ASTNode *title = scan_title(s, p);
+	ast_node_add_child(head, title);
 	
 	head->data.header.type = HEADER_FORCED;
 	head->data.header.keyword = key;
@@ -275,7 +275,7 @@ CueNode *scan_for_forced_header(Scanner *s, Pool *p)
 	return head;
 }
 
-CueNode *scan_for_header(Scanner *s, Pool *p)
+ASTNode *scan_for_header(Scanner *s, Pool *p)
 {
 	HeaderType type;
 	uint32_t kstart = s->loc;
@@ -306,19 +306,19 @@ CueNode *scan_for_header(Scanner *s, Pool *p)
 	
 	s->loc = hstart + 1;
 	
-	CueNode *head = pool_create_node(p, S_NODE_HEADER, s->bol, s->eol);
+	ASTNode *head = pool_create_node(p, S_NODE_HEADER, s->bol, s->eol);
 	
-	CueNode *key = pool_create_node(p, S_NODE_KEYWORD, kstart, kend);
-	cue_node_add_child(head, key);
+	ASTNode *key = pool_create_node(p, S_NODE_KEYWORD, kstart, kend);
+	ast_node_add_child(head, key);
 	
-	CueNode *id = NULL;
+	ASTNode *id = NULL;
 	if (istart < iend) {
 		id = pool_create_node(p, S_NODE_IDENTIFIER, istart, iend);
-		cue_node_add_child(head, id);
+		ast_node_add_child(head, id);
 	}
 	
-	CueNode *title = scan_title(s, p);
-	cue_node_add_child(head, title);
+	ASTNode *title = scan_title(s, p);
+	ast_node_add_child(head, title);
 	
 	head->data.header.type = type;
 	head->data.header.keyword = key;
@@ -328,7 +328,7 @@ CueNode *scan_for_header(Scanner *s, Pool *p)
 	return head;
 }
 
-CueNode *scan_for_end(Scanner *s, Pool *p)
+ASTNode *scan_for_end(Scanner *s, Pool *p)
 {
 	if (s->ewc - s->loc != 7)
 		return NULL;
@@ -349,7 +349,7 @@ CueNode *scan_for_end(Scanner *s, Pool *p)
 	return NULL;
 }
 
-CueNode *scan_for_facsimile(Scanner *s, Pool *p)
+ASTNode *scan_for_facsimile(Scanner *s, Pool *p)
 {
 	if (scanner_is_at_eol(s))
 		return NULL;
@@ -357,9 +357,9 @@ CueNode *scan_for_facsimile(Scanner *s, Pool *p)
 	if (s->buff[s->loc] == '>' && !scanner_loc_is_escaped(s)) {
 		uint32_t bstart = scanner_advance_to_first_nonspace(s);
 		
-		CueNode *facs = pool_create_node(p, S_NODE_FACSIMILE, s->bol, s->eol);
-		CueNode *line = pool_create_node(p, S_NODE_LINE, bstart, s->ewc);
-		cue_node_add_child(facs, line);
+		ASTNode *facs = pool_create_node(p, S_NODE_FACSIMILE, s->bol, s->eol);
+		ASTNode *line = pool_create_node(p, S_NODE_LINE, bstart, s->ewc);
+		ast_node_add_child(facs, line);
 		
 		return facs;
 	}
@@ -367,7 +367,7 @@ CueNode *scan_for_facsimile(Scanner *s, Pool *p)
 	return NULL;
 }
 
-CueNode *scan_for_lyric_line(Scanner *s, Pool *p)
+ASTNode *scan_for_lyric_line(Scanner *s, Pool *p)
 {
 	if (scanner_is_at_eol(s))
 		return NULL;
@@ -376,7 +376,7 @@ CueNode *scan_for_lyric_line(Scanner *s, Pool *p)
 		++(s->loc);
 		uint32_t bstart = scanner_advance_to_first_nonspace(s);
 		
-		CueNode *line = pool_create_node(p, S_NODE_LINE, bstart, s->ewc);
+		ASTNode *line = pool_create_node(p, S_NODE_LINE, bstart, s->ewc);
 		
 		return line;
 	}
@@ -384,7 +384,7 @@ CueNode *scan_for_lyric_line(Scanner *s, Pool *p)
 	return NULL;
 }
 
-CueNode *scan_for_cue(Scanner *s, Pool *p)
+ASTNode *scan_for_cue(Scanner *s, Pool *p)
 {
 	if (scanner_is_at_eol(s))
 		return NULL;
@@ -408,13 +408,13 @@ CueNode *scan_for_cue(Scanner *s, Pool *p)
 	uint32_t dstart = scanner_advance_to_first_nonspace(s);
 	uint32_t dend = s->ewc;
 	
-	CueNode *cue = pool_create_node(p, S_NODE_CUE, s->bol, s->eol);
+	ASTNode *cue = pool_create_node(p, S_NODE_CUE, s->bol, s->eol);
 	
-	CueNode *name = pool_create_node(p, S_NODE_NAME, nstart, nend);
-	cue_node_add_child(cue, name);
+	ASTNode *name = pool_create_node(p, S_NODE_NAME, nstart, nend);
+	ast_node_add_child(cue, name);
 	
-	CueNode *dir = pool_create_node(p, S_NODE_PLAIN_DIRECTION, dstart, dend);
-	cue_node_add_child(cue, dir);
+	ASTNode *dir = pool_create_node(p, S_NODE_PLAIN_DIRECTION, dstart, dend);
+	ast_node_add_child(cue, dir);
 	
 	cue->data.cue.isDual = isDual;
 	cue->data.cue.name = name;

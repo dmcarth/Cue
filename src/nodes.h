@@ -35,7 +35,7 @@ typedef enum
 	S_NODE_REFERENCE,
 	S_NODE_PARENTHETICAL,
 	S_NODE_COMMENT,
-} CueNodeType;
+} ASTNodeType;
 
 typedef struct
 {
@@ -51,45 +51,45 @@ typedef enum
 	HEADER_FORCED
 } HeaderType;
 
-struct CueNode
+struct ASTNode
 {
 	uint32_t type;
 	
 	SRange range;
 	
-	struct CueNode * parent;
-	struct CueNode * first_child;
-	struct CueNode * last_child;
-	struct CueNode * next;
-	struct CueNode * prev;
+	struct ASTNode * parent;
+	struct ASTNode * first_child;
+	struct ASTNode * last_child;
+	struct ASTNode * next;
+	struct ASTNode * prev;
 	
 	union {
 		struct {
 			uint32_t type;
-			struct CueNode *keyword;
-			struct CueNode *id;
-			struct CueNode *title;
+			struct ASTNode *keyword;
+			struct ASTNode *id;
+			struct ASTNode *title;
 		} header;
 		struct {
 			int isDual;
-			struct CueNode *name;
-			struct CueNode *direction;
+			struct ASTNode *name;
+			struct ASTNode *direction;
 		} cue;
 	} data;
 };
 
-typedef struct CueNode CueNode;
+typedef struct ASTNode ASTNode;
 
-void cue_node_add_child(CueNode *node, CueNode *child);
+void ast_node_add_child(ASTNode *node, ASTNode *child);
 
-void cue_node_extend_length_to_include_child(CueNode *node, CueNode *child);
+void ast_node_extend_length_to_include_child(ASTNode *node, ASTNode *child);
 
-int cue_node_is_type(CueNode *node, CueNodeType type);
+int ast_node_is_type(ASTNode *node, ASTNodeType type);
 
-int cue_node_is_direction(CueNode * node);
+int ast_node_is_direction(ASTNode * node);
 
-void cue_node_unlink(CueNode *node);
+void ast_node_unlink(ASTNode *node);
 
-void cue_node_print_description(CueNode *node, int recurse);
+void ast_node_print_description(ASTNode *node, int recurse);
 
 #endif /* nodes_h */
