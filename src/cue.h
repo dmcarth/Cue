@@ -8,17 +8,17 @@
 #include "nodes.h"
 #include "Walker.h"
 
-typedef struct CueParser CueParser;
+typedef struct CueDocument CueDocument;
 
 /** Creates a CueParser from a UTF-8 encoded string `buff` of size `len`. It
  * is the client's responsibility to ensure `buff` is a valid UTF-8 string.
  */
-CueParser *cue_parser_from_utf8(const char *buff, size_t len);
+CueDocument *cue_document_from_utf8(const char *utf8, size_t len);
 
-void cue_parser_free(CueParser *parser);
+void cue_document_free(CueDocument *doc);
 
-ASTNode *cue_parser_get_root(CueParser *parser);
+ASTNode *cue_document_get_root(CueDocument *doc);
 
-void *cue_parser_get_table_of_contents(CueParser *parser);
+void *cue_document_get_table_of_contents(CueDocument *doc);
 
 #endif /* cue_h */

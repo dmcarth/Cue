@@ -9,6 +9,40 @@
 #include "inlines.h"
 #include "parser.h"
 
+struct CueDocument {
+	const char *source;
+	size_t source_len;
+	ASTNode *root;
+	Pool *node_allocator;
+};
+
+CueDocument *cue_document_new(const char *source,
+							  size_t source_len,
+							  ASTNode *root,
+							  Pool *node_allocator)
+{
+	CueDocument *doc = c_malloc(sizeof(CueDocument));
+	
+	doc->source = source;
+	doc->source_len = source_len;
+	doc->root = root;
+	doc->node_allocator = node_allocator;
+	
+	return doc;
+}
+
+void cue_document_free(CueDocument *doc)
+{
+	pool_free(doc->node_allocator);
+	
+	free(doc);
+}
+
+ASTNode *cue_document_get_root(CueDocument *doc)
+{
+	return doc->root;
+}
+
 CueParser *cue_parser_new(const char *buff, uint32_t len)
 {
 	CueParser *p = c_malloc(sizeof(CueParser));
@@ -27,18 +61,11 @@ CueParser *cue_parser_new(const char *buff, uint32_t len)
 
 void cue_parser_free(CueParser *parser)
 {
-	pool_free(parser->node_allocator);
-	
 	free(parser->scanner);
 	
 	delimiter_stack_free(parser->delimiter_stack);
 	
 	free(parser);
-}
-
-ASTNode *cue_parser_get_root(CueParser *parser)
-{
-	return parser->root;
 }
 
 ASTNode *ast_node_description_init(Pool *p, uint32_t start, uint32_t wc,
@@ -215,7 +242,7 @@ void process_line(CueParser *parser)
 	return;
 }
 
-CueParser *cue_parser_from_utf8(const char *buff, size_t len)
+CueDocument *cue_document_from_utf8(const char *buff, size_t len)
 {
 	CueParser *parser = cue_parser_new(buff, (uint32_t)len);
 	
@@ -228,5 +255,9 @@ CueParser *cue_parser_from_utf8(const char *buff, size_t len)
 		}
 	}
 	
-	return parser;
+	CueDocument *doc = cue_document_new(buff, len, parser->root, parser->node_allocator);
+	
+	cue_parser_free(parser);
+	
+	return doc;
 }

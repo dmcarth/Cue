@@ -74,10 +74,14 @@ void benchmark_parsing_string(String *str, const char *file_name,
 	for (int i = 0; i < iterations; ++i) {
 		clock_t t1 = clock();
 		
-		CueParser *parser = cue_parser_from_utf8(str->buff, str->len);
-		cue_parser_free(parser);
+		CueDocument *doc = cue_document_from_utf8(str->buff, str->len);
+		cue_document_free(doc);
 		
 		clock_t t2 = clock();
+		
+		double time = (double)(t2 - t1) / (double)CLOCKS_PER_SEC;
+		
+		printf("%fs\n", time);
 		
 		clocks += t2 - t1;
 	}
@@ -154,14 +158,14 @@ void handle_request(CLIRequest *req)
 			benchmark_parsing_string(str, file_path, req->bench_iterations);
 		}
 		
-		CueParser *parser = cue_parser_from_utf8(str->buff, str->len);
+		CueDocument *doc = cue_document_from_utf8(str->buff, str->len);
 		
 		if (req->options & CUE_OPTION_AST) {
-			ASTNode *root = cue_parser_get_root(parser);
+			ASTNode *root = cue_document_get_root(doc);
 			ast_node_print_description(root, 1);
 		}
 		
-		cue_parser_free(parser);
+		cue_document_free(doc);
 		
 		string_free(str);
 	}
@@ -173,7 +177,7 @@ int main(int argc,
 	CLIRequest *req = parse_cli_request(argv, argc);
 	
 	if (!req) {
-		perror("Error");
+		printf("Error parsing arguments. :(\n");
 		exit(1);
 	}
 	

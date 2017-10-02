@@ -85,7 +85,7 @@ int delimiter_stack_scan_for_last_matchable_tok(DelimiterStack *st,
 	return 0;
 }
 
-void scan_for_tokens(struct CueParser *parser, int handle_parens)
+void scan_for_tokens(CueParser *parser, int handle_parens)
 {
 	DelimiterStack *st = parser->delimiter_stack;
 	delimiter_stack_reset(st);
@@ -128,7 +128,7 @@ void scan_for_tokens(struct CueParser *parser, int handle_parens)
 	}
 }
 
-void construct_ast(struct CueParser *parser, ASTNode *node, uint32_t ewc)
+void construct_ast(CueParser *parser, ASTNode *node, uint32_t ewc)
 {
 	DelimiterStack *st = parser->delimiter_stack;
 	
@@ -165,7 +165,7 @@ void construct_ast(struct CueParser *parser, ASTNode *node, uint32_t ewc)
 	}
 }
 
-void parse_inlines_for_node(struct CueParser *parser, ASTNode *node,
+void parse_inlines_for_node(CueParser *parser, ASTNode *node,
 							int handle_parens)
 {
 	Scanner *s = parser->scanner;

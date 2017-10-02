@@ -9,8 +9,7 @@
 #include "Scanner.h"
 #include "inlines.h"
 
-struct CueParser
-{
+typedef struct {
 	Pool *node_allocator;
 	ASTNode *root;
 	Scanner *scanner;
@@ -21,6 +20,6 @@ struct CueParser
 	 */
 	uint32_t bol, eol;
 	uint32_t first_nonspace, last_nonspace;
-};
+} CueParser;
 
 #endif /* parser_h */

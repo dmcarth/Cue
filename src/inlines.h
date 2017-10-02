@@ -32,7 +32,7 @@ DelimiterStack *delimiter_stack_new(void);
 
 void delimiter_stack_free(DelimiterStack *st);
 
-void parse_inlines_for_node(struct CueParser *parser, ASTNode *node,
+void parse_inlines_for_node(CueParser *parser, ASTNode *node,
 							int handle_parens);
 
 #endif /* inlines_h */
