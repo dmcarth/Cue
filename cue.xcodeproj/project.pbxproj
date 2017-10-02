@@ -51,6 +51,7 @@
 		1097DD711F69586F00164ECF /* pool.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = pool.c; sourceTree = "<group>"; };
 		1097DD721F69586F00164ECF /* pool.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = pool.h; sourceTree = "<group>"; };
 		109DD2C31F7E0FEB00C0E38A /* parser.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = parser.h; sourceTree = "<group>"; };
+		10A1FC431F822584007D7984 /* .gitignore */ = {isa = PBXFileReference; lastKnownFileType = text; path = .gitignore; sourceTree = "<group>"; };
 		10CC02211F81E08500E79FAC /* Makefile */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
 		10EBE2BF1F5FCA2E00C7417A /* inlines.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = inlines.c; sourceTree = "<group>"; };
 		10EBE2C01F5FCA2E00C7417A /* inlines.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = inlines.h; sourceTree = "<group>"; };
@@ -78,6 +79,7 @@
 		1029B8D91F5A2ACE0091471B = {
 			isa = PBXGroup;
 			children = (
+				10A1FC431F822584007D7984 /* .gitignore */,
 				10CC02211F81E08500E79FAC /* Makefile */,
 				10CC02291F82218D00E79FAC /* src */,
 				1029B8E31F5A2ACE0091471B /* Products */,
