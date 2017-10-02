@@ -12,14 +12,13 @@ build/%.o: src/%.c src/%.h
 library: $(OBJFILES)
 	mkdir -p build
 	ar -rsv build/libcue.a $^
-	rm -rf $^
 
 program: library src/main.c
 	mkdir -p build
 	$(CC) $(CFLAGS) src/main.c build/libcue.a -o build/cue -L build -lcue
 
 bench: program
-	./build/cue bench/war+peace.txt --bench
+	./build/cue bench/war+peace.txt --bench 1000
 
 clean:
 	rm -rf build
