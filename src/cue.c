@@ -29,7 +29,7 @@ void cue_parser_free(CueParser *parser)
 {
 	pool_free(parser->node_allocator);
 	
-	free(parser->scanner);
+	//free(parser->scanner);
 	
 	delimiter_stack_free(parser->delimiter_stack);
 	

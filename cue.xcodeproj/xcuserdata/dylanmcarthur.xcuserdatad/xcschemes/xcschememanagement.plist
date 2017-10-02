@@ -34,7 +34,22 @@
 			<key>orderHint</key>
 			<integer>0</integer>
 		</dict>
+		<key>cue_make.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>4</integer>
+		</dict>
+		<key>exttest.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>4</integer>
+		</dict>
 		<key>iOSCue.xcscheme</key>
+		<dict>
+			<key>orderHint</key>
+			<integer>4</integer>
+		</dict>
+		<key>makeit.xcscheme</key>
 		<dict>
 			<key>orderHint</key>
 			<integer>3</integer>
@@ -43,6 +58,16 @@
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
 		<key>1029B8E11F5A2ACE0091471B</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>1076B54C1F66A8E60087075B</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>10CC02231F81E0A700E79FAC</key>
 		<dict>
 			<key>primary</key>
 			<true/>

@@ -3,6 +3,7 @@
 #define cue_h
 
 #include <stdint.h>
+#include <stddef.h>
 
 #include "nodes.h"
 #include "Walker.h"

@@ -46,11 +46,17 @@ uint32_t scanner_advance_to_next_line(Scanner *s)
 	s->bol = s->eol;
 	s->loc = s->bol;
 	
-	while (s->eol < s->len) {
-		uint32_t bt = s->eol++;
-		if (is_newline(s->buff[bt]))
+	for (uint32_t i=s->eol; i < s->len; ++i) {
+		s->eol++;
+		if (is_newline(s->buff[i]))
 			break;
 	}
+	
+//	while (s->eol < s->len) {
+//		uint32_t bt = s->eol++;
+//		if (is_newline(s->buff[bt]))
+//			break;
+//	}
 	
 	scanner_trim_whitespace(s);
 	
