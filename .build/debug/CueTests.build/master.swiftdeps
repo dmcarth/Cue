@@ -1,5 +1,0 @@
-version: "Apple Swift version 3.1 (swiftlang-802.0.51 clang-802.0.41)"
-options: "f3de1b1f32bba94a51f44e91fd4fe5ab"
-build_time: [545345167, 114301000]
-inputs:
-  "/Users/dylanmcarthur/Documents/Frameworks/Cue/Tests/CueTests/CueTests.swift": [545344670, 0]
