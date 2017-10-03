@@ -80,16 +80,20 @@ struct ASTNode
 
 typedef struct ASTNode ASTNode;
 
-void ast_node_add_child(ASTNode *node, ASTNode *child);
+void ast_node_add_child(ASTNode *node,
+						ASTNode *child);
 
-void ast_node_extend_length_to_include_child(ASTNode *node, ASTNode *child);
+void ast_node_extend_length_to_include_child(ASTNode *node,
+											 ASTNode *child);
 
-int ast_node_is_type(ASTNode *node, ASTNodeType type);
+int ast_node_is_type(ASTNode *node,
+					 ASTNodeType type);
 
 int ast_node_is_direction(ASTNode * node);
 
 void ast_node_unlink(ASTNode *node);
 
-void ast_node_print_description(ASTNode *node, int recurse);
+void ast_node_print_description(ASTNode *node,
+								int recurse);
 
 #endif /* nodes_h */

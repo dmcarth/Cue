@@ -3,22 +3,22 @@ OBJFILES=$(LIBSOURCES:src/%.c=build/%.o)
 
 CFLAGS=-Wall -O3
 
-all: library program
+all: program
 
 build/%.o: src/%.c src/%.h
 	mkdir -p build
 	$(CC) -c $(CFLAGS) $< -o $@
 
-library: $(OBJFILES)
+build/libcue.a: $(OBJFILES)
 	mkdir -p build
 	ar -rsv build/libcue.a $^
 
-program: library src/main.c
+program: build/libcue.a src/main.c
 	mkdir -p build
 	$(CC) $(CFLAGS) src/main.c build/libcue.a -o build/cue -L build -lcue
 
 bench: program
-	./build/cue bench/war+peace.txt --bench 1000
+	./build/cue bench/war+peace.txt --bench 500
 
 clean:
 	rm -rf build
