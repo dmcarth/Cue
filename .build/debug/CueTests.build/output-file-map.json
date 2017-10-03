@@ -1,0 +1,11 @@
+{
+  "": {
+    "swift-dependencies": "/Users/dylanmcarthur/Documents/Frameworks/Cue/.build/debug/CueTests.build/master.swiftdeps"
+  },
+  "/Users/dylanmcarthur/Documents/Frameworks/Cue/Tests/CueTests/CueTests.swift": {
+    "dependencies": "/Users/dylanmcarthur/Documents/Frameworks/Cue/.build/debug/CueTests.build/CueTests.d",
+    "object": "/Users/dylanmcarthur/Documents/Frameworks/Cue/.build/debug/CueTests.build/CueTests.swift.o",
+    "swiftmodule": "/Users/dylanmcarthur/Documents/Frameworks/Cue/.build/debug/CueTests.build/CueTests~partial.swiftmodule",
+    "swift-dependencies": "/Users/dylanmcarthur/Documents/Frameworks/Cue/.build/debug/CueTests.build/CueTests.swiftdeps"
+  }
+}

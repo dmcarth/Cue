@@ -1,0 +1,144 @@
+### Swift dependencies file v0 ###
+provides-top-level:
+- "TableOfContentsItem"
+- "TableOfContentsType"
+- "=="
+provides-nominal:
+- "V3Cue19TableOfContentsItem"
+- "O3Cue19TableOfContentsType"
+provides-member:
+- ["V3Cue19TableOfContentsItem", ""]
+- ["O3Cue19TableOfContentsType", ""]
+provides-dynamic-lookup:
+depends-top-level:
+- "=="
+- "AssignmentPrecedence"
+- !private "FloatLiteralType"
+- "Header"
+- "Int"
+- !private "IntegerLiteralType"
+- "TableOfContentsItem"
+- "TableOfContentsType"
+depends-member:
+- ["Ps9AnyObject", "HeaderType"]
+- !private ["Ps17BitwiseOperations", "hashValue"]
+- !private ["Ps7CVarArg", "hashValue"]
+- !private ["Ps10Comparable", "hashValue"]
+- !private ["Ps29CustomPlaygroundQuickLookable", "hashValue"]
+- !private ["Ps17CustomReflectable", "hashValue"]
+- !private ["Ps23CustomStringConvertible", "hashValue"]
+- ["Ps9Equatable", "HeaderType"]
+- ["Ps9Equatable", "_toAnyHashable"]
+- ["Ps9Equatable", "act"]
+- ["Ps9Equatable", "chapter"]
+- ["Ps9Equatable", "forced"]
+- ["Ps9Equatable", "hashValue"]
+- ["Ps9Equatable", "page"]
+- ["Ps9Equatable", "scene"]
+- ["Ps9Equatable", ""]
+- !private ["Ps27ExpressibleByIntegerLiteral", "hashValue"]
+- ["Ps8Hashable", "_toAnyHashable"]
+- ["Ps8Hashable", "act"]
+- ["Ps8Hashable", "chapter"]
+- ["Ps8Hashable", "forced"]
+- ["Ps8Hashable", "hashValue"]
+- ["Ps8Hashable", "page"]
+- ["Ps8Hashable", "scene"]
+- ["Ps8Hashable", ""]
+- ["C3Cue6Header", "HeaderType"]
+- ["OC3Cue6Header10HeaderType", "act"]
+- ["OC3Cue6Header10HeaderType", "chapter"]
+- ["OC3Cue6Header10HeaderType", "forced"]
+- ["OC3Cue6Header10HeaderType", "page"]
+- ["OC3Cue6Header10HeaderType", "scene"]
+- !private ["Si", "hashValue"]
+- !private ["Ps7Integer", "hashValue"]
+- !private ["Ps17IntegerArithmetic", "hashValue"]
+- ["P3Cue13LeftDelimited", "HeaderType"]
+- !private ["Ps10MirrorPath", "hashValue"]
+- ["C3Cue4Node", "HeaderType"]
+- ["P3Cue14RightDelimited", "HeaderType"]
+- !private ["Ps13SignedInteger", "hashValue"]
+- !private ["Ps12SignedNumber", "hashValue"]
+- !private ["Ps10Strideable", "hashValue"]
+- ["V3Cue19TableOfContentsItem", "Int"]
+- ["V3Cue19TableOfContentsItem", "TableOfContentsType"]
+- ["V3Cue19TableOfContentsItem", "init"]
+- ["V3Cue19TableOfContentsItem", "location"]
+- ["V3Cue19TableOfContentsItem", "type"]
+- ["O3Cue19TableOfContentsType", "=="]
+- ["O3Cue19TableOfContentsType", "Header"]
+- ["O3Cue19TableOfContentsType", "_toAnyHashable"]
+- ["O3Cue19TableOfContentsType", "act"]
+- ["O3Cue19TableOfContentsType", "chapter"]
+- ["O3Cue19TableOfContentsType", "deinit"]
+- ["O3Cue19TableOfContentsType", "forced"]
+- ["O3Cue19TableOfContentsType", "hashValue"]
+- ["O3Cue19TableOfContentsType", "init"]
+- ["O3Cue19TableOfContentsType", "page"]
+- ["O3Cue19TableOfContentsType", "reference"]
+- ["O3Cue19TableOfContentsType", "scene"]
+- !private ["Ps35_ExpressibleByBuiltinIntegerLiteral", "hashValue"]
+- ["Ps9_Hashable", "_toAnyHashable"]
+- ["Ps9_Hashable", "act"]
+- ["Ps9_Hashable", "chapter"]
+- ["Ps9_Hashable", "forced"]
+- ["Ps9_Hashable", "hashValue"]
+- ["Ps9_Hashable", "page"]
+- ["Ps9_Hashable", "scene"]
+- ["Ps9_Hashable", ""]
+- !private ["Ps14_Incrementable", "hashValue"]
+- !private ["Ps8_Integer", "hashValue"]
+- !private ["Ps18_IntegerArithmetic", "hashValue"]
+- !private ["Ps21_ObjectiveCBridgeable", "hashValue"]
+- !private ["Ps14_SignedInteger", "hashValue"]
+- !private ["Ps11_Strideable", "hashValue"]
+depends-nominal:
+- "Ps9AnyObject"
+- !private "Ps17BitwiseOperations"
+- !private "Ps7CVarArg"
+- !private "Ps10Comparable"
+- !private "Ps29CustomPlaygroundQuickLookable"
+- !private "Ps17CustomReflectable"
+- !private "Ps23CustomStringConvertible"
+- "Ps9Equatable"
+- !private "Ps27ExpressibleByIntegerLiteral"
+- "Ps8Hashable"
+- "C3Cue6Header"
+- "OC3Cue6Header10HeaderType"
+- !private "Si"
+- !private "Ps7Integer"
+- !private "Ps17IntegerArithmetic"
+- "P3Cue13LeftDelimited"
+- !private "Ps10MirrorPath"
+- "C3Cue4Node"
+- "P3Cue14RightDelimited"
+- !private "Ps13SignedInteger"
+- !private "Ps12SignedNumber"
+- !private "Ps10Strideable"
+- "V3Cue19TableOfContentsItem"
+- "O3Cue19TableOfContentsType"
+- !private "Ps35_ExpressibleByBuiltinIntegerLiteral"
+- "Ps9_Hashable"
+- !private "Ps14_Incrementable"
+- !private "Ps8_Integer"
+- !private "Ps18_IntegerArithmetic"
+- !private "Ps21_ObjectiveCBridgeable"
+- !private "Ps14_SignedInteger"
+- !private "Ps11_Strideable"
+depends-dynamic-lookup:
+depends-external:
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/Swift.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/SwiftOnoneSupport.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/Foundation.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/ObjectiveC.apinotesc"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/Dispatch.apinotesc"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/Darwin.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/Dispatch.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/ObjectiveC.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreGraphics.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreGraphics.apinotesc"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/IOKit.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreText.apinotesc"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/Foundation.apinotesc"
+interface-hash: "88a0422116b3e6ca4743bb5aac0b6114"

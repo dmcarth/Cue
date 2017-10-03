@@ -1,0 +1,65 @@
+### Swift dependencies file v0 ###
+provides-top-level:
+- "SearchResult"
+- "=="
+provides-nominal:
+- "V3Cue12SearchResult"
+provides-member:
+- ["V3Cue12SearchResult", ""]
+provides-dynamic-lookup:
+depends-top-level:
+- !private "&&"
+- "=="
+- "AssignmentPrecedence"
+- "Bool"
+- "Equatable"
+- "Header"
+- "Int"
+- "Range"
+- "SearchResult"
+depends-member:
+- ["Ps9AnyObject", "HeaderType"]
+- ["Ps9Equatable", "HeaderType"]
+- !private ["Ps9Equatable", "keywordType"]
+- !private ["Ps9Equatable", "range"]
+- ["Ps9Equatable", ""]
+- ["C3Cue6Header", "HeaderType"]
+- !private ["OC3Cue6Header10HeaderType", "deinit"]
+- ["P3Cue13LeftDelimited", "HeaderType"]
+- ["C3Cue4Node", "HeaderType"]
+- ["P3Cue14RightDelimited", "HeaderType"]
+- ["V3Cue12SearchResult", "=="]
+- ["V3Cue12SearchResult", "Bool"]
+- ["V3Cue12SearchResult", "Header"]
+- ["V3Cue12SearchResult", "Int"]
+- ["V3Cue12SearchResult", "Range"]
+- ["V3Cue12SearchResult", "SearchResult"]
+- ["V3Cue12SearchResult", "deinit"]
+- ["V3Cue12SearchResult", "init"]
+- ["V3Cue12SearchResult", "keywordType"]
+- ["V3Cue12SearchResult", "range"]
+depends-nominal:
+- "Ps9AnyObject"
+- "Ps9Equatable"
+- "C3Cue6Header"
+- !private "OC3Cue6Header10HeaderType"
+- "P3Cue13LeftDelimited"
+- "C3Cue4Node"
+- "P3Cue14RightDelimited"
+- "V3Cue12SearchResult"
+depends-dynamic-lookup:
+depends-external:
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/Swift.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/SwiftOnoneSupport.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/Foundation.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/ObjectiveC.apinotesc"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/Dispatch.apinotesc"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/Darwin.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/Dispatch.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/ObjectiveC.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreGraphics.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreGraphics.apinotesc"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/IOKit.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreText.apinotesc"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/Foundation.apinotesc"
+interface-hash: "c1f91343e5d8fe71cbfa01b7a60180c6"

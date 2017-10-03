@@ -1,0 +1,11 @@
+Scene 1 - Test
+
+Some dialogue is lovely.
+
+Harry: (O.S.) I **hate** ice-cream.
+^Samantha: You monster! // too much
+
+> Hallo
+> Und hi!
+
+The End
