@@ -1,3 +1,5 @@
+.Forced header
+
 Scene 1 - Test
 
 Some dialogue is lovely.

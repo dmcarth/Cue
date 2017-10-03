@@ -77,11 +77,9 @@ uint32_t scanner_advance_to_first_nonspace(Scanner *s)
 
 uint32_t scanner_advance_to_hyphen(Scanner *s)
 {
-	while (s->loc < s->ewc) {
+	for (; s->loc < s->ewc; ++s->loc) {
 		if (s->buff[s->loc] == '-' && !scanner_loc_is_escaped(s))
 			break;
-		else
-			++(s->loc);
 	}
 	
 	return s->loc;
@@ -258,7 +256,10 @@ ASTNode *scan_for_forced_header(Scanner *s, Pool *p)
 	uint32_t kstart = ++(s->loc);
 	uint32_t hstart = scanner_advance_to_hyphen(s);
 	uint32_t kend = scanner_backtrack_to_first_nonspace(s);
-	s->loc = hstart + 1;
+	s->loc = hstart;
+	if (!scanner_is_at_eol(s)) {
+		++s->loc;
+	}
 	
 	ASTNode *head = pool_create_node(p, S_NODE_HEADER, s->bol, s->eol);
 	
@@ -266,7 +267,9 @@ ASTNode *scan_for_forced_header(Scanner *s, Pool *p)
 	ast_node_add_child(head, key);
 	
 	ASTNode *title = scan_title(s, p);
-	ast_node_add_child(head, title);
+	if (title) {
+		ast_node_add_child(head, title);
+	}
 	
 	head->data.header.type = HEADER_FORCED;
 	head->data.header.keyword = key;
@@ -304,7 +307,10 @@ ASTNode *scan_for_header(Scanner *s, Pool *p)
 	uint32_t hstart = scanner_advance_to_hyphen(s);
 	uint32_t iend = scanner_backtrack_to_first_nonspace(s);
 	
-	s->loc = hstart + 1;
+	s->loc = hstart;
+	if (!scanner_is_at_eol(s)) {
+		++s->loc;
+	}
 	
 	ASTNode *head = pool_create_node(p, S_NODE_HEADER, s->bol, s->eol);
 	
@@ -318,7 +324,9 @@ ASTNode *scan_for_header(Scanner *s, Pool *p)
 	}
 	
 	ASTNode *title = scan_title(s, p);
-	ast_node_add_child(head, title);
+	if (title) {
+		ast_node_add_child(head, title);
+	}
 	
 	head->data.header.type = type;
 	head->data.header.keyword = key;

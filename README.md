@@ -15,28 +15,30 @@ Cue has only been tested with clang and may not work immediately well with other
 Cue is designed to be intuitive and invisible whenever possible. It should look more or less exactly the same as when it's printed on a book or in a script. 
 
 ### Headers
-Headers are marked by one of these four keywords followed by some identifier:
+It can be useful to organize your script into sections. Cue let's you mark different sections with a header. Headers begin with one of these four keywords:
 
 ```
 Act I
-Chapter 1
-Scene The First
-Page 💯
+Scene 1
+Page
+Frame 💯
 ```
 
-For headers that use a non-standard keyword (or that don't have an identifier), you can force a header by inserting a period at the beginning of the line.
+`Frame` is the equivalent of `CUT TO:` in a screenplay. This gives you, the writer, as much granularity as you need to organize your ideas in a script. Note that Cue supports Unicode features like emoji and allows you to specifiy an identifier (`1`) when using a standard keyword. In practice, you should omit the identifiers and let Cue keep track of your headers for you.
+
+But maybe that's not enough for you. For headers that use a non-standard keyword, you can force a header by inserting a period at the beginning of the line.
 
 ```
 .Prologue
 ```
 
-Optionally, you can give each header a title by adding a hyphen.
+You can also give each header a short description by adding a hyphen.
 
 ```
-Chapter I - An Unexpected Party
+Scene - Inside a spooky cave 👻
 ```
 
-### Description
+### Scene Description
 Unmarked text is treated as ordinary scene description.
 
 ```
@@ -52,13 +54,13 @@ Links to images and other embeddable files are wrapped in [brackets].
 ```
 
 ### Cues
-Dialogue is marked by the character's name, a colon, and then their line.
+Dialogue is marked by the character's name, a colon, and their line.
 
 ```
 Jack: Whatever's written here is meant specifically for me.
 ```
 
-Fundamentally, dialogue is just scene description targeted at a single person. This is called a cue. Other cues can be targeted at other people and departments. Indeed, any part of the mise-en-scene can have a cue if it suits the writer and production team.
+Fundamentally, dialogue is just scene description targeted at a single person. This is called a cue. Other cues can be targeted at other people and parts of the mise-en-scene. Indeed, any part of the mise-en-scene can have a cue if it suits the writer and production team.
 
 ```
 Audio FX: This is a cue for the audio department.
@@ -72,7 +74,7 @@ Jack: This is a line of dialogue.
 ```
 
 ### Parentheticals
-Notes like `O.S`, `beat`, *et al.* are wrapped in parenthesis.
+Notes for actors like `O.S`, `beat`, and `V.O.` are wrapped in parenthesis.
 
 ```
 Jill: (O.S) I deeply regret tumbling after you.
