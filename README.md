@@ -1,43 +1,15 @@
 # Cue
-Cue is a Markdown-style language for writing stories for print, screen, and stage. For more information on the spec go to www.dylanthejoel.com/cue.
+Cue is a Markdown-style language for writing stories for print, screen, and stage.
 
-This library is for parsing and interpreting Cue. While the Cue spec continues to develop, the API will also continue to undergo changes. Until the Cue spec reaches 1.0, it should be considered unstable.
+While the Cue spec continues to develop, the API will also continue to undergo changes. Until the Cue spec reaches 1.0, it should be considered unstable.
 
 ## Dependencies
-Every attempt has been made to remove the need for external dependencies. As a result, anything that can compile Swift can compile the Cue library.
+Every attempt has been made to remove the need for external dependencies. As a result, anything that can compile ANSI C can compile Cue.
 
 ## Installation
-It is strongly recommended that you use the Swift Package Manager to install Cue. To do so, add this line to your dependencies in `Package.swift`:
+Cue uses make as its build system. To compile, run `make all` .
 
-```swift
-.Package(url: "https://github.com/dmcarth/Cue.git", majorVersion: 0, minor: 4)
-```
-
-## Usage
-The bread and butter of the Cue library is the Cue class, which accepts a string and provides some useful views onto the parsed data.
-
-```swift
-import Cue
-
-let parser = Cue("Hello world!")
-
-let ast = parser.ast 
-// An abstract syntax tree
-
-let table = parser.tableOfContents
-// An array representing a table of contents
-
-let html = parser.html()
-// Transforms the parsed input into HTML.
-
-let names = parser.namedEntitiesDictionary
-// A dictionary of names, counting their occurences in the original string
-```
-
-### Rendering
-Cue uses its own internal HTML renderer to output HTML, but it defines two public protocols for rendering Cue: `Renderer` and `MarkupRenderer`. 
-
-For more information on rendering Cue, such as for syntax highlighting or for custom HTML rendering, see the docs.
+Cue has only been tested with clang and may not work immediately well with other compilers.
 
 ## Syntax
 Cue is designed to be intuitive and invisible whenever possible. It should look more or less exactly the same as when it's printed on a book or in a script. 
@@ -65,13 +37,7 @@ Chapter I - An Unexpected Party
 ```
 
 ### Description
-Unmarked text is treated as ordinary description.
-
-```
-Jack went to the store to buy some milk, but he came home with a Jack Russell Terrier instead.
-```
-
-Or, if you prefer a screenplay-style of prose:
+Unmarked text is treated as ordinary scene description.
 
 ```
 The door opens to reveal Jack, both arms wrapped around a nervous Jack Russell Terrier. There is no milk to be seen.
@@ -81,30 +47,35 @@ It inherits a similar inline syntax to Markdown.
 
 ```
 Emphasis is marked by *asterisks*.
+Bold is marked by **double asterisks**.
 Links to images and other embeddable files are wrapped in [brackets].
 ```
 
 ### Cues
-The real power of Cue comes from the way it treats dialogue. Fundamentally, dialogue is just scene description targeted at a single person. This targeted direction is called a cue.
+Dialogue is marked by the character's name, a colon, and then their line.
 
 ```
 Jack: Whatever's written here is meant specifically for me.
 ```
 
-Other cues can be targeted at other people and departments. Indeed, any part of the mise-en-scene can have a cue if it suits the writer and production team.
+Fundamentally, dialogue is just scene description targeted at a single person. This is called a cue. Other cues can be targeted at other people and departments. Indeed, any part of the mise-en-scene can have a cue if it suits the writer and production team.
 
 ```
 Audio FX: This is a cue for the audio department.
-Cut to:
 ```
-
-The last line is an example of a self-describing cue. It doesn't need any further description because the cue name *is* the description.
 
 Cues that are meant to overlap with each other can be marked with a caret.
 
 ```
 Jack: This is a line of dialogue.
 ^Jill: This is a line meant to be spoken at the same time.
+```
+
+### Parentheticals
+Notes like `O.S`, `beat`, *et al.* are wrapped in parenthesis.
+
+```
+Jill: (O.S) I deeply regret tumbling after you.
 ```
 
 ### Lyrics
@@ -157,7 +128,7 @@ Five years later, Buttercup was betrothed to a prince...
 ```
 
 ### Comments
-Comments can be extremely useful for sharing notes with yourself and your collaborators, without appearing in the final project. You can add a comment to the end of a line using //.
+Comments can be extremely useful for sharing notes with yourself and your collaborators. You can add a comment to the end of a line using //.
 
 ```
 It was the best of times, it was the worst of times.    // consider revising
