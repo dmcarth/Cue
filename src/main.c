@@ -66,7 +66,8 @@ void string_free(String *str)
 	free(str);
 }
 
-void benchmark_parsing_string(String *str, const char *file_name,
+void benchmark_parsing_string(String *str,
+							  const char *file_name,
 							  int iterations)
 {
 	clock_t clocks = 0;

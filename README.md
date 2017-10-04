@@ -4,29 +4,33 @@ Cue is a Markdown-style language for writing stories for print, screen, and stag
 While the Cue spec continues to develop, the API will also continue to undergo changes. Until the Cue spec reaches 1.0, it should be considered unstable.
 
 ## Dependencies
-Every attempt has been made to remove the need for external dependencies. As a result, anything that can compile ANSI C can compile Cue.
+Cue is designed to be portable and lightweight. Every attempt has been made to remove the need for external dependencies. It's even written in ANSI C for that very purpose!
 
-## Installation
-Cue uses make as its build system. To compile, run `make all` .
+## Usage
+This repo contains a static library, `libcue`, and a command line utility, `cue`. To compile both, run `make all`. To compile one or the other run `make library` or `make program`.
 
-Cue has only been tested with clang and may not work immediately well with other compilers.
+Cue has only been tested with clang and may not work immediately with other compilers. If it doesn't work with yours, pull requests are greatly appreciated.
 
 ## Syntax
 Cue is designed to be intuitive and invisible whenever possible. It should look more or less exactly the same as when it's printed on a book or in a script. 
 
 ### Headers
-It can be useful to organize your script into sections. Cue let's you mark different sections with a header. Headers begin with one of these four keywords:
+It can be useful to organize your script into sections and Cue let's you do this with headers. Headers begin with one of these four keywords: `Act`, `Scene`, `Page`, and `Frame`.
+
+`Frame` is the equivalent of `CUT TO:` in a screenplay. It marks the beginning of a new camera angle. This gives you, the writer, as much granularity as you need to organize your ideas in a script.
+
+In addition, headers can have an optional identifier. For example:
 
 ```
 Act I
 Scene 1
-Page
+Page The First
 Frame 💯
 ```
 
-`Frame` is the equivalent of `CUT TO:` in a screenplay. This gives you, the writer, as much granularity as you need to organize your ideas in a script. Note that Cue supports Unicode features like emoji and allows you to specifiy an identifier (`1`) when using a standard keyword. In practice, you should omit the identifiers and let Cue keep track of your headers for you.
+In practice, however, you should omit the identifiers and let Cue keep track of your headers for you.
 
-But maybe that's not enough for you. For headers that use a non-standard keyword, you can force a header by inserting a period at the beginning of the line.
+You can force a header by inserting a period at the beginning of the line.
 
 ```
 .Prologue
@@ -35,7 +39,7 @@ But maybe that's not enough for you. For headers that use a non-standard keyword
 You can also give each header a short description by adding a hyphen.
 
 ```
-Scene - Inside a spooky cave 👻
+Scene - Interior of a spooky cave 👻
 ```
 
 ### Scene Description
@@ -54,13 +58,13 @@ Links to images and other embeddable files are wrapped in [brackets].
 ```
 
 ### Cues
-Dialogue is marked by the character's name, a colon, and their line.
+Dialogue is marked by the character's name, a colon, and their dialogue.
 
 ```
 Jack: Whatever's written here is meant specifically for me.
 ```
 
-Fundamentally, dialogue is just scene description targeted at a single person. This is called a cue. Other cues can be targeted at other people and parts of the mise-en-scene. Indeed, any part of the mise-en-scene can have a cue if it suits the writer and production team.
+Fundamentally, dialogue is just direction targeted at a single person. This is called a cue. Other cues can be targeted at other people and parts of the mise-en-scene. Indeed, any part of the mise-en-scene can have a cue if it suits the writer and production team.
 
 ```
 Audio FX: This is a cue for the audio department.
@@ -74,7 +78,7 @@ Jack: This is a line of dialogue.
 ```
 
 ### Parentheticals
-Notes for actors like `O.S`, `beat`, and `V.O.` are wrapped in parenthesis.
+Notes for actors like `O.S.`, `beat`, and `V.O.` are wrapped in parenthesis.
 
 ```
 Jill: (O.S) I deeply regret tumbling after you.
@@ -130,7 +134,7 @@ Five years later, Buttercup was betrothed to a prince...
 ```
 
 ### Comments
-Comments can be extremely useful for sharing notes with yourself and your collaborators. You can add a comment to the end of a line using //.
+Comments can be extremely useful for sharing notes with yourself and your collaborators. You can add a comment to the end of a line using `//`.
 
 ```
 It was the best of times, it was the worst of times.    // consider revising
