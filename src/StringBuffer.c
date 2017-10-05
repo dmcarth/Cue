@@ -42,7 +42,7 @@ void string_buffer_put(StringBuffer *string,
 	
 	void *base_ptr = string->buff + string->length;
 	
-	memcpy(base_ptr, a_string, a_len);
+	memmove(base_ptr, a_string, a_len);
 	
 	string->length += a_len;
 }
