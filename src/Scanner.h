@@ -12,14 +12,14 @@ typedef struct DelimiterStack DelimiterStack;
 
 typedef struct
 {
-	const char *buff;
-	uint32_t len;
+	const char *source;
+	uint32_t length;
 	uint32_t bol, eol, loc;
 	uint32_t wc, ewc;
 } Scanner;
 
-Scanner *scanner_new(const char *buff,
-					 uint32_t len);
+Scanner *scanner_new(const char *source,
+					 uint32_t length);
 
 void scanner_free(Scanner *s);
 

@@ -5,7 +5,7 @@
 #include <stdint.h>
 
 typedef struct {
-	char *buff;
+	char *buffer;
 	uint32_t length;
 	uint32_t capacity;
 } StringBuffer;

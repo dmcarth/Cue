@@ -13,7 +13,7 @@ struct DelimiterToken
 {
 	ASTNodeType type;
 	int can_open;
-	uint32_t start, end;
+	SRange range;
 	WalkerEvent event;
 };
 
@@ -27,8 +27,8 @@ struct DelimiterStack
 
 DelimiterToken delimiter_token_init(ASTNodeType type,
 									int can_open,
-									uint32_t start,
-									uint32_t end);
+									uint32_t location,
+									uint32_t length);
 
 DelimiterStack *delimiter_stack_new(void);
 

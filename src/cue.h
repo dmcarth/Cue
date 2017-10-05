@@ -20,8 +20,8 @@ void stack_allocator_reset(NodeAllocator *node_allocator);
  * is the client's responsibility to ensure `utf8` is a valid UTF-8 string.
  */
 CueDocument *cue_document_from_utf8(NodeAllocator *node_allocator,
-									const char *buff,
-									size_t len);
+									const char *source,
+									size_t length);
 
 void cue_document_free(CueDocument *doc);
 

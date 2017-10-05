@@ -10,18 +10,18 @@
 
 struct CueDocument {
     const char *source;
-    size_t source_len;
+    size_t length;
     ASTNode *root;
 };
 
 CueDocument *cue_document_new(const char *source,
-                              size_t source_len,
+                              size_t length,
                               ASTNode *root)
 {
     CueDocument *doc = c_malloc(sizeof(CueDocument));
     
     doc->source = source;
-    doc->source_len = source_len;
+    doc->length = length;
     doc->root = root;
     
     return doc;
@@ -40,14 +40,14 @@ ASTNode *cue_document_get_root(CueDocument *doc)
 }
 
 CueParser *cue_parser_new(NodeAllocator *node_allocator,
-                          const char *buff,
-                          uint32_t len)
+                          const char *source,
+                          uint32_t length)
 {
     CueParser *p = c_malloc(sizeof(CueParser));
     
     p->node_allocator = node_allocator;
-    p->root = ast_node_new(node_allocator, S_NODE_DOCUMENT, 0, len);
-    p->scanner = scanner_new(buff, len);
+    p->root = ast_node_new(node_allocator, S_NODE_DOCUMENT, 0, length);
+    p->scanner = scanner_new(source, length);
     p->delimiter_stack = delimiter_stack_new();
     p->bol = 0;
     p->eol = 0;
@@ -67,13 +67,13 @@ void cue_parser_free(CueParser *parser)
 }
 
 ASTNode *ast_node_description_init(NodeAllocator *node_allocator,
-                                   uint32_t start,
-                                   uint32_t wc,
-                                   uint32_t ewc,
-                                   uint32_t end)
+                                   uint32_t location,
+                                   uint32_t w_location,
+                                   uint32_t w_length,
+                                   uint32_t length)
 {
-    ASTNode *desc = ast_node_new(node_allocator, S_NODE_DESCRIPTION, start, end);
-    ASTNode *stream = ast_node_new(node_allocator, S_NODE_STREAM, wc, ewc);
+    ASTNode *desc = ast_node_new(node_allocator, S_NODE_DESCRIPTION, location, length);
+    ASTNode *stream = ast_node_new(node_allocator, S_NODE_STREAM, w_location, w_length);
     ast_node_add_child(desc, stream);
     
     return desc;
@@ -95,7 +95,7 @@ ASTNode *block_for_line(CueParser *parser)
         return block;
     }
     
-    block = ast_node_description_init(node_allocator, s->bol, s->wc, s->ewc, s->eol);
+    block = ast_node_description_init(node_allocator, s->bol, s->wc, s->ewc - s->wc, s->eol - s->bol);
     
     return block;
 }
@@ -113,7 +113,7 @@ ASTNode *appropriate_container_for_block(CueParser *parser, ASTNode *block)
             return root;
         case S_NODE_CUE:
             if (!block->as.cue.isDual) {
-                ASTNode *scues = ast_node_new(node_allocator, S_NODE_SIMULTANEOUS_CUES, block->range.start, block->range.end);
+                ASTNode *scues = ast_node_new(node_allocator, S_NODE_SIMULTANEOUS_CUES, block->range.location, block->range.length);
                 ast_node_add_child(root, scues);
                 
                 return scues;
@@ -180,7 +180,7 @@ ASTNode *appropriate_container_for_block(CueParser *parser, ASTNode *block)
     
     Scanner *s = parser->scanner;
     
-    block = ast_node_description_init(node_allocator, s->bol, s->wc, s->ewc, s->eol);
+    block = ast_node_description_init(node_allocator, s->bol, s->wc, s->ewc - s->wc, s->eol - s->bol);
     
     return root;
 }
@@ -209,17 +209,17 @@ void finalize_line(CueParser *parser, ASTNode *block)
             ASTNode *dir = block->as.cue.direction;
             
             ASTNode *newdir;
-            s->loc = dir->range.start;
+            s->loc = dir->range.location;
             if ((newdir = scan_for_lyric_line(s, node_allocator))) {
                 dir = newdir;
                 dir->type = S_NODE_LYRIC_DIRECTION;
                 
-                ASTNode *line = ast_node_new(node_allocator, S_NODE_LINE, dir->range.start, dir->range.end);
+                ASTNode *line = ast_node_new(node_allocator, S_NODE_LINE, dir->range.location, dir->range.length);
                 ast_node_add_child(dir, line);
                 
                 parse_inlines_for_node(parser, line->first_child, 1);
             } else {
-                ASTNode *stream = ast_node_new(node_allocator, S_NODE_STREAM, dir->range.start, dir->range.end);
+                ASTNode *stream = ast_node_new(node_allocator, S_NODE_STREAM, dir->range.location, dir->range.length);
                 ast_node_add_child(dir, stream);
                 
                 parse_inlines_for_node(parser, stream, 1);
@@ -244,21 +244,21 @@ void process_line(CueParser *parser)
 }
 
 CueDocument *cue_document_from_utf8(NodeAllocator *node_allocator,
-                                    const char *buff,
-                                    size_t len)
+                                    const char *source,
+                                    size_t length)
 {
-    CueParser *parser = cue_parser_new(node_allocator, buff, (uint32_t)len);
+    CueParser *parser = cue_parser_new(node_allocator, source, (uint32_t)length);
     
     Scanner *scanner = parser->scanner;
     
     // Enumerate lines
-    while (scanner_advance_to_next_line(scanner) < len) {
+    while (scanner_advance_to_next_line(scanner) < length) {
         if (!scanner_is_at_eol(scanner)) {
             process_line(parser);
         }
     }
     
-    CueDocument *doc = cue_document_new(buff, len, parser->root);
+    CueDocument *doc = cue_document_new(source, length, parser->root);
     
     cue_parser_free(parser);
     

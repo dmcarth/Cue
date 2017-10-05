@@ -39,8 +39,10 @@ typedef enum
 
 typedef struct
 {
-	uint32_t start, end;
+	uint32_t location, length;
 } SRange;
+
+#define s_range_max(range) (range.location + range.length)
 
 typedef enum
 {
@@ -89,8 +91,8 @@ struct NodeAllocator {
 
 ASTNode *ast_node_new(NodeAllocator *allocator,
 					  ASTNodeType type,
-					  uint32_t loc,
-					  uint32_t len);
+					  uint32_t location,
+					  uint32_t length);
 
 void ast_node_free(ASTNode *node);
 

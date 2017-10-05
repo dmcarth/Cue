@@ -8,14 +8,14 @@
 
 ASTNode *ast_node_new(NodeAllocator *allocator,
 					  ASTNodeType type,
-					  uint32_t loc,
-					  uint32_t len)
+					  uint32_t location,
+					  uint32_t length)
 {
 	// Obtain node from allocator.
 	ASTNode *node = allocator->alloc(allocator);
 	
 	// Setup node.
-	SRange range = { loc, len };
+	SRange range = { location, length };
 	
 	node->allocator = allocator;
 	node->type = type;
@@ -28,7 +28,7 @@ ASTNode *ast_node_new(NodeAllocator *allocator,
 	
 	// If requested node is a stream container, automatically add a stream.
 	if (type == S_NODE_TITLE || type == S_NODE_LINE) {
-		ASTNode *stream = ast_node_new(allocator, S_NODE_STREAM, loc, len);
+		ASTNode *stream = ast_node_new(allocator, S_NODE_STREAM, location, length);
 		ast_node_add_child(node, stream);
 	}
 	
@@ -117,7 +117,7 @@ int ast_node_is_stream_container(ASTNode *node)
 
 void ast_node_extend_length_to_include_child(ASTNode *node, ASTNode *child)
 {
-	node->range.end = child->range.end;
+	node->range.length = s_range_max(child->range) - node->range.location;
 }
 
 void ast_node_add_child(ASTNode *node, ASTNode *child)
@@ -156,7 +156,7 @@ static void ast_node_print_single_description(ASTNode *node)
 {
 	const char * tdesc = ast_node_type_description(node->type);
 	
-	printf("%s %p {%u, %u}", tdesc, node, node->range.start, node->range.end);
+	printf("%s %p {%u, %u}", tdesc, node, node->range.location, node->range.length);
 }
 
 void ast_node_print_description(ASTNode *node, int recurse)

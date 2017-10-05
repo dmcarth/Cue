@@ -4,14 +4,15 @@
 
 DelimiterToken delimiter_token_init(ASTNodeType type,
 									int can_open,
-									uint32_t start,
-									uint32_t end)
+									uint32_t location,
+									uint32_t length)
 {
+    SRange range = { location, length };
+    
 	DelimiterToken tok = {
 		type,
 		can_open,
-		start,
-		end,
+		range,
 		EVENT_NONE
 	};
 	
@@ -44,14 +45,16 @@ void delimiter_stack_free(DelimiterStack *st)
 	free(st);
 }
 
-void delimiter_stack_resize(DelimiterStack *st, size_t target)
+void delimiter_stack_resize(DelimiterStack *st,
+                            size_t target)
 {
 	st->first = c_realloc(st->first, target * sizeof(DelimiterToken));
 	
 	st->cap = target;
 }
 
-void delimiter_stack_push(DelimiterStack *st, DelimiterToken tok)
+void delimiter_stack_push(DelimiterStack *st,
+                          DelimiterToken tok)
 {
 	if (st->len >= st->cap)
 		delimiter_stack_resize(st, st->cap * 2);
@@ -87,7 +90,8 @@ int delimiter_stack_scan_for_last_matchable_tok(DelimiterStack *st,
 	return 0;
 }
 
-void scan_for_tokens(CueParser *parser, int handle_parens)
+void scan_for_tokens(CueParser *parser,
+                     int handle_parens)
 {
 	DelimiterStack *st = parser->delimiter_stack;
 	delimiter_stack_reset(st);
@@ -98,7 +102,7 @@ void scan_for_tokens(CueParser *parser, int handle_parens)
 	while (scan_delimiter_token(parser->scanner, handle_parens, &tok)) {
 		// If comment, add appropriate tokens to stack and break the loop. Comments take up the rest of a line.
 		if (tok.type == S_NODE_COMMENT) {
-			DelimiterToken ctok = delimiter_token_init(S_NODE_COMMENT, 0, s->ewc, s->ewc);
+			DelimiterToken ctok = delimiter_token_init(S_NODE_COMMENT, 0, s->ewc, 0);
 			tok.event = EVENT_ENTER;
 			ctok.event = EVENT_EXIT;
 			delimiter_stack_push(st, tok);
@@ -135,7 +139,7 @@ void construct_ast(CueParser *parser, ASTNode *node, uint32_t ewc)
 	DelimiterStack *st = parser->delimiter_stack;
 	
 	ASTNode *active_parent = node;
-	uint32_t last_idx = node->range.start;
+	uint32_t last_idx = node->range.location;
 	
 	for (size_t i = 0; i < st->len; ++i) {
 		DelimiterToken *tok = delimiter_stack_peek_at(st, i);
@@ -143,37 +147,38 @@ void construct_ast(CueParser *parser, ASTNode *node, uint32_t ewc)
 		if (tok->event == EVENT_NONE)
 			continue;
 		
-		if (tok->start > last_idx) {
-			ASTNode *literal = ast_node_new(parser->node_allocator, S_NODE_LITERAL, last_idx, tok->start);
+		if (tok->range.location > last_idx) {
+			ASTNode *literal = ast_node_new(parser->node_allocator, S_NODE_LITERAL, last_idx, tok->range.location - last_idx);
 			ast_node_add_child(active_parent, literal);
 		}
 		
 		if (tok->event == EVENT_ENTER) {
-			ASTNode *tnode = ast_node_new(parser->node_allocator, tok->type, tok->start, tok->end);
+			ASTNode *tnode = ast_node_new(parser->node_allocator, tok->type, tok->range.location, tok->range.length);
 			ast_node_add_child(active_parent, tnode);
 			active_parent = tnode;
-			last_idx = tok->end;
+			last_idx = s_range_max(tok->range);
 		} else if (tok->event == EVENT_EXIT) {
-			active_parent->range.end = tok->end;
+            active_parent->range.length = s_range_max(tok->range) - active_parent->range.location;
 			active_parent = active_parent->parent;
-			last_idx = tok->end;
+			last_idx = s_range_max(tok->range);
 		}
 	}
 	
 	// If any space is left over from the stack, fill with a literal node
-	if (last_idx < node->range.end) {
-		ASTNode *literal = ast_node_new(parser->node_allocator, S_NODE_LITERAL, last_idx, ewc);
+	if (last_idx < s_range_max(node->range)) {
+		ASTNode *literal = ast_node_new(parser->node_allocator, S_NODE_LITERAL, last_idx, ewc - last_idx);
 		ast_node_add_child(active_parent, literal);
 	}
 }
 
-void parse_inlines_for_node(CueParser *parser, ASTNode *node,
+void parse_inlines_for_node(CueParser *parser,
+                            ASTNode *node,
 							int handle_parens)
 {
 	Scanner *s = parser->scanner;
-	s->loc = node->range.start;
-	s->wc = node->range.start;
-	s->ewc = node->range.end;
+	s->loc = node->range.location;
+	s->wc = s->loc;
+	s->ewc = s_range_max(node->range);
 	
 	scan_for_tokens(parser, handle_parens);
 	

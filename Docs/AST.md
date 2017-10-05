@@ -25,34 +25,34 @@ That gives us something like this:
 ```
 document 0x7fb382800000 {0, 157}
 ...
-| simultaneous cues 0x7fb382800528 {58, 130}
-| | cue 0x7fb382800420 {58, 94}
-| | | name 0x7fb382800478 {58, 63}
-| | | plain direction 0x7fb3828004d0 {65, 93}
-| | | | stream 0x7fb382802000 {65, 93}
-| | | | | parenthetical 0x7fb382802058 {65, 71}
-| | | | | | literal 0x7fb3828020b0 {66, 70}
-| | | | | literal 0x7fb382802108 {71, 74}
-| | | | | strong 0x7fb382802160 {74, 82}
-| | | | | | literal 0x7fb3828021b8 {76, 80}
-| | | | | literal 0x7fb382802210 {82, 93}
-| | cue 0x7fb382802268 {94, 130}
-| | | name 0x7fb3828022c0 {95, 103}
-| | | plain direction 0x7fb382802318 {105, 129}
-| | | | stream 0x7fb382802370 {105, 129}
-| | | | | literal 0x7fb3828023c8 {105, 118}
-| | | | | comment 0x7fb382802420 {118, 129}
-| | | | | | literal 0x7fb382802478 {119, 129}
+| simultaneous cues 0x7f8c3f0005a0 {58, 72}
+| | cue 0x7f8c3f000480 {58, 36}
+| | | name 0x7f8c3f0004e0 {58, 5}
+| | | plain direction 0x7f8c3f000540 {65, 28}
+| | | | stream 0x7f8c3f000600 {65, 28}
+| | | | | parenthetical 0x7f8c3f000660 {65, 6}
+| | | | | | literal 0x7f8c3f0006c0 {66, 4}
+| | | | | literal 0x7f8c3f000720 {71, 3}
+| | | | | strong 0x7f8c3f000780 {74, 8}
+| | | | | | literal 0x7f8c3f0007e0 {76, 4}
+| | | | | literal 0x7f8c3f000840 {82, 11}
+| | cue 0x7f8c3f0008a0 {94, 36}
+| | | name 0x7f8c3f000900 {95, 8}
+| | | plain direction 0x7f8c3f000960 {105, 24}
+| | | | stream 0x7f8c3f0009c0 {105, 24}
+| | | | | literal 0x7f8c3f000a20 {105, 13}
+| | | | | comment 0x7f8c3f000a80 {118, 11}
+| | | | | | literal 0x7f8c3f000ae0 {119, 10}
 ...
-| end 0x7fb3828027b8 {150, 157}
+| end 0x7fb3828027b8 {150, 7}
 ```
 
-Each line starts with the node's type (`document`, `stream`, etc.), followed by its address in memory (`0x7fb382802760`), followed by its source range (`{58, 130}`).
+Each line starts with the node's type (`document`, `stream`, etc.), followed by its address in memory (`0x7f8c3f0004e0`), followed by its source range (`{58, 5}`).
 
-Source ranges become more specific as you move down the tree. Higher level nodes like `facsimile` and `cue` include whitespace and delimiters in their source ranges, while lower level nodes like `literal` and `name` do not. For example, in the above tree the source range for `strong 0x7fb382802160` is `{74, 82}`, which includes the two asterisks at both ends, while its child node `literal 0x7fb3828021b8` excludes those asterisks (`{76, 80}`).
+Source ranges become more specific as you move down the tree. Higher level nodes like `facsimile` and `cue` include whitespace and delimiters in their source ranges, while lower level nodes like `literal` and `name` do not. For example, in the above tree the source range for `strong 0x7fb382802160` is `{74, 8}`, which includes the two asterisks at both ends, while its child node `literal 0x7fb3828021b8` excludes those asterisks (`{76, 4}`).
 
 ## Headers
-If a node is a header (`ast_node_is_type(node, S_NODE_HEADER`), you can access its header-specific information through the `as` union.
+If a node is a header (`ast_node_is_type(node, S_NODE_HEADER`), you can access its header data through the `as` union.
 
 ```
 HeaderType type = node->as.header->type;
@@ -62,7 +62,7 @@ ASTNode *title = node->as.header->title;	// may be NULL
 ```
 
 ## Cues
-The `as` union also stores cue-specific information when the node is a cue (`ast_node_is_type(node, S_NODE_CUE`).
+The `as` union also stores cue data when the node is a cue (`ast_node_is_type(node, S_NODE_CUE`).
 
 ```
 int isDual = node->as.cue.isDual;
@@ -70,4 +70,6 @@ ASTNode *name = node->as.cue->name;
 ASTNode *direction = node->as.cue->direction;
 ```
 
-There are two different kinds of direction nodes, `S_NODE_PLAIN_DIRECTION` and `S_NODE_LYRIC_DIRECTION`, that might be stored in `as.cue->direction`. Plain direction holds an `S_NODE_STREAM` of inline nodes. Lyric direction holds a sequence of `S_NODE_LINE`s.
+There are two different kinds of direction nodes, `S_NODE_PLAIN_DIRECTION` and `S_NODE_LYRIC_DIRECTION`, that might be stored in `as.cue->direction`. These reflect the two different kinds of possible cues.
+
+Plain direction holds an `S_NODE_STREAM` of inline nodes. Lyric direction holds a sequence of `S_NODE_LINE`s.

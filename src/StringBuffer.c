@@ -11,7 +11,7 @@ StringBuffer *string_buffer_new()
 	
 	uint32_t cap = 32;
 	
-	str->buff = malloc(sizeof(char) * cap);
+	str->buffer = malloc(sizeof(char) * cap);
 	str->length = 0;
 	str->capacity = cap;
 	
@@ -20,7 +20,7 @@ StringBuffer *string_buffer_new()
 
 void string_buffer_free(StringBuffer *string)
 {
-	free(string->buff);
+	free(string->buffer);
 	
 	free(string);
 }
@@ -28,7 +28,7 @@ void string_buffer_free(StringBuffer *string)
 void string_buffer_resize(StringBuffer *string,
 					   uint32_t new_cap)
 {
-	string->buff = c_realloc(string->buff, new_cap);
+	string->buffer = c_realloc(string->buffer, new_cap);
 	
 	string->capacity = new_cap;
 }
@@ -40,7 +40,7 @@ void string_buffer_put(StringBuffer *string,
 	while (string->length + a_len >= string->capacity)
 		string_buffer_resize(string, string->capacity * 2);
 	
-	void *base_ptr = string->buff + string->length;
+	void *base_ptr = string->buffer + string->length;
 	
 	memmove(base_ptr, a_string, a_len);
 	

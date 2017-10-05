@@ -3,12 +3,13 @@
 #include "inlines.h"
 #include "mem.h"
 
-Scanner *scanner_new(const char *buff, uint32_t len)
+Scanner *scanner_new(const char *source,
+                     uint32_t length)
 {
 	Scanner *s = c_calloc(1, sizeof(Scanner));
 	
-	s->buff = buff;
-	s->len = len;
+	s->source = source;
+	s->length = length;
 	
 	return s;
 }
@@ -24,10 +25,10 @@ int scanner_is_at_eol(Scanner *s)
 	return s->loc == s->ewc;
 }
 
-/* true if buff[loc - 1] == '\' */
+/* true if source[loc - 1] == '\' */
 static int scanner_loc_is_escaped(Scanner *s)
 {
-	return s->loc && (s->buff[s->loc-1] == '\\');
+	return s->loc && (s->source[s->loc-1] == '\\');
 }
 
 /*	Cue ignores whitespace so we can safely ignore the "\r\n" case (the parser will interpret '\n' as an empty line and discard it). */
@@ -46,17 +47,11 @@ uint32_t scanner_advance_to_next_line(Scanner *s)
 	s->bol = s->eol;
 	s->loc = s->bol;
 	
-	for (uint32_t i=s->eol; i < s->len; ++i) {
+	for (uint32_t i = s->eol; i < s->length; ++i) {
 		s->eol++;
-		if (is_newline(s->buff[i]))
+		if (is_newline(s->source[i]))
 			break;
 	}
-	
-//	while (s->eol < s->len) {
-//		uint32_t bt = s->eol++;
-//		if (is_newline(s->buff[bt]))
-//			break;
-//	}
 	
 	scanner_trim_whitespace(s);
 	
@@ -66,7 +61,7 @@ uint32_t scanner_advance_to_next_line(Scanner *s)
 uint32_t scanner_advance_to_first_nonspace(Scanner *s)
 {
 	while (s->loc < s->ewc) {
-		if (is_whitespace(s->buff[s->loc]))
+		if (is_whitespace(s->source[s->loc]))
 			++(s->loc);
 		else
 			break;
@@ -78,7 +73,7 @@ uint32_t scanner_advance_to_first_nonspace(Scanner *s)
 uint32_t scanner_advance_to_hyphen(Scanner *s)
 {
 	for (; s->loc < s->ewc; ++s->loc) {
-		if (s->buff[s->loc] == '-' && !scanner_loc_is_escaped(s))
+		if (s->source[s->loc] == '-' && !scanner_loc_is_escaped(s))
 			break;
 	}
 	
@@ -90,7 +85,7 @@ uint32_t scanner_backtrack_to_first_nonspace(Scanner *s)
 	while (s->loc > s->wc) {
 		uint32_t bt = s->loc - 1;
 		
-		if (is_whitespace(s->buff[bt]))
+		if (is_whitespace(s->source[bt]))
 			s->loc = bt;
 		else
 			break;
@@ -99,7 +94,8 @@ uint32_t scanner_backtrack_to_first_nonspace(Scanner *s)
 	return s->loc;
 }
 
-uint32_t scanner_advance_to_colon(Scanner *s, uint32_t bound)
+uint32_t scanner_advance_to_colon(Scanner *s,
+                                  uint32_t bound)
 {
 	uint32_t start = s->loc;
 	
@@ -107,7 +103,7 @@ uint32_t scanner_advance_to_colon(Scanner *s, uint32_t bound)
 		if (s->loc - start > bound)
 			break;
 		
-		if (s->buff[s->loc] == ':' && !scanner_loc_is_escaped(s))
+		if (s->source[s->loc] == ':' && !scanner_loc_is_escaped(s))
 			break;
 		else
 			++(s->loc);
@@ -139,9 +135,9 @@ int scan_for_act(Scanner *s)
 		return 0;
 	
 	uint32_t loc = s->loc;
-	if (s->buff[loc++] == 'A' &&
-		s->buff[loc++] == 'c' &&
-		s->buff[loc++] == 't') {
+	if (s->source[loc++] == 'A' &&
+		s->source[loc++] == 'c' &&
+		s->source[loc++] == 't') {
 		s->loc = loc;
 		
 		return 1;
@@ -156,11 +152,11 @@ int scan_for_scene(Scanner *s)
 		return 0;
 	
 	uint32_t loc = s->loc;
-	if (s->buff[loc++] == 'S' &&
-		s->buff[loc++] == 'c' &&
-		s->buff[loc++] == 'e' &&
-		s->buff[loc++] == 'n' &&
-		s->buff[loc++] == 'e') {
+	if (s->source[loc++] == 'S' &&
+		s->source[loc++] == 'c' &&
+		s->source[loc++] == 'e' &&
+		s->source[loc++] == 'n' &&
+		s->source[loc++] == 'e') {
 		s->loc = loc;
 		
 		return 1;
@@ -175,10 +171,10 @@ int scan_for_page(Scanner *s)
 		return 0;
 	
 	uint32_t loc = s->loc;
-	if (s->buff[loc++] == 'P' &&
-		s->buff[loc++] == 'a' &&
-		s->buff[loc++] == 'g' &&
-		s->buff[loc++] == 'e') {
+	if (s->source[loc++] == 'P' &&
+		s->source[loc++] == 'a' &&
+		s->source[loc++] == 'g' &&
+		s->source[loc++] == 'e') {
 		s->loc = loc;
 		
 		return 1;
@@ -193,11 +189,11 @@ int scan_for_frame(Scanner *s)
 		return 0;
 	
 	uint32_t loc = s->loc;
-	if (s->buff[loc++] == 'F' &&
-		s->buff[loc++] == 'r' &&
-		s->buff[loc++] == 'a' &&
-		s->buff[loc++] == 'm' &&
-		s->buff[loc++] == 'e') {
+	if (s->source[loc++] == 'F' &&
+		s->source[loc++] == 'r' &&
+		s->source[loc++] == 'a' &&
+		s->source[loc++] == 'm' &&
+		s->source[loc++] == 'e') {
 		s->loc = loc;
 		
 		return 1;
@@ -216,7 +212,7 @@ ASTNode *scan_for_thematic_break(Scanner *s,
 	
 	uint32_t loc = s->loc;
 	while (loc < s->ewc) {
-		if (s->buff[loc] == '-' && !scanner_loc_is_escaped(s))
+		if (s->source[loc] == '-' && !scanner_loc_is_escaped(s))
 			++loc;
 		else
 			break;
@@ -233,7 +229,7 @@ ASTNode *scan_for_thematic_break(Scanner *s,
 		return NULL;
 	}
 	
-	return ast_node_new(node_allocator, S_NODE_THEMATIC_BREAK, s->bol, s->eol);
+	return ast_node_new(node_allocator, S_NODE_THEMATIC_BREAK, s->bol, s->eol - s->bol);
 }
 
 ASTNode *scan_title(Scanner *s,
@@ -244,7 +240,7 @@ ASTNode *scan_title(Scanner *s,
 	if (!scanner_is_at_eol(s)) {
 		uint32_t tstart = scanner_advance_to_first_nonspace(s);
 		
-		title = ast_node_new(node_allocator, S_NODE_TITLE, tstart, s->ewc);
+		title = ast_node_new(node_allocator, S_NODE_TITLE, tstart, s->ewc - tstart);
 	}
 	
 	return title;
@@ -253,7 +249,7 @@ ASTNode *scan_title(Scanner *s,
 ASTNode *scan_for_forced_header(Scanner *s,
 								NodeAllocator *node_allocator)
 {
-	if (s->ewc - s->loc < 1 || s->buff[s->loc] != '.')
+	if (s->ewc - s->loc < 1 || s->source[s->loc] != '.')
 		return NULL;
 	
 	uint32_t kstart = ++(s->loc);
@@ -264,9 +260,9 @@ ASTNode *scan_for_forced_header(Scanner *s,
 		++s->loc;
 	}
 	
-	ASTNode *head = ast_node_new(node_allocator, S_NODE_HEADER, s->bol, s->eol);
+	ASTNode *head = ast_node_new(node_allocator, S_NODE_HEADER, s->bol, s->eol - s->bol);
 	
-	ASTNode *key = ast_node_new(node_allocator, S_NODE_KEYWORD, kstart, kend);
+	ASTNode *key = ast_node_new(node_allocator, S_NODE_KEYWORD, kstart, kend - kstart);
 	ast_node_add_child(head, key);
 	
 	ASTNode *title = scan_title(s, node_allocator);
@@ -316,14 +312,14 @@ ASTNode *scan_for_header(Scanner *s,
 		++s->loc;
 	}
 	
-	ASTNode *head = ast_node_new(node_allocator, S_NODE_HEADER, s->bol, s->eol);
+	ASTNode *head = ast_node_new(node_allocator, S_NODE_HEADER, s->bol, s->eol - s->bol);
 	
-	ASTNode *key = ast_node_new(node_allocator, S_NODE_KEYWORD, kstart, kend);
+	ASTNode *key = ast_node_new(node_allocator, S_NODE_KEYWORD, kstart, kend - kstart);
 	ast_node_add_child(head, key);
 	
 	ASTNode *id = NULL;
 	if (istart < iend) {
-		id = ast_node_new(node_allocator, S_NODE_IDENTIFIER, istart, iend);
+		id = ast_node_new(node_allocator, S_NODE_IDENTIFIER, istart, iend - istart);
 		ast_node_add_child(head, id);
 	}
 	
@@ -347,16 +343,16 @@ ASTNode *scan_for_end(Scanner *s,
 		return NULL;
 	
 	uint32_t loc = s->loc;
-	if (s->buff[loc++] == 'T' &&
-		s->buff[loc++] == 'h' &&
-		s->buff[loc++] == 'e' &&
-		s->buff[loc++] == ' ' &&
-		s->buff[loc++] == 'E' &&
-		s->buff[loc++] == 'n' &&
-		s->buff[loc++] == 'd') {
+	if (s->source[loc++] == 'T' &&
+		s->source[loc++] == 'h' &&
+		s->source[loc++] == 'e' &&
+		s->source[loc++] == ' ' &&
+		s->source[loc++] == 'E' &&
+		s->source[loc++] == 'n' &&
+		s->source[loc++] == 'd') {
 		s->loc = loc;
 		
-		return ast_node_new(node_allocator, S_NODE_END, s->bol, s->eol);
+		return ast_node_new(node_allocator, S_NODE_END, s->bol, s->eol - s->bol);
 	}
 	
 	return NULL;
@@ -368,11 +364,11 @@ ASTNode *scan_for_facsimile(Scanner *s,
 	if (scanner_is_at_eol(s))
 		return NULL;
 	
-	if (s->buff[s->loc] == '>' && !scanner_loc_is_escaped(s)) {
+	if (s->source[s->loc] == '>' && !scanner_loc_is_escaped(s)) {
 		uint32_t bstart = scanner_advance_to_first_nonspace(s);
 		
-		ASTNode *facs = ast_node_new(node_allocator, S_NODE_FACSIMILE, s->bol, s->eol);
-		ASTNode *line = ast_node_new(node_allocator, S_NODE_LINE, bstart, s->ewc);
+		ASTNode *facs = ast_node_new(node_allocator, S_NODE_FACSIMILE, s->bol, s->eol - s->bol);
+		ASTNode *line = ast_node_new(node_allocator, S_NODE_LINE, bstart, s->ewc - bstart);
 		ast_node_add_child(facs, line);
 		
 		return facs;
@@ -387,11 +383,11 @@ ASTNode *scan_for_lyric_line(Scanner *s,
 	if (scanner_is_at_eol(s))
 		return NULL;
 	
-	if (s->buff[s->loc] == '~' && !scanner_loc_is_escaped(s)) {
+	if (s->source[s->loc] == '~' && !scanner_loc_is_escaped(s)) {
 		++(s->loc);
 		uint32_t bstart = scanner_advance_to_first_nonspace(s);
 		
-		ASTNode *line = ast_node_new(node_allocator, S_NODE_LINE, bstart, s->ewc);
+		ASTNode *line = ast_node_new(node_allocator, S_NODE_LINE, bstart, s->ewc - bstart);
 		
 		return line;
 	}
@@ -407,7 +403,7 @@ ASTNode *scan_for_cue(Scanner *s,
 	
 	uint32_t bt = s->loc;
 	int isDual = 0;
-	if (s->buff[s->loc] == '^' && !scanner_loc_is_escaped(s)) {
+	if (s->source[s->loc] == '^' && !scanner_loc_is_escaped(s)) {
 		isDual = 1;
 		++(s->loc);
 	}
@@ -424,12 +420,12 @@ ASTNode *scan_for_cue(Scanner *s,
 	uint32_t dstart = scanner_advance_to_first_nonspace(s);
 	uint32_t dend = s->ewc;
 	
-	ASTNode *cue = ast_node_new(node_allocator, S_NODE_CUE, s->bol, s->eol);
+	ASTNode *cue = ast_node_new(node_allocator, S_NODE_CUE, s->bol, s->eol - s->bol);
 	
-	ASTNode *name = ast_node_new(node_allocator, S_NODE_NAME, nstart, nend);
+	ASTNode *name = ast_node_new(node_allocator, S_NODE_NAME, nstart, nend - nstart);
 	ast_node_add_child(cue, name);
 	
-	ASTNode *dir = ast_node_new(node_allocator, S_NODE_PLAIN_DIRECTION, dstart, dend);
+	ASTNode *dir = ast_node_new(node_allocator, S_NODE_PLAIN_DIRECTION, dstart, dend - dstart);
 	ast_node_add_child(cue, dir);
 	
 	cue->as.cue.isDual = isDual;
@@ -439,44 +435,47 @@ ASTNode *scan_for_cue(Scanner *s,
 	return cue;
 }
 
-int scan_delimiter_token(Scanner *s, int handle_parens, DelimiterToken *out)
+int scan_delimiter_token(Scanner *s,
+                         int handle_parens,
+                         DelimiterToken *out)
 {
 	for (; s->loc < s->ewc; ++s->loc) {
 		if (scanner_loc_is_escaped(s))
 			continue;
 		
-		switch (s->buff[s->loc]) {
+		switch (s->source[s->loc]) {
 			case '*': {
-				*out = delimiter_token_init(S_NODE_EMPHASIS, 1, s->loc, ++s->loc);
-				if (!scanner_is_at_eol(s) && s->buff[s->loc] == '*') {
+				*out = delimiter_token_init(S_NODE_EMPHASIS, 1, s->loc++, 1);
+				if (!scanner_is_at_eol(s) && s->source[s->loc] == '*') {
 					out->type = S_NODE_STRONG;
-					out->end = ++s->loc;
+                    out->range.length = 2;
+                    ++s->loc;
 				}
 				return 1;
 			}
 			case '(':
 				if (handle_parens) {
-					*out = delimiter_token_init(S_NODE_PARENTHETICAL, 1, s->loc, ++s->loc);
+					*out = delimiter_token_init(S_NODE_PARENTHETICAL, 1, s->loc++, 1);
 					return 1;
 				}
 				break;
 			case ')':
 				if (handle_parens) {
-					*out = delimiter_token_init(S_NODE_PARENTHETICAL, 0, s->loc, ++s->loc);
+					*out = delimiter_token_init(S_NODE_PARENTHETICAL, 0, s->loc++, 1);
 					return 1;
 				}
 				break;
 			case '[':
-				*out = delimiter_token_init(S_NODE_REFERENCE, 1, s->loc, ++s->loc);
+				*out = delimiter_token_init(S_NODE_REFERENCE, 1, s->loc++, 1);
 				return 1;
 			case ']':
-				*out = delimiter_token_init(S_NODE_REFERENCE, 0, s->loc, ++s->loc);
+				*out = delimiter_token_init(S_NODE_REFERENCE, 0, s->loc++, 1);
 				return 1;
 			case '/': {
 				uint32_t bt = s->loc++;
-				if (!scanner_is_at_eol(s) && s->buff[s->loc] == '/') {
+				if (!scanner_is_at_eol(s) && s->source[s->loc] == '/') {
 					scanner_advance_to_first_nonspace(s);
-					*out = delimiter_token_init(S_NODE_COMMENT, 1, bt, s->loc);
+					*out = delimiter_token_init(S_NODE_COMMENT, 1, bt, s->loc - bt);
 					s->loc = s->ewc;
 					return 1;
 				}
