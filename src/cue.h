@@ -14,6 +14,8 @@ NodeAllocator *stack_allocator_new(void);
 
 void stack_allocator_free(NodeAllocator *node_allocator);
 
+void stack_allocator_reset(NodeAllocator *node_allocator);
+
 /** Creates a CueDocument from a UTF-8 encoded string `utf8` of size `len`. It
  * is the client's responsibility to ensure `utf8` is a valid UTF-8 string.
  */

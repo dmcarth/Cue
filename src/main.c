@@ -72,13 +72,14 @@ void benchmark_parsing_string(String *str,
 {
 	clock_t clocks = 0;
 	
+	NodeAllocator *alloc = stack_allocator_new();
+	
 	for (int i = 0; i < iterations; ++i) {
 		clock_t t1 = clock();
 		
-		NodeAllocator *alloc = stack_allocator_new();
+		stack_allocator_reset(alloc);
 		CueDocument *doc = cue_document_from_utf8(alloc, str->buff, str->len);
 		cue_document_free(doc);
-		stack_allocator_free(alloc);
 		
 		clock_t t2 = clock();
 		
@@ -88,6 +89,8 @@ void benchmark_parsing_string(String *str,
 		
 		clocks += t2 - t1;
 	}
+	
+	stack_allocator_free(alloc);
 	
 	double ticks = ((double)clocks / (double)iterations);
 	double time = ticks / (double)CLOCKS_PER_SEC;

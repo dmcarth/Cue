@@ -17,7 +17,7 @@ typedef struct Bucket {
 typedef struct Pool
 {
 	Bucket *first;
-	Bucket *last;
+	Bucket *current;
 	size_t cap;
 } Pool;
 
@@ -35,7 +35,8 @@ Bucket *bucket_new(size_t len)
 
 ASTNode *pool_create_node(NodeAllocator *node_allocator);
 
-void pool_release_node(NodeAllocator *node_allocator, ASTNode *node);
+void pool_release_node(NodeAllocator *node_allocator,
+					   ASTNode *node);
 
 NodeAllocator *stack_allocator_new()
 {
@@ -44,7 +45,7 @@ NodeAllocator *stack_allocator_new()
 	size_t cap = 16;
 	
 	p->first = bucket_new(cap);
-	p->last = p->first;
+	p->current = p->first;
 	p->cap = cap;
 	
 	NodeAllocator *node_allocator = c_malloc(sizeof(NodeAllocator));
@@ -77,20 +78,43 @@ void stack_allocator_free(NodeAllocator *node_allocator)
 	free(node_allocator);
 }
 
+void stack_allocator_reset(NodeAllocator *node_allocator)
+{
+	Pool *p = node_allocator->data;
+	Bucket *b = p->first;
+	Bucket *next;
+	
+	while (b) {
+		next = b->next;
+		
+		b->head = 0;
+		
+		b = next;
+	}
+	
+	p->current = p->first;
+}
+
 ASTNode *pool_create_node(NodeAllocator *node_allocator)
 {
 	Pool *p = node_allocator->data;
 	
-	Bucket *b = p->last;
+	Bucket *b = p->current;
 	
-	// If current bucket is full, create a new one.
+	// If current bucket is full, obtain a new one.
 	if (b->head >= b->len) {
-		// We want our pool to grow exponentially to amortize the cost of bucket allocation. Make each new bucket equal to the pool's current capacity to double its size.
-		size_t newlen = p->cap;
-		b = bucket_new(newlen);
-		p->last->next = b;
-		p->last = b;
-		p->cap += b->len;
+		if (b->next) {
+			// If there is already an available bucket, use it.
+			b = b->next;
+			p->current = b;
+		} else {
+			// We want our pool to grow exponentially to amortize the cost of bucket allocation. Make each new bucket equal to the pool's current capacity to double its size.
+			size_t newlen = p->cap;
+			b = bucket_new(newlen);
+			p->current->next = b;
+			p->current = b;
+			p->cap += b->len;
+		}
 	}
 	
 	// Obtain pointer to next available ast_node and increment b->head.
@@ -100,11 +124,12 @@ ASTNode *pool_create_node(NodeAllocator *node_allocator)
 }
 
 // Releases a given ast_node pointer back into the pool. Assumes that ast_node is at the top of the stack. If node isn't at the top of the stack, it will persist in memory until the pool is freed.
-void pool_release_node(NodeAllocator *node_allocator, ASTNode *node)
+void pool_release_node(NodeAllocator *node_allocator,
+					   ASTNode *node)
 {
 	Pool *p = node_allocator->data;
 	
-	Bucket *b = p->last;
+	Bucket *b = p->current;
 	
 	if (b->first + b->head - 1 == node) {
 		--b->head;
