@@ -3,7 +3,7 @@ BUILDDIR=build
 LIBSOURCES=$(addprefix $(SRCDIR)/,nodes.c Scanner.c inlines.c pool.c mem.c StringBuffer.c Walker.c cue.c)
 OBJFILES=$(LIBSOURCES:$(SRCDIR)/%.c=$(BUILDDIR)/%.o)
 
-CFLAGS=-Wall -O3
+CFLAGS=-Wall -O2
 
 all: program
 
