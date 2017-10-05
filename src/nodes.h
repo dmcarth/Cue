@@ -78,7 +78,7 @@ typedef struct ASTNode
 			struct ASTNode *name;
 			struct ASTNode *direction;
 		} cue;
-	} data;
+	} as;
 } ASTNode;
 
 struct NodeAllocator {

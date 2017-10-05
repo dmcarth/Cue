@@ -274,9 +274,9 @@ ASTNode *scan_for_forced_header(Scanner *s,
 		ast_node_add_child(head, title);
 	}
 	
-	head->data.header.type = HEADER_FORCED;
-	head->data.header.keyword = key;
-	head->data.header.title = title;
+	head->as.header.type = HEADER_FORCED;
+	head->as.header.keyword = key;
+	head->as.header.title = title;
 	
 	return head;
 }
@@ -332,10 +332,10 @@ ASTNode *scan_for_header(Scanner *s,
 		ast_node_add_child(head, title);
 	}
 	
-	head->data.header.type = type;
-	head->data.header.keyword = key;
-	head->data.header.id = id;
-	head->data.header.title = title;
+	head->as.header.type = type;
+	head->as.header.keyword = key;
+	head->as.header.id = id;
+	head->as.header.title = title;
 	
 	return head;
 }
@@ -432,9 +432,9 @@ ASTNode *scan_for_cue(Scanner *s,
 	ASTNode *dir = ast_node_new(node_allocator, S_NODE_PLAIN_DIRECTION, dstart, dend);
 	ast_node_add_child(cue, dir);
 	
-	cue->data.cue.isDual = isDual;
-	cue->data.cue.name = name;
-	cue->data.cue.direction = dir;
+	cue->as.cue.isDual = isDual;
+	cue->as.cue.name = name;
+	cue->as.cue.direction = dir;
 	
 	return cue;
 }

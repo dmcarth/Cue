@@ -9,7 +9,7 @@
 #include "parser.h"
 
 struct CueDocument {
-	const char *source;
+    const char *source;
     size_t source_len;
     ASTNode *root;
 };
@@ -19,7 +19,7 @@ CueDocument *cue_document_new(const char *source,
                               ASTNode *root)
 {
     CueDocument *doc = c_malloc(sizeof(CueDocument));
-	
+    
     doc->source = source;
     doc->source_len = source_len;
     doc->root = root;
@@ -29,7 +29,7 @@ CueDocument *cue_document_new(const char *source,
 
 void cue_document_free(CueDocument *doc)
 {
-	//ast_node_free(doc->root);
+    //ast_node_free(doc->root);
     
     free(doc);
 }
@@ -40,8 +40,8 @@ ASTNode *cue_document_get_root(CueDocument *doc)
 }
 
 CueParser *cue_parser_new(NodeAllocator *node_allocator,
-						  const char *buff,
-						  uint32_t len)
+                          const char *buff,
+                          uint32_t len)
 {
     CueParser *p = c_malloc(sizeof(CueParser));
     
@@ -67,15 +67,15 @@ void cue_parser_free(CueParser *parser)
 }
 
 ASTNode *ast_node_description_init(NodeAllocator *node_allocator,
-								   uint32_t start,
-								   uint32_t wc,
-								   uint32_t ewc,
-								   uint32_t end)
+                                   uint32_t start,
+                                   uint32_t wc,
+                                   uint32_t ewc,
+                                   uint32_t end)
 {
     ASTNode *desc = ast_node_new(node_allocator, S_NODE_DESCRIPTION, start, end);
     ASTNode *stream = ast_node_new(node_allocator, S_NODE_STREAM, wc, ewc);
     ast_node_add_child(desc, stream);
-	
+    
     return desc;
 }
 
@@ -112,7 +112,7 @@ ASTNode *appropriate_container_for_block(CueParser *parser, ASTNode *block)
         case S_NODE_THEMATIC_BREAK:
             return root;
         case S_NODE_CUE:
-            if (!block->data.cue.isDual) {
+            if (!block->as.cue.isDual) {
                 ASTNode *scues = ast_node_new(node_allocator, S_NODE_SIMULTANEOUS_CUES, block->range.start, block->range.end);
                 ast_node_add_child(root, scues);
                 
@@ -159,7 +159,7 @@ ASTNode *appropriate_container_for_block(CueParser *parser, ASTNode *block)
             if (!ast_node_is_type(cue, S_NODE_CUE))
                 break;
             
-            ASTNode *dir = cue->data.cue.direction;
+            ASTNode *dir = cue->as.cue.direction;
             if (!ast_node_is_type(dir, S_NODE_LYRIC_DIRECTION))
                 break;
             
@@ -199,14 +199,14 @@ void finalize_line(CueParser *parser, ASTNode *block)
             parse_inlines_for_node(parser, block->first_child->first_child, 0);
             break;
         case S_NODE_HEADER: {
-            ASTNode *title = block->data.header.title;
+            ASTNode *title = block->as.header.title;
             if (title) {
                 parse_inlines_for_node(parser, title->first_child, 0);
             }
             break;
         }
         case S_NODE_CUE: {
-            ASTNode *dir = block->data.cue.direction;
+            ASTNode *dir = block->as.cue.direction;
             
             ASTNode *newdir;
             s->loc = dir->range.start;
@@ -244,8 +244,8 @@ void process_line(CueParser *parser)
 }
 
 CueDocument *cue_document_from_utf8(NodeAllocator *node_allocator,
-									const char *buff,
-									size_t len)
+                                    const char *buff,
+                                    size_t len)
 {
     CueParser *parser = cue_parser_new(node_allocator, buff, (uint32_t)len);
     
