@@ -7,7 +7,9 @@ CFLAGS=-Wall -O3
 
 all: program
 
-$(BUILDDIR)/%.o: $(SRCDIR)/%.c $(SRCDIR)/%.h
+$(SRCDIR)/%.c: $(SRCDIR)/%.h
+
+$(BUILDDIR)/%.o: $(SRCDIR)/%.c 
 	mkdir -p $(BUILDDIR)
 	$(CC) -c $(CFLAGS) $< -o $@
 
