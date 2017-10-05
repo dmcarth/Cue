@@ -51,8 +51,11 @@ typedef enum
 	HEADER_FORCED
 } HeaderType;
 
-struct ASTNode
+typedef struct NodeAllocator NodeAllocator;
+
+typedef struct ASTNode
 {
+	NodeAllocator *allocator;
 	uint32_t type;
 	
 	SRange range;
@@ -76,9 +79,20 @@ struct ASTNode
 			struct ASTNode *direction;
 		} cue;
 	} data;
+} ASTNode;
+
+struct NodeAllocator {
+	ASTNode *(*alloc)(struct NodeAllocator*);
+	void (*release)(struct NodeAllocator*, ASTNode *);
+	void *data;
 };
 
-typedef struct ASTNode ASTNode;
+ASTNode *ast_node_new(NodeAllocator *allocator,
+					  ASTNodeType type,
+					  uint32_t loc,
+					  uint32_t len);
+
+void ast_node_free(ASTNode *node);
 
 void ast_node_add_child(ASTNode *node,
 						ASTNode *child);

@@ -4,36 +4,32 @@
 #include <stdio.h>
 
 #include "mem.h"
-#include "pool.h"
 #include "Scanner.h"
 #include "inlines.h"
 #include "parser.h"
 
 struct CueDocument {
-    const char *source;
+	const char *source;
     size_t source_len;
     ASTNode *root;
-    Pool *node_allocator;
 };
 
 CueDocument *cue_document_new(const char *source,
                               size_t source_len,
-                              ASTNode *root,
-                              Pool *node_allocator)
+                              ASTNode *root)
 {
     CueDocument *doc = c_malloc(sizeof(CueDocument));
-    
+	
     doc->source = source;
     doc->source_len = source_len;
     doc->root = root;
-    doc->node_allocator = node_allocator;
     
     return doc;
 }
 
 void cue_document_free(CueDocument *doc)
 {
-    pool_free(doc->node_allocator);
+	//ast_node_free(doc->root);
     
     free(doc);
 }
@@ -43,12 +39,14 @@ ASTNode *cue_document_get_root(CueDocument *doc)
     return doc->root;
 }
 
-CueParser *cue_parser_new(const char *buff, uint32_t len)
+CueParser *cue_parser_new(NodeAllocator *node_allocator,
+						  const char *buff,
+						  uint32_t len)
 {
     CueParser *p = c_malloc(sizeof(CueParser));
     
-    p->node_allocator = pool_new();
-    p->root = pool_create_node(p->node_allocator, S_NODE_DOCUMENT, 0, len);
+    p->node_allocator = node_allocator;
+    p->root = ast_node_new(node_allocator, S_NODE_DOCUMENT, 0, len);
     p->scanner = scanner_new(buff, len);
     p->delimiter_stack = delimiter_stack_new();
     p->bol = 0;
@@ -68,33 +66,36 @@ void cue_parser_free(CueParser *parser)
     free(parser);
 }
 
-ASTNode *ast_node_description_init(Pool *p, uint32_t start, uint32_t wc,
-                               uint32_t ewc, uint32_t end)
+ASTNode *ast_node_description_init(NodeAllocator *node_allocator,
+								   uint32_t start,
+								   uint32_t wc,
+								   uint32_t ewc,
+								   uint32_t end)
 {
-    ASTNode *desc = pool_create_node(p, S_NODE_DESCRIPTION, start, end);
-    ASTNode *stream = pool_create_node(p, S_NODE_STREAM, wc, ewc);
+    ASTNode *desc = ast_node_new(node_allocator, S_NODE_DESCRIPTION, start, end);
+    ASTNode *stream = ast_node_new(node_allocator, S_NODE_STREAM, wc, ewc);
     ast_node_add_child(desc, stream);
-
+	
     return desc;
 }
 
 ASTNode *block_for_line(CueParser *parser)
 {
     Scanner *s = parser->scanner;
-    Pool *p = parser->node_allocator;
+    NodeAllocator *node_allocator = parser->node_allocator;
     ASTNode *block;
     
-    if ((block = scan_for_thematic_break(s, p)) ||
-            (block = scan_for_forced_header(s, p)) ||
-            (block = scan_for_header(s, p)) ||
-            (block = scan_for_end(s, p)) ||
-            (block = scan_for_facsimile(s, p)) ||
-            (block = scan_for_lyric_line(s, p)) ||
-            (block = scan_for_cue(s, p))) {
+    if ((block = scan_for_thematic_break(s, node_allocator)) ||
+            (block = scan_for_forced_header(s, node_allocator)) ||
+            (block = scan_for_header(s, node_allocator)) ||
+            (block = scan_for_end(s, node_allocator)) ||
+            (block = scan_for_facsimile(s, node_allocator)) ||
+            (block = scan_for_lyric_line(s, node_allocator)) ||
+            (block = scan_for_cue(s, node_allocator))) {
         return block;
     }
     
-    block = ast_node_description_init(p, s->bol, s->wc, s->ewc, s->eol);
+    block = ast_node_description_init(node_allocator, s->bol, s->wc, s->ewc, s->eol);
     
     return block;
 }
@@ -102,7 +103,7 @@ ASTNode *block_for_line(CueParser *parser)
 ASTNode *appropriate_container_for_block(CueParser *parser, ASTNode *block)
 {
     ASTNode *root = parser->root;
-    Pool *p = parser->node_allocator;
+    NodeAllocator *node_allocator = parser->node_allocator;
     
     switch (block->type) {
         case S_NODE_HEADER:
@@ -112,7 +113,7 @@ ASTNode *appropriate_container_for_block(CueParser *parser, ASTNode *block)
             return root;
         case S_NODE_CUE:
             if (!block->data.cue.isDual) {
-                ASTNode *scues = pool_create_node(p, S_NODE_SIMULTANEOUS_CUES, block->range.start, block->range.end);
+                ASTNode *scues = ast_node_new(node_allocator, S_NODE_SIMULTANEOUS_CUES, block->range.start, block->range.end);
                 ast_node_add_child(root, scues);
                 
                 return scues;
@@ -140,7 +141,7 @@ ASTNode *appropriate_container_for_block(CueParser *parser, ASTNode *block)
                 
                 ast_node_unlink(stream);
                 
-                pool_release_node(p, stream);
+                ast_node_free(stream);
                 
                 ast_node_extend_length_to_include_child(last, block);
                 return last;
@@ -175,11 +176,11 @@ ASTNode *appropriate_container_for_block(CueParser *parser, ASTNode *block)
     // invalid syntax, fail gracefully
     
     ast_node_unlink(block);
-    pool_release_node(p, block);
+    ast_node_free(block);
     
     Scanner *s = parser->scanner;
     
-    block = ast_node_description_init(p, s->bol, s->wc, s->ewc, s->eol);
+    block = ast_node_description_init(node_allocator, s->bol, s->wc, s->ewc, s->eol);
     
     return root;
 }
@@ -187,7 +188,7 @@ ASTNode *appropriate_container_for_block(CueParser *parser, ASTNode *block)
 void finalize_line(CueParser *parser, ASTNode *block)
 {
     Scanner *s = parser->scanner;
-    Pool *p = parser->node_allocator;
+    NodeAllocator *node_allocator = parser->node_allocator;
     
     switch (block->type) {
         case S_NODE_DESCRIPTION:
@@ -209,16 +210,16 @@ void finalize_line(CueParser *parser, ASTNode *block)
             
             ASTNode *newdir;
             s->loc = dir->range.start;
-            if ((newdir = scan_for_lyric_line(s, p))) {
+            if ((newdir = scan_for_lyric_line(s, node_allocator))) {
                 dir = newdir;
                 dir->type = S_NODE_LYRIC_DIRECTION;
                 
-                ASTNode *line = pool_create_node(p, S_NODE_LINE, dir->range.start, dir->range.end);
+                ASTNode *line = ast_node_new(node_allocator, S_NODE_LINE, dir->range.start, dir->range.end);
                 ast_node_add_child(dir, line);
                 
                 parse_inlines_for_node(parser, line->first_child, 1);
             } else {
-                ASTNode *stream = pool_create_node(p, S_NODE_STREAM, dir->range.start, dir->range.end);
+                ASTNode *stream = ast_node_new(node_allocator, S_NODE_STREAM, dir->range.start, dir->range.end);
                 ast_node_add_child(dir, stream);
                 
                 parse_inlines_for_node(parser, stream, 1);
@@ -242,9 +243,11 @@ void process_line(CueParser *parser)
     return;
 }
 
-CueDocument *cue_document_from_utf8(const char *buff, size_t len)
+CueDocument *cue_document_from_utf8(NodeAllocator *node_allocator,
+									const char *buff,
+									size_t len)
 {
-    CueParser *parser = cue_parser_new(buff, (uint32_t)len);
+    CueParser *parser = cue_parser_new(node_allocator, buff, (uint32_t)len);
     
     Scanner *scanner = parser->scanner;
     
@@ -255,7 +258,7 @@ CueDocument *cue_document_from_utf8(const char *buff, size_t len)
         }
     }
     
-    CueDocument *doc = cue_document_new(buff, len, parser->root, parser->node_allocator);
+    CueDocument *doc = cue_document_new(buff, len, parser->root);
     
     cue_parser_free(parser);
     

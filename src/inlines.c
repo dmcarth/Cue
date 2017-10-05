@@ -2,8 +2,10 @@
 #include "inlines.h"
 #include "mem.h"
 
-DelimiterToken delimiter_token_init(ASTNodeType type, int can_open,
-									uint32_t start, uint32_t end)
+DelimiterToken delimiter_token_init(ASTNodeType type,
+									int can_open,
+									uint32_t start,
+									uint32_t end)
 {
 	DelimiterToken tok = {
 		type,
@@ -142,12 +144,12 @@ void construct_ast(CueParser *parser, ASTNode *node, uint32_t ewc)
 			continue;
 		
 		if (tok->start > last_idx) {
-			ASTNode *literal = pool_create_node(parser->node_allocator, S_NODE_LITERAL, last_idx, tok->start);
+			ASTNode *literal = ast_node_new(parser->node_allocator, S_NODE_LITERAL, last_idx, tok->start);
 			ast_node_add_child(active_parent, literal);
 		}
 		
 		if (tok->event == EVENT_ENTER) {
-			ASTNode *tnode = pool_create_node(parser->node_allocator, tok->type, tok->start, tok->end);
+			ASTNode *tnode = ast_node_new(parser->node_allocator, tok->type, tok->start, tok->end);
 			ast_node_add_child(active_parent, tnode);
 			active_parent = tnode;
 			last_idx = tok->end;
@@ -160,7 +162,7 @@ void construct_ast(CueParser *parser, ASTNode *node, uint32_t ewc)
 	
 	// If any space is left over from the stack, fill with a literal node
 	if (last_idx < node->range.end) {
-		ASTNode *literal = pool_create_node(parser->node_allocator, S_NODE_LITERAL, last_idx, ewc);
+		ASTNode *literal = ast_node_new(parser->node_allocator, S_NODE_LITERAL, last_idx, ewc);
 		ast_node_add_child(active_parent, literal);
 	}
 }

@@ -6,6 +6,42 @@
 #include "mem.h"
 #include "Walker.h"
 
+ASTNode *ast_node_new(NodeAllocator *allocator,
+					  ASTNodeType type,
+					  uint32_t loc,
+					  uint32_t len)
+{
+	// Obtain node from allocator.
+	ASTNode *node = allocator->alloc(allocator);
+	
+	// Setup node.
+	SRange range = { loc, len };
+	
+	node->allocator = allocator;
+	node->type = type;
+	node->range = range;
+	node->parent = NULL;
+	node->first_child = NULL;
+	node->last_child = NULL;
+	node->next = NULL;
+	node->prev = NULL;
+	
+	// If requested node is a stream container, automatically add a stream.
+	if (type == S_NODE_TITLE || type == S_NODE_LINE) {
+		ASTNode *stream = ast_node_new(allocator, S_NODE_STREAM, loc, len);
+		ast_node_add_child(node, stream);
+	}
+	
+	return node;
+}
+
+void ast_node_free(ASTNode *node)
+{
+	NodeAllocator *allocator = node->allocator;
+	
+	allocator->release(allocator, node);
+}
+
 const char *ast_node_type_description(ASTNodeType type)
 {
 	switch (type) {

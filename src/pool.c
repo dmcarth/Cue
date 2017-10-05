@@ -1,28 +1,25 @@
 
-#include "pool.h"
+#include "cue.h"
 
 #include <stdio.h>
 
 #include "mem.h"
 
 // We store pre-allocated nodes in buckets of varying sizes. Each bucket also holds a reference to the next bucket in the list.
-struct Bucket
-{
+typedef struct Bucket {
 	struct Bucket *next;
 	ASTNode *first;
 	size_t head;
 	size_t len;
-};
-
-typedef struct Bucket Bucket;
+} Bucket;
 
 // This pool maintains a linked list of buckets. cap represents the total capacity of all buckets combined.
-struct Pool
+typedef struct Pool
 {
 	Bucket *first;
 	Bucket *last;
 	size_t cap;
-};
+} Pool;
 
 Bucket *bucket_new(size_t len)
 {
@@ -36,7 +33,11 @@ Bucket *bucket_new(size_t len)
 	return b;
 }
 
-Pool *pool_new()
+ASTNode *pool_create_node(NodeAllocator *node_allocator);
+
+void pool_release_node(NodeAllocator *node_allocator, ASTNode *node);
+
+NodeAllocator *stack_allocator_new()
 {
 	Pool *p = c_malloc(sizeof(Pool));
 	
@@ -46,11 +47,18 @@ Pool *pool_new()
 	p->last = p->first;
 	p->cap = cap;
 	
-	return p;
+	NodeAllocator *node_allocator = c_malloc(sizeof(NodeAllocator));
+	
+	node_allocator->alloc = &pool_create_node;
+	node_allocator->release = &pool_release_node;
+	node_allocator->data = p;
+	
+	return node_allocator;
 }
 
-void pool_free(Pool *p)
+void stack_allocator_free(NodeAllocator *node_allocator)
 {
+	Pool *p = node_allocator->data;
 	Bucket *b = p->first;
 	Bucket *next;
 	
@@ -65,10 +73,14 @@ void pool_free(Pool *p)
 	}
 	
 	free(p);
+	
+	free(node_allocator);
 }
 
-ASTNode *pool_create_node(Pool *p, ASTNodeType type, uint32_t loc, uint32_t len)
+ASTNode *pool_create_node(NodeAllocator *node_allocator)
 {
+	Pool *p = node_allocator->data;
+	
 	Bucket *b = p->last;
 	
 	// If current bucket is full, create a new one.
@@ -84,29 +96,14 @@ ASTNode *pool_create_node(Pool *p, ASTNodeType type, uint32_t loc, uint32_t len)
 	// Obtain pointer to next available ast_node and increment b->head.
 	ASTNode *node = b->first + b->head++;
 	
-	// Setup node.
-	SRange range = { loc, len };
-	
-	node->type = type;
-	node->range = range;
-	node->parent = NULL;
-	node->first_child = NULL;
-	node->last_child = NULL;
-	node->next = NULL;
-	node->prev = NULL;
-	
-	// If requested node is a stream container, automatically add a stream.
-	if (type == S_NODE_TITLE || type == S_NODE_LINE) {
-		ASTNode *stream = pool_create_node(p, S_NODE_STREAM, loc, len);
-		ast_node_add_child(node, stream);
-	}
-	
 	return node;
 }
 
 // Releases a given ast_node pointer back into the pool. Assumes that ast_node is at the top of the stack. If node isn't at the top of the stack, it will persist in memory until the pool is freed.
-void pool_release_node(Pool *p, ASTNode *node)
+void pool_release_node(NodeAllocator *node_allocator, ASTNode *node)
 {
+	Pool *p = node_allocator->data;
+	
 	Bucket *b = p->last;
 	
 	if (b->first + b->head - 1 == node) {

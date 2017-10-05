@@ -75,8 +75,10 @@ void benchmark_parsing_string(String *str,
 	for (int i = 0; i < iterations; ++i) {
 		clock_t t1 = clock();
 		
-		CueDocument *doc = cue_document_from_utf8(str->buff, str->len);
+		NodeAllocator *alloc = stack_allocator_new();
+		CueDocument *doc = cue_document_from_utf8(alloc, str->buff, str->len);
 		cue_document_free(doc);
+		stack_allocator_free(alloc);
 		
 		clock_t t2 = clock();
 		
@@ -159,7 +161,8 @@ void handle_request(CLIRequest *req)
 			benchmark_parsing_string(str, file_path, req->bench_iterations);
 		}
 		
-		CueDocument *doc = cue_document_from_utf8(str->buff, str->len);
+		NodeAllocator *alloc = stack_allocator_new();
+		CueDocument *doc = cue_document_from_utf8(alloc, str->buff, str->len);
 		
 		if (req->options & CUE_OPTION_AST) {
 			ASTNode *root = cue_document_get_root(doc);
@@ -167,6 +170,7 @@ void handle_request(CLIRequest *req)
 		}
 		
 		cue_document_free(doc);
+		stack_allocator_free(alloc);
 		
 		string_free(str);
 	}

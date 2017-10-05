@@ -4,13 +4,12 @@
 
 #include <stdint.h>
 
-#include "pool.h"
 #include "nodes.h"
 #include "Scanner.h"
 #include "inlines.h"
 
 typedef struct {
-	Pool *node_allocator;
+	NodeAllocator *node_allocator;
 	ASTNode *root;
 	Scanner *scanner;
 	DelimiterStack *delimiter_stack;
