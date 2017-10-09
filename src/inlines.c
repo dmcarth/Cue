@@ -57,7 +57,7 @@ void delimiter_stack_push(DelimiterStack *st,
                           DelimiterToken tok)
 {
 	if (st->len >= st->cap)
-		delimiter_stack_resize(st, st->cap * 2);
+		delimiter_stack_resize(st, st->cap * 1.5);
 	
 	st->first[st->len++] = tok;
 }
